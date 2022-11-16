@@ -1,0 +1,5 @@
+imports_layout = "Horizontal"
+imports_granularity = "Crate"
+imports_indent = "Visual"
+group_imports = "One"
+max_width = 150
