@@ -1,31 +1,31 @@
-import Service_STT                   from "./stt";
-import Service_VRC                   from "./vrc";
-import {proxy, subscribe}            from "valtio";
-import Ajv                           from "ajv";
-import {backendSchema, BackendState} from "./schema";
-
+import Service_STT from "./stt";
+import Service_VRC from "./vrc";
+import { proxy, subscribe } from "valtio";
+import Ajv from "ajv";
+import { backendSchema, BackendState } from "./schema";
+import Service_PubSub from "./pubsub";
 
 export enum Services {
   vrc,
   stt,
   tts,
-  twitch
+  twitch,
 }
 
 class Backend {
   constructor() {
-    const ajv      = new Ajv({useDefaults: "empty", removeAdditional: true});
+    const ajv = new Ajv({ useDefaults: "empty", removeAdditional: true });
     const validate = ajv.compile(backendSchema);
 
-    let str  = localStorage.getItem('backendState');
+    let str = localStorage.getItem("backendState");
     let data = {};
-    if (str) try {
-      data = JSON.parse(str);
-    } catch (error) {
-      console.error("invalid data format");
-    }
-    if (typeof data !== "object")
-      data = {};
+    if (str)
+      try {
+        data = JSON.parse(str);
+      } catch (error) {
+        console.error("invalid data format");
+      }
+    if (typeof data !== "object") data = {};
     validate(data);
     this.state = proxy<BackendState>(data as BackendState);
     console.log(this.state);
@@ -37,7 +37,8 @@ class Backend {
   public isClient = false;
 
   public readonly stt = new Service_STT();
-  public readonly osc = new Service_VRC();
+  public readonly vrc = new Service_VRC();
+  public readonly pubsub = new Service_PubSub();
 
   public changeTheme(value: string) {
     this.state.clientTheme = value;
@@ -45,17 +46,16 @@ class Backend {
   }
 
   private save_state() {
-    localStorage.setItem('backendState', JSON.stringify(this.state));
+    localStorage.setItem("backendState", JSON.stringify(this.state));
   }
 
   public async Init() {
-    const q       = new URLSearchParams(window.location.search.substring(1));
-    this.isClient = window.location.pathname.startsWith('/client');
-    if (this.isClient && !q.has("c"))
-      throw Error("invalid host netId");
+    const q = new URLSearchParams(window.location.search.substring(1));
+    this.isClient = window.location.pathname.startsWith("/client");
+    if (this.isClient && !q.has("c")) throw Error("invalid host netId");
 
     subscribe(this.state, () => this.save_state());
-
+    this.vrc.init();
     // await this.document.LoadLocalState();
     // this.network.Init();
     if (this.isClient) {
@@ -65,8 +65,7 @@ class Backend {
       //   this.files.Init(); // load files/blobs
       //   await this.addons.Init();
       //   this.fields.Init(); // load/initialize plugins
-    }
-    else {
+    } else {
       //   // this.CreateInputWindow();
       //   this.state.theme = window.API.document.getLocalData("theme") as string || "night";
       //   this.changeTheme(this.state.theme);

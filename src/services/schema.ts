@@ -50,5 +50,6 @@ export const backendSchema: JSONSchemaType<BackendState> = {
       required:   ["vrc", "stt", "tts", "twitch"],
     }
   },
+  additionalProperties: false,
   required:   ["clientTheme", "services"]
 }

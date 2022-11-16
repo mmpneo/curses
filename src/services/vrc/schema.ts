@@ -1,16 +1,23 @@
 import {JSONSchemaType} from "ajv";
 
 export type VRC_State = {
-  indicator: boolean
+  sendStt: boolean,
+  sendText: boolean,
+  indicator: boolean,
+  // interim: boolean
 };
 
 const Schema_VRC: JSONSchemaType<VRC_State> = {
   type: "object",
   properties: {
-    indicator: {type: "boolean", default: false}
+    sendStt: {type: "boolean", default: false},
+    sendText: {type: "boolean", default: false},
+    indicator: {type: "boolean", default: false},
+    // interim: {type: "boolean", default: false},
   },
-  required: ["indicator"],
-  default: {}
+  required: ["sendStt", "sendText", "indicator"],
+  default: {},
+  additionalProperties: false
 }
 
 export default Schema_VRC

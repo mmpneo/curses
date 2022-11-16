@@ -695,6 +695,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/lodash@npm:^4.14.189":
+  version: 4.14.189
+  resolution: "@types/lodash@npm:4.14.189"
+  checksum: 096d1e0954794fb76bd6a0ea443067f02004b53e3c59ac6e3fed88817a1468fc2e6614abdf44341f5e0fdff5f9a3c94a934cc9ff7126e07efbcd94355a21fe45
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:^18.7.10":
   version: 18.11.9
   resolution: "@types/node@npm:18.11.9"
@@ -706,6 +713,13 @@ __metadata:
   version: 15.7.5
   resolution: "@types/prop-types@npm:15.7.5"
   checksum: 5b43b8b15415e1f298243165f1d44390403bb2bd42e662bca3b5b5633fdd39c938e91b7fce3a9483699db0f7a715d08cef220c121f723a634972fdf596aec980
+  languageName: node
+  linkType: hard
+
+"@types/pubsub-js@npm:^1.8.3":
+  version: 1.8.3
+  resolution: "@types/pubsub-js@npm:1.8.3"
+  checksum: 10161a266ad6e35f059e0d8aca2612530ea1c747812b813ecc7934cd0aec5f7ca1d6f8fdea91d79ffaea698cde2e873f0c8a402210bc32861a16e88661d1c797
   languageName: node
   linkType: hard
 
@@ -2069,6 +2083,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash@npm:^4.17.21":
+  version: 4.17.21
+  resolution: "lodash@npm:4.17.21"
+  checksum: eb835a2e51d381e561e508ce932ea50a8e5a68f4ebdd771ea240d3048244a8d13658acbd502cd4829768c56f2e16bdd4340b9ea141297d472517b83868e677f7
+  languageName: node
+  linkType: hard
+
 "loose-envify@npm:^1.1.0, loose-envify@npm:^1.4.0":
   version: 1.4.0
   resolution: "loose-envify@npm:1.4.0"
@@ -2574,6 +2595,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"pubsub-js@npm:^1.9.4":
+  version: 1.9.4
+  resolution: "pubsub-js@npm:1.9.4"
+  checksum: 4644a74d0731786bc10b5b01418ee8221f1dcd3ce6b6b011cf383059f625d6ce658e83c234c67dcdd3058023867bdcf128c1edff6cc05d09a3206d2276e14d36
+  languageName: node
+  linkType: hard
+
 "punycode@npm:^2.1.0":
   version: 2.1.1
   resolution: "punycode@npm:2.1.1"
@@ -2886,7 +2914,9 @@ __metadata:
     "@floating-ui/react-dom-interactions": ^0.11.0
     "@tauri-apps/api": ^1.1.0
     "@tauri-apps/cli": ^1.1.0
+    "@types/lodash": ^4.14.189
     "@types/node": ^18.7.10
+    "@types/pubsub-js": ^1.8.3
     "@types/react": ^18.0.15
     "@types/react-dom": ^18.0.6
     "@vitejs/plugin-react": ^2.0.0
@@ -2895,8 +2925,10 @@ __metadata:
     classnames: ^2.3.2
     daisyui: ^2.40.1
     framer-motion: ^7.6.7
+    lodash: ^4.17.21
     postcss: ^8.4.19
     prettier: ^2.7.1
+    pubsub-js: ^1.9.4
     react: ^18.2.0
     react-dom: ^18.2.0
     react-icons: ^4.6.0

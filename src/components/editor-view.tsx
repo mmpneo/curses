@@ -2,6 +2,7 @@ import {FC, FormEvent, useState} from "react";
 import Sidebar                   from "./sidebar";
 import Actionbar                 from "./actionbar";
 import Canvas                    from "./canvas";
+import { TextEventSource, TextEventType } from "../types";
 
 const EditorView: FC = () => {
   return <div className="relative bg-base-300 w-screen h-screen flex overflow-hidden">
@@ -43,12 +44,12 @@ const STTInput: FC = () => {
     if (!inputValue)
       return;
     setInputValue('');
-    // window.API.pubsub.publish("inputfield.final", inputValue, {replicate: true});
+    window.API.pubsub.publishText(TextEventSource.textfield, {type: TextEventType.final, value: inputValue});
   }
-
-  const handleChange = (e: string) => {
-    // window.API.pubsub.publish("inputfield.interim", e, {replicate: true});
-    setInputValue(e);
+  
+  const handleChange = (value: string) => {
+    window.API.pubsub.publishText(TextEventSource.textfield, {type: TextEventType.interim, value});
+    setInputValue(value);
   }
 
   return <div className="flex items-center space-x-2 p-4 w-96">
