@@ -6,10 +6,10 @@ import { backendSchema, BackendState } from "./schema";
 import Service_PubSub from "./pubsub";
 
 export enum Services {
-  vrc,
-  stt,
-  tts,
-  twitch,
+  vrc = "vrc",
+  stt = "stt",
+  tts = "tts",
+  twitch = "twitch",
 }
 
 class Backend {

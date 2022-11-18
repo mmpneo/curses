@@ -1,4 +1,4 @@
-import {IServiceInterface} from "../schema";
+import { IServiceInterface } from "../../types";
 
 class Service_Twitch implements IServiceInterface {
   init(): void {

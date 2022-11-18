@@ -1,6 +1,5 @@
-import { IServiceInterface } from "../schema";
 import { invoke } from "@tauri-apps/api/tauri";
-import { TextEventSource, TextEventType } from "../../types";
+import { IServiceInterface, TextEventSource, TextEventType } from "../../types";
 import throttle from "lodash/throttle";
 
 class Service_VRC implements IServiceInterface {

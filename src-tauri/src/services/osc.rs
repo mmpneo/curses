@@ -1,14 +1,9 @@
-use std::net::{SocketAddr, SocketAddrV4, UdpSocket};
-use std::str::FromStr;
+use std::net::{SocketAddr, UdpSocket};
 
 use rosc::{encoder, OscMessage, OscPacket, OscType};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tauri::{Builder, command, State, Wry};
-
-fn get_addr_from_arg(arg: &str) -> SocketAddrV4 {
-    SocketAddrV4::from_str(arg).unwrap()
-}
 
 pub struct OscPlugin {
     socket: Option<UdpSocket>,
@@ -60,7 +55,7 @@ pub struct RpcOscMessage {
 }
 
 #[command]
-pub fn osc_send(rpc: RpcOscMessage, mut state: State<OscPlugin>) {
+pub fn osc_send(rpc: RpcOscMessage, state: State<OscPlugin>) {
     state.send(rpc);
 }
 

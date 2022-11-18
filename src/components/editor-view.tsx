@@ -1,16 +1,19 @@
-import {FC, FormEvent, useState} from "react";
-import Sidebar                   from "./sidebar";
-import Actionbar                 from "./actionbar";
-import Canvas                    from "./canvas";
+import { FC, FormEvent, useState } from "react";
+import Sidebar from "./sidebar";
+import Actionbar from "./actionbar";
+import Canvas from "./canvas";
 import { TextEventSource, TextEventType } from "../types";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const EditorView: FC = () => {
   return <div className="relative bg-base-300 w-screen h-screen flex overflow-hidden">
-    <Sidebar/>
-    <EditorViewport/>
+    <Sidebar />
+    <EditorViewport />
     <div className="absolute top-3 right-4">
-      <Actionbar/>
+      <Actionbar />
     </div>
+    <ToastContainer />
   </div>
 }
 
@@ -18,7 +21,7 @@ export const EditorViewport: FC = () => {
   const [[x, y], setTranslate] = useState([0, 0]);
 
   const handleStartPan = (e: any) => {
-    const onUp   = () => {
+    const onUp = () => {
       document.removeEventListener("mouseup", onUp);
       document.removeEventListener("mousemove", onMove);
     }
@@ -28,12 +31,12 @@ export const EditorViewport: FC = () => {
   }
 
   return <div onMouseDown={event => event.button === 1 && handleStartPan(event)} className="relative flex flex-grow items-center justify-center overflow-hidden">
-    <div className="rounded-lg border border-dashed border-divider" style={{
+    <div className="rounded-lg border-2 border-dashed border-base-100" style={{
       transform: `translate3d(${x}px, ${y}px, 0px)`,
     }}>
-      <Canvas/>
+      <Canvas />
     </div>
-    <div className="absolute bottom-4"><STTInput/></div>
+    <div className="absolute bottom-4"><STTInput /></div>
   </div>
 }
 
@@ -44,18 +47,18 @@ const STTInput: FC = () => {
     if (!inputValue)
       return;
     setInputValue('');
-    window.API.pubsub.publishText(TextEventSource.textfield, {type: TextEventType.final, value: inputValue});
+    window.API.pubsub.publishText(TextEventSource.textfield, { type: TextEventType.final, value: inputValue });
   }
-  
+
   const handleChange = (value: string) => {
-    window.API.pubsub.publishText(TextEventSource.textfield, {type: TextEventType.interim, value});
+    window.API.pubsub.publishText(TextEventSource.textfield, { type: TextEventType.interim, value });
     setInputValue(value);
   }
 
   return <div className="flex items-center space-x-2 p-4 w-96">
     {/* <button className="btn btn-circle btn-ghost"><RiChatDeleteFill/></button> */}
     <form onSubmit={submit} className="w-full">
-      <input autoComplete="off" name="sttimput" placeholder="Type something and press [Enter]" className="w-full input" value={inputValue} onChange={e => handleChange(e.target.value)}/>
+      <input autoComplete="off" name="sttimput" placeholder="Type something and press [Enter]" className="w-full input text-sm" value={inputValue} onChange={e => handleChange(e.target.value)} />
     </form>
   </div>
 }

@@ -14,10 +14,6 @@ export interface BackendState {
   }
 }
 
-export interface IServiceInterface {
-  init(): void;
-}
-
 
 type ServiceState<Data = any> = {
   autoStart: boolean

@@ -1,5 +1,5 @@
 import { STT_State } from "../schema";
-import {ISpeechRecognitionService} from "../types";
+import {ISpeechRecognitionService, SpeechServiceEventBindings} from "../types";
 
 export const browserDefaultParams = {
   lang: "en-US",
@@ -7,25 +7,19 @@ export const browserDefaultParams = {
   interim: true
 }
 
-export class BrowserSpeechRecognitionService implements ISpeechRecognitionService{
-  constructor(
-    private onStart: () => void,
-    private onStop: (reason?: string) => void,
-    private onInterim: (value: string) => void,
-    private onFinal: (value: string) => void,
-) {
+export class STT_BrowserService implements ISpeechRecognitionService{
+  constructor(private bindings: SpeechServiceEventBindings) {
     const sp = ((<any>window).webkitSpeechRecognition) || ((<any>window).SpeechRecognition);
     this.#instance = new sp();
-    this.#instance.addEventListener("start", () => this.onStart());
+    this.#instance.addEventListener("start", () => this.bindings.onStart());
     this.#instance.onresult = (event: any) => this.#processResults(event);
     window.addEventListener("beforeunload", () => { // temp fix for edge freezing on page reload
       this.#instance?.stop();
     });
     this.#instance.addEventListener("error", (error: any) => { // listener for active connection
-      this.onStop(error.error);
+      this.bindings.onStop(error.error);
     })
   }
-  // speechrecognition instance
   
   #instance: any;
 
@@ -38,23 +32,25 @@ export class BrowserSpeechRecognitionService implements ISpeechRecognitionServic
     for (let i = event.resultIndex; i < event.results.length; ++i) {
       if (event.results[i].isFinal) {
         final_transcript += event.results[i][0].transcript;
-        this.onFinal(final_transcript);
+        this.bindings.onFinal(final_transcript);
       }
       else {
         interim_transcript += event.results[i][0].transcript;
-        this.onInterim(interim_transcript);
+        this.bindings.onInterim(interim_transcript);
       }
     }
   }
 
   start(params: STT_State): void {
-    this.#instance.lang           = params.lang_name;
+    this.#instance.lang           = "en-US";
     this.#instance.continuous     = true;
-    this.#instance.interimResults = params.interim;
+    this.#instance.interimResults = true;
 
-    this.#instance.onend = () => {
+    
+
+    this.#instance.onend = (e: any) => {
       setTimeout(() => this.#instance.start(), 1000);
-      console.log(`[Native] Restart`);
+      console.log(`[Native] Restart`, e);
     } // auto restart after silence
     this.#instance.start();
   }
@@ -62,7 +58,7 @@ export class BrowserSpeechRecognitionService implements ISpeechRecognitionServic
   stop(): void {
     this.#instance.onend = null;
     this.#instance?.stop?.()
-    this.onStop();
+    this.bindings.onStop();
   }
 
 }
