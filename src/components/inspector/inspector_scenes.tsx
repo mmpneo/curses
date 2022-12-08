@@ -1,23 +1,23 @@
 import { FC } from "react";
 import Inspector from ".";
 import { useGetState, useUpdateState } from "../../frontend-services";
-import { nanoid } from "nanoid";
-import { SceneState } from "../../frontend-services/schema";
 import Input from "../input";
-import { RiDeleteBack2Fill, RiStarFill, RiStarLine } from "react-icons/ri";
+import { RiCheckboxBlankCircleLine, RiCheckboxCircleFill, RiDeleteBack2Fill, RiStackFill } from "react-icons/ri";
+import classNames from "classnames";
+import { SceneState } from "../../frontend-services/schema/scene";
 
 const Scene: FC<{ data: SceneState }> = ({ data }) => {
-  const defaultScene = useGetState(state => state.defaultScene);
+  const defaultScene = useGetState(state => state.activeScene);
   const update = useUpdateState();
-  return <div className="group flex flex-col space-y-1 p-2 border rounded-md border-neutral">
-    {/* <span className="text-sm flex-grow">{data.name}</span> */}
-
-    <Input.Text label="Name" value={data.name} onChange={e => update(state => {state.scenes[data.id].name = e.target.value})} />
-    <Input.Text label="OBS name" value={data.bindOBSName} onChange={e => update(state => {state.scenes[data.id].bindOBSName = e.target.value})} />
-    <Input.Checkbox label="Bind OBS" value={data.bindOBS} onChange={e => update(state => {state.scenes[data.id].bindOBS = e})} />
-    <div className="flex space-x-2">
-      <button className="btn btn-sm btn-ghost gap-2 flex-grow" onClick={() => window.APIFrontend.scenes.setDefault(data.id)}>{defaultScene === data.id ? <RiStarFill/> : <RiStarLine/>} Make default</button>
-      <button disabled={data.id === "main"} className="btn btn-sm gap-2 btn-error" onClick={() => window.APIFrontend.scenes.deleteScene(data.id)}><RiDeleteBack2Fill/> Delete</button>
+  return <div className="group flex flex-col border space-y-2 px-3 py-2 bg-base-200 rounded-md border-neutral/10">
+    <Input.Text label="Name" value={data.name} onChange={e => update(state => { state.scenes[data.id].name = e.target.value })} />
+    <Input.Checkbox label="Bind to OBS" value={data.bindOBS} onChange={e => update(state => { state.scenes[data.id].bindOBS = e })} />
+    {data.bindOBS && <Input.Text label="OBS scene name" value={data.bindOBSName} onChange={e => update(state => { state.scenes[data.id].bindOBSName = e.target.value })} />}
+    <div className="flex justify-end space-x-2">
+      <button className={classNames("btn btn-sm gap-2", defaultScene === data.id ? "btn-success" : "btn-ghost")} onClick={() => window.APIFrontend.scenes.setActive(data.id)}>
+        {defaultScene === data.id ? <RiCheckboxCircleFill className="text-lg" /> : <RiCheckboxBlankCircleLine className="text-lg" />}
+        Active</button>
+      <button disabled={data.id === "main"} className="btn btn-sm gap-2 btn-error" onClick={() => window.APIFrontend.scenes.deleteScene(data.id)}><RiDeleteBack2Fill /> Delete</button>
     </div>
   </div>
 }
@@ -30,11 +30,13 @@ const Inspector_Scenes: FC = () => {
 
   // create scene
   return <Inspector.Body>
-    <Inspector.Header>Layout & Scenes</Inspector.Header>
+    <Inspector.Header><RiStackFill /> Layout & Scenes</Inspector.Header>
     <Inspector.Content>
       <Inspector.SubHeader>Canvas</Inspector.SubHeader>
-      <Input.Text label="Canvas width" type="number" value={canvas?.w} onChange={e => updateState(state => { state.canvas.w = parseFloat(e.target.value) })} />
-      <Input.Text label="Canvas height" type="number" value={canvas?.h} onChange={e => updateState(state => { state.canvas.h = parseFloat(e.target.value) })} />
+      <Input.DoubleCountainer label="Canvas Size">
+        <Input.BaseText value={canvas?.w} onChange={e => updateState(state => { state.canvas.w = parseFloat(e.target.value) })} type="number"/>
+        <Input.BaseText value={canvas?.h} onChange={e => updateState(state => { state.canvas.h = parseFloat(e.target.value) })} type="number"/>
+      </Input.DoubleCountainer>
 
       <Inspector.SubHeader>Scenes</Inspector.SubHeader>
       {scenes && Object.keys(scenes).map((sceneId) => <Scene key={sceneId} data={scenes[sceneId]} />)}

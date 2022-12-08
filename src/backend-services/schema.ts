@@ -6,6 +6,11 @@ import Schema_TTS, {TTS_State}       from "./tts/schema";
 
 export interface BackendState {
   clientTheme: string
+  shortcuts: {
+    start: string;
+    muteMic: string;
+    muteSound: string;
+  },
   services: {
     stt: ServiceState<STT_State>
     tts: ServiceState<TTS_State>
@@ -34,6 +39,16 @@ export const backendSchema: JSONSchemaType<BackendState> = {
   type:       "object",
   properties: {
     clientTheme: {type: "string", default: "night"},
+    shortcuts:    {
+      type:       "object",
+      properties: {
+        muteMic: {type: "string", default: ""},
+        muteSound: {type: "string", default: ""},
+        start: {type: "string", default: ""},
+      },
+      default:    {} as any,
+      required:   ["muteMic", "muteSound", "start"],
+    },
     services:    {
       type:       "object",
       properties: {

@@ -1,5 +1,7 @@
 import { FC } from "react";
+import { RiMessage2Fill } from "react-icons/ri";
 import { useSnapshot } from "valtio";
+import Input from "../../components/input";
 import Inspector from "../../components/inspector";
 import { VRC_State } from "./schema";
 
@@ -8,27 +10,12 @@ const Inspector_VRC: FC = () => {
   const handleUpdate = (key: keyof VRC_State, v: boolean) => window.API.state.services.vrc.data[key] = v;
 
   return <Inspector.Body>
-    <Inspector.Header>Vrchat text bubble</Inspector.Header>
+    <Inspector.Header><RiMessage2Fill /> Vrchat text bubble</Inspector.Header>
     <Inspector.Content>
-      <fieldset>
-        <label htmlFor="vrc-stt">Send from STT</label>
-        <input onChange={e => handleUpdate("sendStt", e.target.checked)} checked={state.sendStt} id="vrc-stt" type="checkbox" className="toggle toggle-primary" />
-      </fieldset>
-
-      <fieldset>
-        <label htmlFor="vrc-input-field">Send from input field</label>
-        <input onChange={e => handleUpdate("sendText", e.target.checked)} checked={state.sendText} id="vrc-input-field" type="checkbox" className="toggle toggle-primary" />
-      </fieldset>
-      {/* <fieldset>
-        <label htmlFor="vrc-interim">Use interim results</label>
-        <input onChange={e => handleUpdate("interim", e.target.checked)} checked={state.interim} id="vrc-interim" type="checkbox" className="toggle toggle-primary"/>
-        </fieldset> */}
-
-      <fieldset>
-        <label htmlFor="vrc-indicator">Show typing indicator</label>
-        <input onChange={e => handleUpdate("indicator", e.target.checked)} checked={state.indicator} id="vrc-indicator" type="checkbox" className="toggle toggle-primary" />
-      </fieldset>
-
+      <Input.Checkbox label="Send from STT" value={state.sendStt} onChange={e => handleUpdate("sendStt", e)} />
+      <Input.Checkbox label="Send from input field" value={state.sendText} onChange={e => handleUpdate("sendText", e)} />
+      <Input.Checkbox label="Show indicator" value={state.indicator} onChange={e => handleUpdate("indicator", e)} />
+      {/* <Input.Checkbox label="Use interim results" value={state.interim} onChange={e => handleUpdate("interim", e)} /> */}
       <button className="btn btn-sm" onClick={() => window.API.vrc.sendTest("Test test test!")}>Send Test</button>
     </Inspector.Content>
   </Inspector.Body>

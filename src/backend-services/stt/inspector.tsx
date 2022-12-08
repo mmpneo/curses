@@ -6,6 +6,7 @@ import ServiceLanguageSelect from "./language-select";
 import { azureLanguages, deepGramLangs } from "./service_data";
 import Inspector from "../../components/inspector";
 import Input from "../../components/input";
+import { RiMicFill } from "react-icons/ri";
 
 const Browser: FC = () => {
   const pr = useSnapshot(window.API.state.services.stt.data);
@@ -27,11 +28,11 @@ const Azure: FC = () => {
 
     <ServiceLanguageSelect library={azureLanguages} />
 
-    <Input.Select label="Profanity" value={pr.azure_profanity} onChange={e => handleUpdate("azure_profanity", e.target.value)}>
-      <option value="masked">Masked</option>
-      <option value="removed">Removed</option>
-      <option value="raw">Raw</option>
-    </Input.Select>
+    <Input.Select options={[
+      { label: 'Masked', value: 'masked' },
+      { label: 'Removed', value: 'removed' },
+      { label: 'Raw', value: 'raw' },
+    ]} label="Profanity" value={{ value: pr.azure_profanity, label: pr.azure_profanity }} onChange={(e: any) => handleUpdate("azure_profanity", e.value)} />
 
     <Input.Checkbox label="Interim result" onChange={e => handleUpdate("interim", e)} value={pr.interim} />
   </>
@@ -46,10 +47,10 @@ const Deepgram: FC = () => {
 
     <ServiceLanguageSelect library={deepGramLangs} />
 
-    <Input.Select label="Quality" value={pr.deepgram_tier} onChange={e => handleUpdate("deepgram_tier", e.target.value)}>
-      <option value="base">Base</option>
-      <option value="enhanced">Enchanced</option>
-    </Input.Select>
+    <Input.Select options={[
+      { label: 'Base', value: 'base' },
+      { label: 'Enchanced', value: 'enchanced' },
+    ]} label="Quality" value={{ value: pr.deepgram_tier, label: pr.deepgram_tier }} onChange={(e: any) => handleUpdate("deepgram_tier", e.value)} />
 
     <span className="text-base-content/60 text-xs">
       Some languages cannot be used with "enchanced" quality option
@@ -71,15 +72,15 @@ const Inspector_STT: FC = () => {
   const handleBackend = (v: STT_Backends) => window.API.state.services.stt.data.backend = v;
 
   return <Inspector.Body>
-    <Inspector.Header>Speech to text</Inspector.Header>
+    <Inspector.Header><RiMicFill /> Speech to text</Inspector.Header>
     <Inspector.Content>
       <Input.Checkbox label="Start with play button" onChange={handleStart} value={data.autoStart} />
 
-      <Input.Select label="Service" value={data.data.backend} onChange={e => handleBackend(e.target.value as STT_Backends)}>
-        <option value={STT_Backends.browser}>Browser</option>
-        <option value={STT_Backends.azure}>Azure</option>
-        <option value={STT_Backends.deepgram}>Deepgram</option>
-      </Input.Select>
+      <Input.Select options={[
+        { label: "Browser", value: STT_Backends.browser },
+        { label: "Azure", value: STT_Backends.azure },
+        { label: "Deepgram", value: STT_Backends.deepgram }
+      ]} label="Service" value={{ value: data.data.backend, label: data.data.backend }} onChange={(e: any) => handleBackend(e.value as STT_Backends)} />
 
       {data.data.backend === STT_Backends.browser && <Browser />}
       {data.data.backend === STT_Backends.azure && <Azure />}

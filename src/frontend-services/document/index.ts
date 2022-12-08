@@ -9,12 +9,12 @@ import {
 } from "@tauri-apps/api/fs";
 import { bind, Binder } from "immer-yjs";
 import { toast } from "react-toastify";
-import { createDocumentState } from "../schema";
+import { createDocumentState, DocumentState } from "../schema";
 import { debounce } from "lodash";
 
 class Service_Document implements IServiceInterface {
   #file: Y.Doc = new Y.Doc();
-  fileBinder!: Binder<any>;
+  fileBinder!: Binder<DocumentState>;
 
   get template() {
     return this.#file?.getMap("template");
@@ -50,9 +50,13 @@ class Service_Document implements IServiceInterface {
     });
   }, 1000);
 
-  async init() {
-    this.fileBinder = bind<any>(this.#file.getMap("template"));
+  patch(patchFn: (state: DocumentState) => void) {
+    this.file.transact((_) => {
+      this.fileBinder.update(patchFn);
+    });
+  }
 
+  async init() {
     const loadState = await this.loadDocument();
     if (loadState) {
       Y.applyUpdate(this.#file, loadState);
@@ -63,6 +67,8 @@ class Service_Document implements IServiceInterface {
         this.saveDocument();
       });
     }
+    this.fileBinder = bind<any>(this.#file.getMap("template"));
+    console.log("Loaded template", this.#file.getMap("template").toJSON());
 
     this.#file.on("update", () => {
       this.saveDocument();
@@ -70,7 +76,7 @@ class Service_Document implements IServiceInterface {
   }
 
   async initClient() {
-    if (this.#file) this.fileBinder = bind<any>(this.#file.getMap("template"));
+    if (this.#file) this.fileBinder = bind<DocumentState>(this.#file.getMap("template"));
     await new Promise((res, rej) => {
       this.#file?.once("update", res);
     });

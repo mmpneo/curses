@@ -4,7 +4,8 @@ import { ButtonHTMLAttributes, createContext, FC, PropsWithChildren, useCallback
 import { RiAddFill, RiCloseFill, RiFontSize, RiImageFill, RiMessage2Fill, RiMicFill, RiSettings2Fill, RiStackFill, RiTwitchFill, RiVoiceRecognitionFill } from "react-icons/ri";
 import { TbArrowBarToLeft, TbArrowBarToRight, TbTextResize } from "react-icons/tb";
 import { Services } from "../backend-services";
-import { ElementType } from "../frontend-services/schema";
+import { useGetState } from "../frontend-services";
+import { ElementType } from "../frontend-services/schema/element";
 import { InspectorTabPath } from "../types";
 import Dropdown from "./dropdown/Dropdown";
 import Tooltip from "./dropdown/Tooltip";
@@ -52,7 +53,7 @@ const SideBarButtonBase: FC<PropsWithChildren<Omit<ButtonProps, "tab"> & { activ
 
 const SideBarButton: FC<PropsWithChildren<ButtonProps>> = memo(({ tab, ...props }) => {
   const { show, expand, ...ctx } = useContext(sidebarContext);
-  const active = show && ctx.tab?.tab === tab.tab;
+  const active = show && ctx.tab?.tab === tab.tab && ctx.tab?.value === tab.value;
   return <SideBarButtonBase {...props} active={active} onClick={() => ctx.changeTab(tab)} />
 });
 
@@ -61,14 +62,51 @@ const Divider: FC = () => {
 }
 
 const AddElementsMenu: FC = () => {
+  const handleAdd = (type: ElementType) => {
+    window.APIFrontend.elements.addElement(type);
+  }
   return (
     <ul className="dropdown p-2">
       <li className="menu-title"><span>Elements</span></li>
-      <li><button>Add text</button></li>
-      <li><button>Add image</button></li>
+      <li><button onClick={() => handleAdd(ElementType.text)}>Add text</button></li>
+      <li><button onClick={() => handleAdd(ElementType.image)}>Add image</button></li>
     </ul>
   );
 };
+
+const ElementMenu: FC<{id: string, title: string}> = ({id, title}) => {
+  const handleRemove = () => {
+    window.APIFrontend.elements.removeElement(id);
+  }
+  return (
+    <ul className="dropdown p-2">
+      <li className="menu-title"><span>{title}</span></li>
+      <li><button onClick={() => handleRemove()}>Remove element</button></li>
+      <li><button>Add to scene</button></li>
+      <li><button>Remove from scene</button></li>
+    </ul>
+  );
+};
+
+const SidebarElementButton: FC<{ id: string }> = memo(({ id }) => {
+  const name = useGetState(state => state.elements[id].name);
+  const type = useGetState(state => state.elements[id].type);
+  console.log("sidebar ele")
+  return <Dropdown interact="context" placement="right" content={<ElementMenu title={name} id={id} />}>
+    <SideBarButton tab={{ tab: type, value: id }} tooltip={name}>
+      {type === ElementType.text && <TbTextResize />}
+      {type === ElementType.image && <RiImageFill />}
+    </SideBarButton>
+  </Dropdown>
+  
+});
+
+const ElementList: FC = () => {
+  const ids = useGetState(state => state.elementsIds);
+  return <>
+    {ids.map(id => <SidebarElementButton key={id} id={id} />)}
+  </>
+}
 
 const Sidebar: FC = () => {
   const [show, setShow] = useState(false);
@@ -76,7 +114,7 @@ const Sidebar: FC = () => {
   const [tab, setTab] = useState<InspectorTabPath | undefined>();
 
   const changeTab = useCallback((v: InspectorTabPath) => {
-    if (tab?.tab === v.tab && show) {
+    if (tab?.tab === v.tab && tab?.value === v.value && show) {
       setShow(false);
       return;
     }
@@ -89,9 +127,9 @@ const Sidebar: FC = () => {
       <div className="z-10 flex-none overflow-y-scroll scrollbar-hide">
         <div className="w-max">
           <ul className="menu p-3 space-y-2">
-            <button className={classNames("swap swap-flip btn btn-ghost btn-sm self-start", {"swap-active": expand})} onClick={() => setExpand(e => !e)}>
-            <TbArrowBarToLeft className="swap-on" />
-            <TbArrowBarToRight className="swap-off" />
+            <button className={classNames("swap swap-flip btn btn-ghost btn-sm self-start", { "swap-active": expand })} onClick={() => setExpand(e => !e)}>
+              <TbArrowBarToLeft className="swap-on" />
+              <TbArrowBarToRight className="swap-off" />
             </button>
             <SideBarButton tab={{ tab: Services.stt }} tooltip="Speech to Text"><RiMicFill /></SideBarButton>
             <SideBarButton tab={{ tab: Services.tts }} tooltip="Text to Speech"><RiVoiceRecognitionFill /></SideBarButton>
@@ -100,8 +138,9 @@ const Sidebar: FC = () => {
             <SideBarButton tab={{ tab: "settings" }} tooltip="Settings & About"><RiSettings2Fill /></SideBarButton>
             <Divider />
             <SideBarButton tab={{ tab: "scenes" }} tooltip="Canvas & Scenes"><RiStackFill /></SideBarButton>
-            <SideBarButton tab={{ tab: ElementType.text }} tooltip="Text element"><TbTextResize /></SideBarButton>
-            <SideBarButton tab={{ tab: ElementType.image }} tooltip="Image element"><RiImageFill /></SideBarButton>
+            <ElementList />
+            {/* <SideBarButton tab={{ tab: ElementType.text }} tooltip="Text element"><TbTextResize /></SideBarButton>
+            <SideBarButton tab={{ tab: ElementType.image }} tooltip="Image element"><RiImageFill /></SideBarButton> */}
             <Dropdown placement="right" content={<AddElementsMenu />}>
               <SideBarButtonBase tooltip="Add element"><RiAddFill /></SideBarButtonBase>
             </Dropdown>
@@ -110,7 +149,6 @@ const Sidebar: FC = () => {
             <SideBarButtonBase tooltip="Fonts"><RiFontSize /></SideBarButtonBase>
           </ul>
         </div>
-
       </div>
 
     </sidebarContext.Provider>

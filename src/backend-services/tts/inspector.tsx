@@ -1,9 +1,10 @@
 import { FC } from "react";
+import { RiVoiceRecognitionFill } from "react-icons/ri";
 import Inspector from "../../components/inspector";
 
 const Inspector_TTS: FC = () => {
   return <Inspector.Body>
-    <Inspector.Header>Text to Speech</Inspector.Header>
+    <Inspector.Header><RiVoiceRecognitionFill /> Text to Speech</Inspector.Header>
     <Inspector.Content>
       <fieldset>
         <label>Font size</label>

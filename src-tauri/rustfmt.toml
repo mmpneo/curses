@@ -3,3 +3,4 @@ imports_granularity = "Crate"
 imports_indent = "Visual"
 group_imports = "One"
 max_width = 150
+chain_width = 60

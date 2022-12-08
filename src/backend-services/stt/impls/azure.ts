@@ -21,6 +21,14 @@ export class STT_AzureService implements ISpeechRecognitionService {
   dispose(): void {}
 
   start(params: STT_State): void {
+
+    if (!params.lang_name)
+      return this.bindings.onStop("[STT:Azure] Missing language");
+    if (!params.azure_key)
+      return this.bindings.onStop("[STT:Azure] Missing key");
+    if (!params.azure_location)
+      return this.bindings.onStop("[STT:Azure] Missing location");
+
     const speechConfig = SpeechConfig.fromSubscription(
       params.azure_key,
       params.azure_location

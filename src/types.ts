@@ -1,5 +1,5 @@
 import { Services } from "./backend-services";
-import { ElementType } from "./frontend-services/schema";
+import { ElementType } from "./frontend-services/schema/element";
 
 export interface IServiceInterface {
   init(): void;
@@ -15,9 +15,9 @@ export type TextEvent = {
 };
 
 export enum TextEventSource {
-  textfield = "textfield",
-  stt = "stt",
-  translation = "translation",
+  textfield = "text.textfield",
+  stt = "text.stt",
+  translation = "text.translation",
 }
 
 export type InspectorTabPath = {

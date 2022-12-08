@@ -45,7 +45,7 @@ class Service_VRC implements IServiceInterface {
   #sendText(value: string, isFinal: boolean = false) {
     console.log(value);
     
-    invoke("osc_send", {
+    invoke("plugin:osc|send", {
       rpc: {
         path: "/chatbox/input",
         args: [value, true],
@@ -54,7 +54,7 @@ class Service_VRC implements IServiceInterface {
   }
 
   #sendIndicator(value: boolean) {
-    invoke("osc_send", {
+    invoke("plugin:osc|send", {
       rpc: {
         path: "/chatbox/typing",
         args: [value],

@@ -4,6 +4,7 @@ import { proxy, subscribe } from "valtio";
 import Ajv from "ajv";
 import { backendSchema, BackendState } from "./schema";
 import Service_PubSub from "./pubsub";
+import Service_Shortcuts from "./shortcuts";
 
 export enum Services {
   vrc = "vrc",
@@ -39,6 +40,7 @@ class Backend {
   public readonly stt = new Service_STT();
   public readonly vrc = new Service_VRC();
   public readonly pubsub = new Service_PubSub();
+  public readonly shortcuts = new Service_Shortcuts();
 
   public changeTheme(value: string) {
     this.state.clientTheme = value;
@@ -56,6 +58,7 @@ class Backend {
 
     subscribe(this.state, () => this.save_state());
     this.vrc.init();
+    this.shortcuts.init();
     // await this.document.LoadLocalState();
     // this.network.Init();
     if (this.isClient) {

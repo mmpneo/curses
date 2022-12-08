@@ -34,12 +34,16 @@ const ServiceLanguageSelect: FC<{ library: ServiceLanguageLibrary }> = ({ librar
   };
 
   return <>
-    <Input.Select label="Language" value={state.lang_group} onChange={e => handleSelectLang(e.target.value)}>
-      {library.map((lang, i) => <option key={i} value={lang[0]}>{lang[0]}</option>)}
-    </Input.Select>
-    {dialectList.length > 1 && <Input.Select label="Dialect" value={state.lang_name} onChange={e => handleSelectDialect(e.target.value)}>
-      {dialectList?.map((d, i) => <option key={i} value={d[0]}>{d[1]}</option>)}
-    </Input.Select>}
+    <Input.Select
+      options={library.map((lang, i) => ({ label: lang[0], value: lang[0] }))}
+      label="Language"
+      value={{ value: state.lang_group, label: state.lang_group }}
+      onChange={(e: any) => handleSelectLang(e.value)} />
+    {dialectList.length > 1 && <Input.Select
+      options={dialectList.map((lang, i) => ({ label: lang[1], value: lang[0] }))}
+      label="Dialect"
+      value={{ value: state.lang_name, label: state.lang_name }}
+      onChange={(e: any) => handleSelectDialect(e.value)} />}
   </>
 }
 

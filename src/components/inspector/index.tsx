@@ -7,6 +7,9 @@ import Inspector_STT from "../../backend-services/stt/inspector";
 import Inspector_TTS from "../../backend-services/tts/inspector";
 import Inspector_Twitch from "../../backend-services/twitch/inspector";
 import Inspector_VRC from "../../backend-services/vrc/inspector";
+import { Inspector_ElementImage } from "../../frontend-services/elements/image";
+import { Inspector_ElementText } from "../../frontend-services/elements/text";
+import { ElementType } from "../../frontend-services/schema/element";
 import { InspectorTabPath } from "../../types";
 import Inspector_Scenes from "./inspector_scenes";
 import Inspector_Settings from "./inspector_settings";
@@ -20,6 +23,8 @@ const Base: FC<{ path?: InspectorTabPath }> = ({ path }) => {
       {path?.tab === Services.vrc && <Inspector_VRC key="vrc" />}
       {path?.tab === "settings" && <Inspector_Settings key="settings" />}
       {path?.tab === "scenes" && <Inspector_Scenes key="scenes" />}
+      {path?.tab === ElementType.text && path?.value && <Inspector_ElementText id={path.value} key={`${path.tab}-${path.value}`} />}
+      {path?.tab === ElementType.image && path?.value && <Inspector_ElementImage id={path.value} key={`${path.tab}-${path.value}`} />}
     </AnimatePresence>
   </div>
 }
@@ -40,11 +45,11 @@ export const Body: FC<PropsWithChildren<{ scrollable?: boolean }>> = ({ scrollab
 }
 
 export const Header: FC<PropsWithChildren> = memo(({ children }) => {
-  return <div className="px-4 pt-5 text-xl font-bold">{children}</div>
+  return <div className="flex items-center gap-2 px-4 pt-5 text-xl font-bold">{children}</div>
 })
 
 const SubHeader: FC<PropsWithChildren> = ({ children }) => {
-  return <span className="pt-3 font-semibold text-xs opacity-50">{children}</span>
+  return <span className="font-semibold pt-4 text-xs opacity-50 flex justify-between items-center gap-2 whitespace-nowrap">{children}</span>
 }
 
 export const Content: FC<PropsWithChildren> = ({ children }) => {

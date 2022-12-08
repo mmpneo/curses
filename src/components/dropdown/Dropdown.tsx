@@ -6,6 +6,7 @@ interface Props {
   content: ReactNode,
   interact?: "hover" | "click" | "context",
   placement?: Placement
+  targetOffset?: number
 }
 
 export function useDropdown() {
@@ -17,7 +18,7 @@ export const dropdownContext = createContext({
   close: () => { }
 });
 
-const Dropdown: FC<PropsWithChildren<Props>> = ({ children, content, interact = "click", placement = "bottom" }) => {
+const Dropdown: FC<PropsWithChildren<Props>> = ({ children, content, interact = "click", placement = "bottom", targetOffset = 8 }) => {
   const arrowRef = useRef(null);
   const [open, setOpen] = useState(false);
   const { x, y, reference, floating, strategy, context, middlewareData: { arrow: { x: arrowX, y: arrowY } = {} } } = useFloating({
@@ -28,7 +29,7 @@ const Dropdown: FC<PropsWithChildren<Props>> = ({ children, content, interact = 
     onOpenChange: setOpen,
     middleware: [
       shift(),
-      offset(8),
+      offset(targetOffset),
       flip(),
       arrow({ element: arrowRef, padding: 20 })
     ]
@@ -53,12 +54,12 @@ const Dropdown: FC<PropsWithChildren<Props>> = ({ children, content, interact = 
       {open && <motion.span
         key="inspector"
         initial={{ scale: 0.95, opacity: 0 }}
-        transition={{ ease: "easeInOut", duration: 0.15 }}
-        exit={{ scale: 0.95, opacity: 0 }}
+        transition={{ ease: "anticipate", duration: 0.15 }}
+        exit={{ scale: 0.97, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        className="z-50 p-1" {...getFloatingProps()} ref={floating} style={{margin: 0,position: strategy,top: y ?? 0,left: x ?? 0,}}>
-        <div style={{ top: arrowY ?? 0, left: arrowX ?? 0 }} className="dropdown-arrow" ref={arrowRef} />
+        className="z-50" {...getFloatingProps()} ref={floating} style={{margin: 0,position: strategy,top: y ?? 0,left: x ?? 0,}}>
         {content}
+        <div style={{ top: arrowY ?? 0, left: arrowX ?? -5 }} className="dropdown-arrow" ref={arrowRef} />
       </motion.span>
       }
     </AnimatePresence>
