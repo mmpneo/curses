@@ -30,10 +30,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
     Builder::new("web")
         .invoke_handler(tauri::generate_handler![send])
         .setup(|app| {
-            let ar = app.asset_resolver();
-
             let a = Arc::new(app.asset_resolver());
-
             tauri::async_runtime::spawn(async move {
                 let routes = warp::path!("ping")
                     .map(|| format!("pong"))

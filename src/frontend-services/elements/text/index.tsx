@@ -26,14 +26,14 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
   const behaviorClearDelayCancelToken = useRef(-1);
   const [active, setActive] = useState(false);
 
-  const [, cancelClearTimer, startClearTimer] = useTimeoutFn(() => {
+  const [_clearTimeoutReady, cancelClearTimer, startClearTimer] = useTimeoutFn(() => {
     console.log(stateRef.current.behaviorClearTimer)
     setActive(false);
     if (sentenceQueue.current.length === 0)
       behaviorClearDelayCancelToken.current = setTimeout(() => {
         setSentences([]);
       }, stateRef.current.behaviorClearDelay) as unknown as number;
-  }, stateRef.current.behaviorClearTimer);
+  }, state.behaviorClearTimer);
 
   const tryDequeue = () => {
     if (isRunning.current)
@@ -88,6 +88,16 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
     }
   }
 
+  const name = useGetState(s => s.elements[id].name);
+  useEffect(() => {
+    const event = {
+      label: `${name || 'Text element'} activity`,
+      value: `element.${id}`
+    }
+    window.API.pubsub.registerEvent(event)
+    return () => {window.API.pubsub.unregisterEvent(event);}
+}, [name]);
+
   useEffect(() => {
     const sub = window.API.pubsub.subscribeText(TextEventSource.textfield, event => {
       enqueueSentence(event);
@@ -102,6 +112,24 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
     else
       startClearTimer();
   }, []);
+
+  const onActivity = () => {
+    // play sound
+    if (stateRef.current.soundEnable && stateRef.current.soundFile) {
+      window.APIFrontend.sound.playFromFile(stateRef.current.soundFile, {
+        volume: stateRef.current.soundVolume || 1,
+        detuneMin: stateRef.current.soundDetuneMin || 0,
+        detuneMax: stateRef.current.soundDetuneMax || 0,
+        playbackMin: stateRef.current.soundPlaybackMin || 1,
+        playbackMax: stateRef.current.soundPlaybackMax || 1,
+      });
+    }
+
+    // emit activity event
+    if (stateRef.current.animateEvent) {
+      window.API.pubsub.publish(`element.${id}`);
+    }
+  }
 
   return <>
     <style>{elementStyle}</style>
@@ -161,11 +189,12 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
       min-height: calc((${state.textFontSize}px + (${state.boxPadding}px * 2)) * ${state.textLineHeight});
     }
     `}</style>
+    <style>{state.css}</style>
     <div className="container">
       <BoxElement className={classNames("box", { active: active || state.previewMode, animateScroll: state.animateScroll })}>
         <span className="text">
           {state.previewMode && <TextSentenceTest />}
-          {sentences.map(sentence => <TextSentence onComplete={onComplete} key={sentence.id} data={sentence} />)}
+          {sentences.map(sentence => <TextSentence onComplete={onComplete} onActivity={onActivity} key={sentence.id} data={sentence} />)}
         </span>
       </BoxElement>
     </div>
@@ -181,7 +210,6 @@ const BoxElement: FC<PropsWithChildren<any>> = memo(({ children, ...boxProps }) 
   useEffect(() => {
     if (textRect.height === scrollRect.height)
       return;
-    console.log("changed", textRect.height, scrollRect.height);
     boxRef.current?.scrollTo({ top: boxRef.current.scrollHeight, behavior: "smooth" });
   }, [textRect.height, scrollRect.height]);
 

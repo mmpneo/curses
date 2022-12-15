@@ -8,8 +8,6 @@ repository = ""
 edition = "2021"
 rust-version = "1.57"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [build-dependencies]
 tauri-build = { version = "1.2", features = [] }
 
@@ -19,10 +17,19 @@ serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "1.2", features = ["api-all"] }
 rosc = "0.9.1"
 warp = "0.3.3"
-tokio = {version = "1.23.0", features = ["full"] }
+tokio = { version = "1.23.0", features = ["full"] }
 tokio-stream = "0.1.11"
 futures = "0.3.25"
+windows = { version = "0.43.0", features = [
+  "Win32_Foundation",
+  "Win32_Media_Speech",
+  "Win32_Media_Audio",
+  # "Media_SpeechSynthesis",
+  "Win32_System_Com",
+  "Win32_System_Ole",
+  "Win32_System_WindowsProgramming",
+] }
 
 [features]
-default = [ "custom-protocol" ]
-custom-protocol = [ "tauri/custom-protocol" ]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

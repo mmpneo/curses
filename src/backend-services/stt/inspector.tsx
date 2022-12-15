@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { useSnapshot } from "valtio";
 import { STT_Backends, STT_State } from "./schema";
-import { SpeechServiceState } from "./types";
+import { ServiceNetworkState } from "./types";
 import ServiceLanguageSelect from "./language-select";
 import { azureLanguages, deepGramLangs } from "./service_data";
 import Inspector from "../../components/inspector";
@@ -86,10 +86,10 @@ const Inspector_STT: FC = () => {
       {data.data.backend === STT_Backends.azure && <Azure />}
       {data.data.backend === STT_Backends.deepgram && <Deepgram />}
 
-      {state.status === SpeechServiceState.disconnected && <button className="btn btn-sm btn-primary" onClick={() => window.API.stt.start()}>Start</button>}
-      {state.status === SpeechServiceState.connecting && <button className="btn btn-sm btn-primary loading">Connecting</button>}
-      {state.status === SpeechServiceState.connected && <button className="btn btn-sm btn-primary" onClick={() => window.API.stt.stop()}>Disconnect</button>}
-      {state.status === SpeechServiceState.error && <button className="btn btn-sm btn-error" onClick={() => window.API.stt.start()}>Disconnected, try again</button>}
+      {state.status === ServiceNetworkState.disconnected && <button className="btn btn-sm btn-primary" onClick={() => window.API.stt.start()}>Start</button>}
+      {state.status === ServiceNetworkState.connecting && <button className="btn btn-sm btn-primary loading">Connecting</button>}
+      {state.status === ServiceNetworkState.connected && <button className="btn btn-sm btn-primary" onClick={() => window.API.stt.stop()}>Disconnect</button>}
+      {state.status === ServiceNetworkState.error && <button className="btn btn-sm btn-error" onClick={() => window.API.stt.start()}>Disconnected, try again</button>}
     </Inspector.Content>
   </Inspector.Body>
 }

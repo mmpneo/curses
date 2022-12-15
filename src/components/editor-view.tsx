@@ -5,15 +5,20 @@ import Canvas from "./canvas";
 import { TextEventSource, TextEventType } from "../types";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import NiceModal from "@ebay/nice-modal-react";
+
+import "./file-modal";
 
 const EditorView: FC = () => {
   return <div className="relative bg-base-300 w-screen h-screen flex overflow-hidden">
-    <Sidebar />
-    <EditorViewport />
-    <div className="absolute top-3 right-4">
-      <Actionbar />
-    </div>
-    <ToastContainer />
+    <NiceModal.Provider>
+      <Sidebar />
+      <EditorViewport />
+      <div className="absolute top-3 right-4">
+        <Actionbar />
+      </div>
+      <ToastContainer />
+    </NiceModal.Provider>
   </div>
 }
 
@@ -55,10 +60,10 @@ const STTInput: FC = () => {
     setInputValue(value);
   }
 
-  return <div className="flex items-center space-x-2 p-4 w-96">
+  return <div className="flex items-center space-x-2 w-96">
     {/* <button className="btn btn-circle btn-ghost"><RiChatDeleteFill/></button> */}
     <form onSubmit={submit} className="w-full">
-      <input autoComplete="off" name="sttimput" placeholder="Type something and press [Enter]" className="w-full input text-sm" value={inputValue} onChange={e => handleChange(e.target.value)} />
+      <input type="text" autoComplete="off" name="sttimput" placeholder="Type something and press [Enter]" className="w-full textarea" value={inputValue} onChange={e => handleChange(e.target.value)}/>
     </form>
   </div>
 }

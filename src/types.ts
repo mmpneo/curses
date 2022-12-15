@@ -15,6 +15,7 @@ export type TextEvent = {
 };
 
 export enum TextEventSource {
+  any = "text",
   textfield = "text.textfield",
   stt = "text.stt",
   translation = "text.translation",

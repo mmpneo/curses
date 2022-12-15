@@ -103,7 +103,15 @@ const TextSentenceRenderSimple: FC<{ data: TextSentenceData, onComplete?: () => 
 type CharData = [TextSymbolType, string, number, number, number];
 type WordData = { classes: string, symbols: CharData[] };
 
-const TextSentenceRenderAnimated: FC<{ data: TextSentenceData, onComplete?: () => void }> = memo(({ data, onComplete }) => {
+function loopEventSequence(timers: number[], index: number, onActivity?: () => void) {
+  setTimeout(() => {
+    if (index + 2 <= timers.length)
+      loopEventSequence(timers, index + 1, onActivity)
+    onActivity?.()
+  }, timers[index]);
+}
+
+const TextSentenceRenderAnimated: FC<{ data: TextSentenceData, onActivity?: () => void, onComplete?: () => void }> = memo(({ data, onComplete, onActivity }) => {
   const [words, setWords] = useState<WordData[]>([]);
   const [animated, setAnimated] = useState(false); // animate only once
 
@@ -145,6 +153,11 @@ const TextSentenceRenderAnimated: FC<{ data: TextSentenceData, onComplete?: () =
     });
     setWords(words);
 
+    eventTimers.splice(0, 1) // remove first timer and replace it with 0 later
+    eventTimers = eventTimers.filter(t => t); // collapse zero timers
+    eventTimers.unshift(0);
+    loopEventSequence(eventTimers, 0, onActivity);
+
     setTimeout(() => {
       onComplete?.();
       setAnimated(true);
@@ -173,12 +186,12 @@ const TextSentenceRenderAnimated: FC<{ data: TextSentenceData, onComplete?: () =
   </>
 })
 
-const TextSentence: FC<{ data: TextSentenceData, onComplete?: () => void }> = memo(({ data, onComplete }) => {
+const TextSentence: FC<{ data: TextSentenceData, onActivity?: () => void, onComplete?: () => void }> = memo(({ data, onComplete, onActivity }) => {
 
   // console.log("render sentence", data.value);
 
   if (data.state.animateEnable)
-    return <TextSentenceRenderAnimated onComplete={onComplete} data={data} />
+    return <TextSentenceRenderAnimated onActivity={onActivity} onComplete={onComplete} data={data} />
   return <TextSentenceRenderSimple onComplete={onComplete} data={data} />
 })
 

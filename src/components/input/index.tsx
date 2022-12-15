@@ -5,6 +5,10 @@ import Select, { Props as SelectProps } from 'react-select';
 import styles from "./style.module.css"
 import { RgbaColorPicker, RgbaColor } from "react-colorful";
 import Dropdown from "../dropdown/Dropdown";
+import { FileState, FileType } from "../../frontend-services/files/schema";
+import FileElement from "../../frontend-services/components/file-element";
+import NiceModal from "@ebay/nice-modal-react";
+import { RiUpload2Fill } from "react-icons/ri";
 
 const cx = classNames.bind(styles);
 
@@ -12,9 +16,10 @@ interface InputBaseProps {
   label: string
 }
 
-const Container: FC<PropsWithChildren<{ id?: string, label: string }>> = memo(({ id, label, children }) => {
-  return <div className="flex justify-between items-center min-h-8">
-    <label className="flex-grow font-semibold text-base-content text-xs cursor-pointer" htmlFor={id}>{label}</label>
+const Container: FC<PropsWithChildren<{ id?: string, vertical?: boolean, label: string }>> = memo(({ id, vertical, label, children }) => {
+  const layout = vertical ? "flex-col space-y-2" : "justify-between items-center"
+  return <div className={cx("flex min-h-8", layout)}>
+    <label className="flex-grow font-medium text-base-content text-xs cursor-pointer" htmlFor={id}>{label}</label>
     {children}
   </div>
 });
@@ -225,4 +230,85 @@ const Checkbox: FC<CheckboxTextProps> = memo(({ label, value, onChange }) => {
   )
 })
 
-export default { BaseText, Text, Chips, Range, Color, Select: NewSelect, Checkbox, DoubleCountainer };
+interface FileProps extends InputBaseProps {
+  type: FileType,
+  value: string,
+  onChange: (value: string) => void
+}
+const File: FC<FileProps> = ({ label, type, onChange, value }) => {
+  const [file, setFile] = useState<FileState>();
+
+  useEffect(() => {
+    const f = window.APIFrontend.files.getFileData(value);
+    setFile(f ?? undefined);
+  }, [value]);
+
+  const handleAdd = async () => {
+    try {
+      const resp = await window.APIFrontend.files.addFile(type);
+      if (resp?.[0]) {
+        onChange(resp[0]);
+      }
+    } catch (error) {}
+  }
+
+  const handleSelect = async () => {
+    const resp = await NiceModal.show('files', { select: type });
+    if (resp && typeof resp === "string") onChange(resp);
+  }
+
+  return <Container label={label} vertical>
+    {file && <FileElement actions={[
+      { label: "Clear", fn: () => onChange("") },
+      { label: "Change", fn: handleSelect },
+    ]} data={file} />}
+    {!file && <div className="flex space-x-2">
+      <div onClick={handleAdd} className="text-base-content p-2 flex-none relative bg-base-200 rounded-lg w-14 h-14 flex items-center justify-center overflow-hidden">
+        <RiUpload2Fill/>
+      </div>
+      <div className="flex flex-col">
+        <span>Select file</span>
+        <button onClick={handleSelect} className="flex-grow btn btn-sm btn-primary">Select file</button>
+      </div>
+    </div>}
+  </Container>
+}
+
+interface EventProps extends InputBaseProps {
+  onChange: (value: string) => void,
+  value: string
+}
+const Event: FC<EventProps> = memo(({ label, value, onChange }) => {
+  const events = Array.from(window.API.pubsub.registeredEvents.values());
+  return <NewSelect options={events} label={label} defaultValue={events.find(e => e.value === value)} onChange={(e: any) => {console.log(e);onChange(e.value || "")}} />
+});
+
+// import "ace-builds/src-noconflict/mod";
+import AceEditor from "react-ace";
+import "ace-builds/src-noconflict/mode-css";
+import "ace-builds/src-noconflict/ext-language_tools";
+import "ace-builds/src-noconflict/theme-twilight";
+
+interface CodeProps extends InputBaseProps {
+  value: string,
+  language: string,
+  onChange: (value: string | undefined) => void
+}
+const Code: FC<CodeProps> = memo(({ label, ...rest }) => {
+  return <Container label={label} vertical>
+    <AceEditor
+    showGutter={false}
+    enableLiveAutocompletion
+    width="100%"
+    className="w-full"
+    mode="css"
+    theme="twilight"
+    value={rest.value}
+    onChange={rest.onChange}
+    name="UNIQUE_ID_OF_DIV"
+    editorProps={{ $blockScrolling: true }}
+  />
+  </Container>
+});
+
+export default { BaseText, Text, Chips, Range, Color, Select: NewSelect, Checkbox, File, Event, Code, Container, DoubleCountainer };

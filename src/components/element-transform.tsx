@@ -1,37 +1,39 @@
 import classNames from "classnames";
-import { FC, memo } from "react"
-import { Rnd, DraggableData, ResizableDelta, Position } from "react-rnd";
+import { FC, memo } from "react";
+import { DraggableData, Position, ResizableDelta, Rnd } from "react-rnd";
 import { useGetState, useUpdateState } from "../frontend-services";
-import { Element_Image, Element_Text } from "../frontend-services/elements";
-import { ElementType } from "../frontend-services/schema/element";
-import root from 'react-shadow';
+import { ElementInstance } from "./element-instance";
 
-const ElementInstance: FC<{ id: string }> = memo(({ id }) => {
-  const t = useGetState(state => state.elements[id].type);
-
-  if (t === ElementType.text)
-    return  <root.div className="absolute inset-0"><Element_Text id={id} /></root.div>
-  if (t === ElementType.image)
-    return <Element_Image />
-
-  return <></>
-})
+export const ElementSimpleTransform: FC<{ id: string }> = memo(({ id }) => {
+  const rect = useGetState(state => state.elements[id].scenes["main"].rect);
+  return <div
+    className="absolute"
+    style={{
+      width: rect?.w || 100,
+      height: rect?.h || 100,
+      left: rect?.x || 100,
+      top: rect?.y || 100,
+    }}
+  >
+    <ElementInstance id={id} />
+  </div>
+});
 
 const Knob: FC<{ className: string }> = ({ className }) => {
   return <div className={classNames("absolute rounded-full bg-secondary w-2 h-2", className)}></div>
 }
 
-const ElementTransform: FC<{ id: string }> = memo(({ id }) => {
+export const ElementEditorTransform: FC<{ id: string }> = memo(({ id }) => {
   const rect = useGetState(state => state.elements[id].scenes["main"].rect);
   const update = useUpdateState();
 
-  const handleDrag = (e: any, data: DraggableData) => {
+  const handleDrag = (_e: any, data: DraggableData) => {
     update(state => {
       state.elements[id].scenes["main"].rect.x = Math.round(data.x);
       state.elements[id].scenes["main"].rect.y = Math.round(data.y);
     });
   }
-  const handleResize = (e: MouseEvent | TouchEvent, _dir: unknown, elementRef: HTMLElement, delta: ResizableDelta, position: Position) => {
+  const handleResize = (_e: MouseEvent | TouchEvent, _dir: unknown, elementRef: HTMLElement, _delta: ResizableDelta, position: Position) => {
     update(state => {
       state.elements[id].scenes["main"].rect.x = Math.round(position.x);
       state.elements[id].scenes["main"].rect.y = Math.round(position.y);
@@ -59,7 +61,3 @@ const ElementTransform: FC<{ id: string }> = memo(({ id }) => {
     <Knob className="group-hover:opacity-100 opacity-0 transition-opacity -top-1 -left-1" />
   </Rnd>
 });
-ElementTransform.displayName = "ElementTransform";
-ElementTransform.whyDidYouRender = true;
-
-export default ElementTransform;

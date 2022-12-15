@@ -4,6 +4,7 @@ import { ElementState, ElementType } from "../schema/element";
 import Element_Image from "./image";
 import Element_Text, { Element_TextStateSchema } from "./text";
 import Ajv from "ajv";
+import { Element_ImageStateSchema } from "./image/schema";
 
 class Service_Elements implements IServiceInterface {
   #ajv!: Ajv;
@@ -15,13 +16,17 @@ class Service_Elements implements IServiceInterface {
       removeAdditional: true,
     });
     
-    const validator = this.#ajv.compile(Element_TextStateSchema);
+    const validator_text = this.#ajv.compile(Element_TextStateSchema);
+    const validator_image = this.#ajv.compile(Element_ImageStateSchema);
     window.APIFrontend.document.patch(state => {
       const elements = state.elements
       Object.values(elements).forEach(element => {
         Object.values(element.scenes).forEach(elementScene => { 
           if (element.type === ElementType.text) {
-            validator(elementScene.data);
+            validator_text(elementScene.data);
+          }
+          else if (element.type === ElementType.image) {
+            validator_image(elementScene.data);
           }
         });
       });

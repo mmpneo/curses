@@ -1,5 +1,5 @@
-import { createContext, FC, PropsWithChildren, ReactNode, useContext, useRef, useState } from "react";
-import { arrow, offset, autoUpdate, flip, safePolygon, shift, useClick, useDismiss, useFloating, useHover, useInteractions } from "@floating-ui/react-dom-interactions";
+import { createContext, FC, memo, PropsWithChildren, ReactNode, useContext, useRef, useState } from "react";
+import { arrow, offset, autoUpdate, flip, safePolygon, shift, useClick, useDismiss, useFloating, useHover, useInteractions, FloatingPortal } from "@floating-ui/react-dom-interactions";
 import { Placement } from "@floating-ui/dom";
 import { AnimatePresence, motion } from "framer-motion";
 interface Props {
@@ -18,7 +18,7 @@ export const dropdownContext = createContext({
   close: () => { }
 });
 
-const Dropdown: FC<PropsWithChildren<Props>> = ({ children, content, interact = "click", placement = "bottom", targetOffset = 8 }) => {
+const Dropdown: FC<PropsWithChildren<Props>> = memo(({ children, content, interact = "click", placement = "bottom", targetOffset = 8 }) => {
   const arrowRef = useRef(null);
   const [open, setOpen] = useState(false);
   const { x, y, reference, floating, strategy, context, middlewareData: { arrow: { x: arrowX, y: arrowY } = {} } } = useFloating({
@@ -50,20 +50,22 @@ const Dropdown: FC<PropsWithChildren<Props>> = ({ children, content, interact = 
   return <dropdownContext.Provider value={{ close: () => setOpen(false) }}>
     <span onContextMenu={handleContext} {...getReferenceProps()} ref={reference}>{children}</span>
 
-    <AnimatePresence>
-      {open && <motion.span
-        key="inspector"
-        initial={{ scale: 0.95, opacity: 0 }}
-        transition={{ ease: "anticipate", duration: 0.15 }}
-        exit={{ scale: 0.97, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        className="z-50" {...getFloatingProps()} ref={floating} style={{margin: 0,position: strategy,top: y ?? 0,left: x ?? 0,}}>
-        {content}
-        <div style={{ top: arrowY ?? 0, left: arrowX ?? -5 }} className="dropdown-arrow" ref={arrowRef} />
-      </motion.span>
-      }
-    </AnimatePresence>
+    <FloatingPortal id="custom-root-id">
+      <AnimatePresence initial={false}>
+        {open && <motion.span
+          key="inspector"
+          initial={{ scale: 0.95, opacity: 0 }}
+          transition={{ ease: "anticipate", duration: 0.15 }}
+          exit={{ scale: 0.97, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="z-50" {...getFloatingProps()} ref={floating} style={{margin: 0,position: strategy,top: y ?? 0,left: x ?? 0,}}>
+          {content}
+          <div style={{ top: arrowY ?? 0, left: arrowX ?? -5 }} className="dropdown-arrow" ref={arrowRef} />
+        </motion.span>
+        }
+      </AnimatePresence>
+    </FloatingPortal>
   </dropdownContext.Provider>
-}
+})
 
 export default Dropdown;

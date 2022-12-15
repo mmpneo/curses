@@ -1,15 +1,41 @@
 import classNames from "classnames";
-import { FC, memo, useState } from "react";
+import { ButtonHTMLAttributes, FC, memo, PropsWithChildren, useState } from "react";
+import { BsTextareaResize } from "react-icons/bs";
 import { GrTextAlignCenter, GrTextAlignLeft, GrTextAlignRight } from "react-icons/gr";
-import { RiAlignBottom, RiAlignTop, RiAlignVertically } from "react-icons/ri";
+import { HiOutlineMusicNote } from "react-icons/hi";
+import { IoIosRadio } from "react-icons/io";
+import { RiAlignBottom, RiAlignTop, RiAlignVertically, RiFontSize } from "react-icons/ri";
+import { SiCsswizardry } from "react-icons/si";
 import { TbTextResize } from "react-icons/tb";
+import { VscSettings } from "react-icons/vsc";
+import { useCopyToClipboard } from "react-use";
 import { useGetState, useUpdateState } from "../..";
+import Tooltip from "../../../components/dropdown/Tooltip";
 import Input from "../../../components/input";
 import Inspector from "../../../components/inspector";
 import { TextEventSource } from "../../../types";
+import NameInput from "../../components/name-input";
 import TransformInput from "../../components/transform-input";
 import { Element_TextState, FlexAlign, FontCase } from "./schema";
 
+const SourceInspector: FC<{ id: string }> = ({ id }) => {
+  const data = useGetState(state => state.elements[id].scenes["main"].data);
+  const update = useUpdateState();
+  const up = <K extends keyof Element_TextState>(key: K, v: Element_TextState[K]) => update(state => {
+    state.elements[id].scenes["main"].data[key] = v;
+  });
+
+  return <>
+    <Inspector.SubHeader>Source</Inspector.SubHeader>
+    <Input.Select value={data.sourceMain} onChange={e => up("sourceMain", e as any)} options={[
+      { label: 'STT', value: TextEventSource.stt },
+      { label: 'Translation', value: TextEventSource.translation }
+    ]} placeholder="Text source" label="Main text source" />
+    <Input.Text label="Text source mask" />
+    <Input.Checkbox label="Input field" />
+    <Input.Text label="Input field mask" />
+  </>
+}
 
 const TextInspector: FC<{ id: string }> = ({ id }) => {
   const data = useGetState(state => state.elements[id].scenes["main"].data);
@@ -20,6 +46,8 @@ const TextInspector: FC<{ id: string }> = ({ id }) => {
 
   return <>
     <Inspector.SubHeader>Font</Inspector.SubHeader>
+    <Input.Color label="Color" value={data.textColor} onChange={e => up("textColor", e)} />
+    <Input.Color label="Interim Color" value={data.textColorInterim} onChange={e => up("textColorInterim", e)} />
     <Input.Text label="Size" type="number" value={data.textFontSize} onChange={e => up("textFontSize", parseFloat(e.target.value))} />
     <Input.Text label="Family" value={data.textFontFamily} onChange={e => up("textFontFamily", e.target.value)} />
     <Input.Range label="Weight" step="100" min="100" max="900" value={data.textFontWeight} onChange={e => up("textFontWeight", parseFloat(e.target.value))} />
@@ -30,9 +58,7 @@ const TextInspector: FC<{ id: string }> = ({ id }) => {
     ]} label="Case" value={data.textCase} onChange={e => up("textCase", e as FontCase)} />
     <Input.Text label="Line Height" type="number" value={data.textLineHeight} onChange={e => up("textLineHeight", parseFloat(e.target.value))} />
 
-    <Inspector.SubHeader>Font Color</Inspector.SubHeader>
-    <Input.Color label="Color" value={data.textColor} onChange={e => up("textColor", e)} />
-    <Input.Color label="Interim Color" value={data.textColorInterim} onChange={e => up("textColorInterim", e)} />
+    {/* <Inspector.SubHeader>Font Color</Inspector.SubHeader> */}
 
     <Inspector.SubHeader>Shadow</Inspector.SubHeader>
     <Input.DoubleCountainer label="Position">
@@ -42,8 +68,8 @@ const TextInspector: FC<{ id: string }> = ({ id }) => {
     <Input.Text label="Blur" type="number" value={data.textShadowZ} onChange={e => up("textShadowZ", parseFloat(e.target.value))} />
     <Input.Color label="Color" value={data.textShadowColor} onChange={e => up("textShadowColor", e)} />
 
-    <Inspector.SubHeader>Text Stroke</Inspector.SubHeader>
-    <Input.Text label="Width" min="0" step="0.05" type="number" value={data.textStroke} onChange={e => up("textStroke", parseFloat(e.target.value))} />
+    <Inspector.SubHeader>Outline</Inspector.SubHeader>
+    <Input.Text label="Size" min="0" step="0.05" type="number" value={data.textStroke} onChange={e => up("textStroke", parseFloat(e.target.value))} />
     <Input.Color label="Color" value={data.textStrokeColor} onChange={e => up("textStrokeColor", e)} />
 
     <Inspector.SubHeader>Align</Inspector.SubHeader>
@@ -96,16 +122,30 @@ const BoxInspector: FC<{ id: string }> = ({ id }) => {
   </>
 }
 
-const AnimationInspector: FC<{ id: string }> = ({ id }) => {
+const BehaviourInspector: FC<{ id: string }> = ({ id }) => {
   const data = useGetState(state => state.elements[id].scenes["main"].data);
   const update = useUpdateState();
+  const [, copyToClipboard] = useCopyToClipboard();
+
   const up = <K extends keyof Element_TextState>(key: K, v: Element_TextState[K]) => update(state => {
     state.elements[id].scenes["main"].data[key] = v;
   });
 
+  const handleCopyCss = () => {
+    const style = `[event-element-${id}-100] {}`
+    copyToClipboard(style);
+  }
+
   return <>
-    <Inspector.SubHeader>Animate</Inspector.SubHeader>
+    <Inspector.SubHeader>Animation</Inspector.SubHeader>
     <Input.Checkbox label="Enable animation" value={data.animateEnable} onChange={e => up("animateEnable", e)} />
+    <Input.Checkbox label="Emit event" value={data.animateEvent} onChange={e => up("animateEvent", e)} />
+    {data.animateEvent && <Input.Container label="Copy event as">
+      <div className="btn-group">
+        <button className="btn btn-neutral btn-xs">css</button>
+        <button onClick={handleCopyCss} className="btn btn-neutral btn-xs">name</button>
+      </div>
+    </Input.Container>}
     <Input.Text label="Characters delay" type="number" value={data.animateDelayChar} onChange={e => up("animateDelayChar", parseFloat(e.target.value))} />
     <Input.Text label="Words delay" type="number" value={data.animateDelayWord} onChange={e => up("animateDelayWord", parseFloat(e.target.value))} />
     <Input.Text label="Sentence delay" type="number" value={data.animateDelaySentence} onChange={e => up("animateDelaySentence", parseFloat(e.target.value))} />
@@ -117,58 +157,81 @@ const AnimationInspector: FC<{ id: string }> = ({ id }) => {
     <Input.Text label="Clear animation delay" type="number" value={data.behaviorClearDelay} onChange={e => up("behaviorClearDelay", parseFloat(e.target.value))} />
     <Input.Checkbox label="Show only one sentence" value={data.behaviorLastSentence} onChange={e => up("behaviorLastSentence", e)} />
     <Input.Checkbox label="Break line" value={data.behaviorBreakLine} onChange={e => up("behaviorBreakLine", e)} />
-
-    <Inspector.SubHeader>Custom event</Inspector.SubHeader>
-    <Input.Checkbox label="Emit event" value={data.animateEvent} onChange={e => up("animateEvent", e)} />
-    <Input.Text label="Event name" type="number" value={data.animateEventName} onChange={e => up("animateEventName", e.target.value)} />
   </>
 }
 
-const Inspector_ElementText: FC<{ id: string }> = memo(({ id }) => {
-  const data = useGetState(state => state.elements[id].scenes["main"].data);
-  const name = useGetState(state => state.elements[id].name);
+const SoundInspector: FC<{ id: string }> = ({ id }) => {
+  const data: Element_TextState = useGetState(state => state.elements[id].scenes["main"].data);
   const update = useUpdateState();
-
-  const handleUpdateName = (v: string) => update(state => {
-    state.elements[id].name = v;
+  const up = <K extends keyof Element_TextState>(key: K, v: Element_TextState[K]) => update(state => {
+    state.elements[id].scenes["main"].data[key] = v;
   });
+
+  return <>
+    <Inspector.SubHeader>Audio</Inspector.SubHeader>
+    <Input.Checkbox label="Enabled" value={data.soundEnable} onChange={e => up("soundEnable", e)} />
+    <Input.File label="Audio file" type="audio" value={data.soundFile} onChange={e => up("soundFile", e)} />
+    <Input.Range label={`Volume (${data.soundVolume})`} step="0.01" min="0" max="1" value={data.soundVolume} onChange={e => up("soundVolume", parseFloat(e.target.value) || 0)} />
+    <Inspector.SubHeader>Effects</Inspector.SubHeader>
+    <Input.DoubleCountainer label="Detune (min/max)">
+      <Input.BaseText type="number" value={data.soundDetuneMin} onChange={e => up("soundDetuneMin", parseFloat(e.target.value) || 0)} />
+      <Input.BaseText type="number" value={data.soundDetuneMax} onChange={e => up("soundDetuneMax", parseFloat(e.target.value) || 0)} />
+    </Input.DoubleCountainer>
+    <Input.DoubleCountainer label="Playback (min/max)">
+      <Input.BaseText type="number" value={data.soundPlaybackMin} onChange={e => up("soundPlaybackMin", parseFloat(e.target.value) || 0)} />
+      <Input.BaseText type="number" value={data.soundPlaybackMax} onChange={e => up("soundPlaybackMax", parseFloat(e.target.value) || 0)} />
+    </Input.DoubleCountainer>
+  </>
+}
+
+const CssInspector: FC<{ id: string }> = ({ id }) => {
+  const data: Element_TextState = useGetState(state => state.elements[id].scenes["main"].data);
+  const update = useUpdateState();
+  const up = <K extends keyof Element_TextState>(key: K, v: Element_TextState[K]) => update(state => {
+    state.elements[id].scenes["main"].data[key] = v;
+  });
+  return <>
+    <Inspector.SubHeader>CSS style</Inspector.SubHeader>
+    <Input.Code language="css" label="CSS" value={data.css} onChange={e => up("css", e || "")} />
+  </>
+}
+
+
+const Inspector_ElementText: FC<{ id: string }> = memo(({ id }) => {
+  const data: Element_TextState = useGetState(state => state.elements[id].scenes["main"].data);
+  const update = useUpdateState();
 
   const up = <K extends keyof Element_TextState>(key: K, v: Element_TextState[K]) => update(state => {
     state.elements[id].scenes["main"].data[key] = v;
   });
 
-  const [tab, setTab] = useState<string>("text")
+  const [[tab, direction], setTab] = useState<[number, number]>([0, 0]);
+
+  const handleTab = (v: number) => {
+    setTab([v, Math.sign(v - tab)]);
+  }
 
   return <Inspector.Body>
-    <Inspector.Header><TbTextResize /> {name}</Inspector.Header>
+    <Inspector.Header><TbTextResize /> <NameInput id={id} /></Inspector.Header>
     <Inspector.Content>
-      <Input.Text label="Name" value={name} onChange={e => handleUpdateName(e.target.value)} />
       <TransformInput id={id} />
-
-      <div className="flex flex-col space-y-1">
-        <Inspector.SubHeader>Source</Inspector.SubHeader>
-        <Input.Select value={data.sourceMain} onChange={e => up("sourceMain", e as any)} options={[
-          { label: 'STT', value: TextEventSource.stt },
-          { label: 'Translation', value: TextEventSource.translation }
-        ]} placeholder="Text source" label="Main text source" />
-        <Input.Text label="Text source mask" />
-        <Input.Checkbox label="Input field" />
-        <Input.Text label="Input field mask" />
-      </div>
-
-      <div className="-ml-2 pt-2 tabs bg-transparent tabs-boxed">
-        <a onClick={() => setTab("text")} className={classNames("tab tab-xs", { "tab-active": tab === "text" })}>Text</a>
-        <a onClick={() => setTab("box")} className={classNames("tab tab-xs", { "tab-active": tab === "box" })}>Box</a>
-        <a onClick={() => setTab("animation")} className={classNames("tab tab-xs", { "tab-active": tab === "animation" })}>Animation</a>
-        <a onClick={() => setTab("sound")} className={classNames("tab tab-xs", { "tab-active": tab === "sound" })}>Sound</a>
-        <a onClick={() => setTab("CSS")} className={classNames("tab tab-xs", { "tab-active": tab === "CSS" })}>Css</a>
-      </div>
       <Input.Checkbox label="Preview mode" value={data.previewMode} onChange={e => up("previewMode", e)} />
-
-      {tab === "text" && <TextInspector id={id} />}
-      {tab === "box" && <BoxInspector id={id} />}
-      {tab === "animation" && <AnimationInspector id={id} />}
-
+      <Inspector.Tabs>
+        <Inspector.Tab tooltip="Text source" tooltipBody="Where should we get the text from" onClick={() => handleTab(0)} active={tab === 0}><IoIosRadio /></Inspector.Tab>
+        <Inspector.Tab tooltip="Text" tooltipBody="Colors, size, shadow, stroke" onClick={() => handleTab(1)} active={tab === 1}><RiFontSize /></Inspector.Tab>
+        <Inspector.Tab tooltip="Box" tooltipBody="Background, border, size" onClick={() => handleTab(2)} active={tab === 2}><BsTextareaResize /></Inspector.Tab>
+        <Inspector.Tab tooltip="Behaviour" tooltipBody="Timer, typing and scroll animations, events" onClick={() => handleTab(3)} active={tab === 3}><VscSettings /></Inspector.Tab>
+        <Inspector.Tab tooltip="Sound" tooltipBody="Volume, sound vfx" onClick={() => handleTab(4)} active={tab === 4}><HiOutlineMusicNote /></Inspector.Tab>
+        <Inspector.Tab tooltip="CSS editor" onClick={() => handleTab(5)} active={tab === 5}><SiCsswizardry /></Inspector.Tab>
+      </Inspector.Tabs>
+      <Inspector.TabsContent direction={direction} tabKey={tab}>
+        {tab === 0 && <SourceInspector id={id} />}
+        {tab === 1 && <TextInspector id={id} />}
+        {tab === 2 && <BoxInspector id={id} />}
+        {tab === 3 && <BehaviourInspector id={id} />}
+        {tab === 4 && <SoundInspector id={id} />}
+        {tab === 5 && <CssInspector id={id} />}
+      </Inspector.TabsContent>
     </Inspector.Content>
   </Inspector.Body>
 })

@@ -1,18 +1,53 @@
 import PubSub from "pubsub-js";
-import { TextEvent, TextEventSource } from "../../types";
+import { IServiceInterface, TextEvent, TextEventSource } from "../../types";
+import { proxyMap, proxySet } from 'valtio/utils'
+import { subscribe } from "valtio";
 
-function log(...args: any) {
-  console.log('[pubsub]', ...args);
+type RegisteredEvent = {
+  label: string
+  description?: string
+  value: string
 }
 
-class Service_PubSub {
+function log(...args: any) {
+  console.log("[pubsub]", ...args);
+}
+
+class Service_PubSub implements IServiceInterface {
+  constructor() {}
+
   public pubsub = PubSub;
 
-  constructor() {
-    // window.nativeApi?.onMessage(({topic, data}) => {
-    //   this.#publishLocally(topic, data);
-    //   window.API.network.broadcast({topic, data});
-    // });
+  public registeredEvents = proxyMap<string, RegisteredEvent>([]);
+
+  registerEvent(event: RegisteredEvent) {
+    this.registeredEvents.set(event.value, event);
+  }
+  unregisterEvent(event: RegisteredEvent) {
+    console.log('remove result', this.registeredEvents.delete(event.value));
+  }
+
+  async init() {
+    subscribe(this.registeredEvents, e => {
+      log("added event", e);
+    });
+
+    this.registerEvent({
+      label: "Speech to text",
+      value: TextEventSource.stt
+    });
+    this.registerEvent({
+      label: "Translation",
+      value: TextEventSource.translation
+    });
+    this.registerEvent({
+      label: "Input field",
+      value: TextEventSource.textfield
+    });
+    this.registerEvent({
+      label: "Any text source",
+      value: TextEventSource.any
+    });
   }
 
   #publishLocally(topic: string, data: any) {
@@ -20,10 +55,14 @@ class Service_PubSub {
   }
 
   publishText(topic: TextEventSource, data: TextEvent) {
-      this.#publishLocally(topic, data);
+    this.#publishLocally(topic, data);
   }
 
-  publish(topic: string, data?: any, {replicate}: { replicate?: boolean } = {replicate: false}) {
+  publish(
+    topic: string,
+    data?: any,
+    { replicate }: { replicate?: boolean } = { replicate: false }
+  ) {
     this.#publishLocally(topic, data);
     // emit to clients
     // if (replicate)
@@ -38,7 +77,10 @@ class Service_PubSub {
     return PubSub.subscribe(eventname, (_, data) => callback(data));
   }
 
-  public subscribeText(source: TextEventSource, callback: (value: TextEvent) => void) {
+  public subscribeText(
+    source: TextEventSource,
+    callback: (value: TextEvent) => void
+  ) {
     return PubSub.subscribe(source, (_, data) => callback(data));
   }
 
@@ -46,10 +88,7 @@ class Service_PubSub {
     return PubSub.subscribeOnce(eventname, (_, data) => callback(data));
   }
 
-
-  Init() {
-
-  }
+  Init() {}
 }
 
 export default Service_PubSub;

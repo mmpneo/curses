@@ -1,6 +1,6 @@
 import { STT_State } from "./schema";
 
-export enum SpeechServiceState {
+export enum ServiceNetworkState {
   disconnected,
   connecting,
   connected,

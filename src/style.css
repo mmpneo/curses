@@ -4,14 +4,41 @@
 @tailwind components;
 @tailwind utilities;
 
+html, :root {
+  background-color: transparent;
+}
+
+@font-face {
+  font-family: 'Mona Sans';
+  src:
+    url('assets/fonts/Mona-Sans.woff2') format('woff2 supports variations'),
+    url('assets/fonts/Mona-Sans.woff2') format('woff2-variations');
+  font-weight: 200 900;
+  font-stretch: 75% 125%;
+}
+
+@font-face {
+  font-family: 'Hubot Sans';
+  src:
+    url('assets/fonts/Hubot-Sans.woff2') format('woff2 supports variations'),
+    url('assets/fonts/Hubot-Sans.woff2') format('woff2-variations');
+  font-weight: 200 900;
+  font-stretch: 75% 125%;
+}
+
 :root {
   margin: 0;
-  font-size: 16px;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+  /* font-size: 16px; */
+  font-family: 'Hubot Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
   "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
   sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: calc(16px * var(--uiscale));
+}
+
+body {
+  
 }
 
 * {

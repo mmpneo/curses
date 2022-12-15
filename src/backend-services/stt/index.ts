@@ -8,14 +8,14 @@ import { STT_Backends } from "./schema";
 import {
   ISpeechRecognitionService,
   SpeechServiceEventBindings,
-  SpeechServiceState,
+  ServiceNetworkState,
 } from "./types";
 
 class Service_STT implements IServiceInterface {
-  init(): void {}
+  async init() {}
 
   serviceState = proxy({
-    status: SpeechServiceState.disconnected,
+    status: ServiceNetworkState.disconnected,
   });
 
   get data() {
@@ -23,8 +23,7 @@ class Service_STT implements IServiceInterface {
   }
 
   stop(): void {
-    if (this.#serviceInstance)
-      this.#serviceInstance.stop();
+    if (this.#serviceInstance) this.#serviceInstance.stop();
   }
 
   #sendFinal(value: string) {
@@ -41,7 +40,7 @@ class Service_STT implements IServiceInterface {
     });
   }
 
-  #setStatus(value: SpeechServiceState) {
+  #setStatus(value: ServiceNetworkState) {
     this.serviceState.status = value;
   }
 
@@ -51,11 +50,12 @@ class Service_STT implements IServiceInterface {
     this.stop();
 
     let bindings: SpeechServiceEventBindings = {
-      onStart: () => this.#setStatus(SpeechServiceState.connected),
+      onStart: () => this.#setStatus(ServiceNetworkState.connected),
       onStop: (error?: string) => {
-        if (error)
-          toast(error, {type: 'error'})
-        return this.#setStatus(error ? SpeechServiceState.error : SpeechServiceState.disconnected);
+        if (error) toast(error, { type: "error" });
+        return this.#setStatus(
+          error ? ServiceNetworkState.error : ServiceNetworkState.disconnected
+        );
       },
       onInterim: (interim: string) => this.#sendInterim(interim),
       onFinal: (final: string) => this.#sendFinal(final),
@@ -73,7 +73,7 @@ class Service_STT implements IServiceInterface {
     }
 
     if (!this.#serviceInstance) return;
-    this.#setStatus(SpeechServiceState.connecting);
+    this.#setStatus(ServiceNetworkState.connecting);
     this.#serviceInstance.start(this.data.data);
   }
 }

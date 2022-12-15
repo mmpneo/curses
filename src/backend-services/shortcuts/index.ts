@@ -4,6 +4,9 @@ import { subscribe } from "valtio";
 import { debounce } from "lodash";
 class Service_Shortcuts implements IServiceInterface {
   async init() {
+    if (window.platform === "web" || window.mode === "client") {
+      return;
+    }
     subscribe(window.API.state.shortcuts, () => {
       this.#_update();
     });
@@ -14,7 +17,6 @@ class Service_Shortcuts implements IServiceInterface {
     await unregisterAll();
 
     const st = window.API.state.shortcuts;
-    console.log("register", st);
 
     if (st.muteMic)
       await register(st.muteMic, (a) => console.log("mute mic", a));

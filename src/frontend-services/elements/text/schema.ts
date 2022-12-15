@@ -53,7 +53,6 @@ export type Element_TextState = {
   animateDelaySentence: number;
   animateScroll: boolean;
   animateEvent: boolean;
-  animateEventName: string;
 
   //sources
   sourceMain: TextEventSource;
@@ -116,7 +115,6 @@ export const Element_TextStateSchema: JSONSchemaType<Element_TextState> = {
     animateDelaySentence: { type: "number", default: 100 },
     animateScroll: { type: "boolean", default: true },
     animateEvent: { type: "boolean", default: false },
-    animateEventName: { type: "string", default: "" },
     sourceMain: { type: "string", default: TextEventSource.stt },
     sourceInputField: { type: "boolean", default: true },
     behaviorClearTimer: { type: "number", default: 5000 },
@@ -167,7 +165,6 @@ export const Element_TextStateSchema: JSONSchemaType<Element_TextState> = {
     "animateDelaySentence",
     "animateScroll",
     "animateEvent",
-    "animateEventName",
     "sourceMain",
     "sourceInputField",
     "behaviorClearTimer",

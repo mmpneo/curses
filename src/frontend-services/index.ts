@@ -4,14 +4,22 @@ import { useSyncExternalStoreWithSelector } from "use-sync-external-store/with-s
 import { DocumentState } from "./schema";
 import Service_Scenes from "./scenes";
 import Service_Elements from "./elements";
+import Service_Files from "./files";
+import Service_Sound from "./sound";
 class Frontend {
   network = new Service_Network();
   document = new Service_Document();
   scenes = new Service_Scenes();
+  sound = new Service_Sound();
   elements = new Service_Elements();
+  files = new Service_Files();
 
-  async Init() {
+  async init() {
+    await this.network.init();
     await this.document.init();
+    await this.scenes.init();
+    await this.files.init();
+    await this.sound.init();
     await this.elements.init();
   }
 }

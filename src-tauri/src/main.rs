@@ -8,6 +8,7 @@ fn main() {
     app
     .plugin(services::osc::init())
     .plugin(services::web::init())
+    .plugin(services::windows_tts::init())
     .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

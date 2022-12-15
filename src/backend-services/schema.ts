@@ -5,7 +5,8 @@ import Schema_VRC, {VRC_State}       from "./vrc/schema";
 import Schema_TTS, {TTS_State}       from "./tts/schema";
 
 export interface BackendState {
-  clientTheme: string
+  clientTheme: string;
+  uiScale: number;
   shortcuts: {
     start: string;
     muteMic: string;
@@ -39,6 +40,7 @@ export const backendSchema: JSONSchemaType<BackendState> = {
   type:       "object",
   properties: {
     clientTheme: {type: "string", default: "night"},
+    uiScale: {type: "number", default: 1},
     shortcuts:    {
       type:       "object",
       properties: {

@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { AnimatePresence, motion } from "framer-motion";
-import { ButtonHTMLAttributes, createContext, FC, PropsWithChildren, useCallback, useState, useContext, memo } from "react";
-import { RiAddFill, RiCloseFill, RiFontSize, RiImageFill, RiMessage2Fill, RiMicFill, RiSettings2Fill, RiStackFill, RiTwitchFill, RiVoiceRecognitionFill } from "react-icons/ri";
+import { ButtonHTMLAttributes, createContext, FC, memo, PropsWithChildren, useCallback, useContext, useState } from "react";
+import { RiAddFill, RiChatVoiceFill, RiCloseFill, RiFolderMusicFill, RiFontSize, RiImageFill, RiMessage2Fill, RiMicFill, RiSettings2Fill, RiStackFill, RiTranslate2, RiTwitchFill } from "react-icons/ri";
 import { TbArrowBarToLeft, TbArrowBarToRight, TbTextResize } from "react-icons/tb";
 import { Services } from "../backend-services";
 import { useGetState } from "../frontend-services";
@@ -35,7 +35,7 @@ const SideBarButtonBase: FC<PropsWithChildren<Omit<ButtonProps, "tab"> & { activ
 
   return <Tooltip enable={!expand} placement={["right"]} content={tooltip}>
     <li className="overflow-hidden">
-      <button {...props} className={classNames("flex-none whitespace-nowrap h-10 px-3 gap-0 space-x-2 text-lg", activeStyles)}>
+      <button {...props} className={classNames("flex-none whitespace-nowrap h-10 px-3 gap-0 space-x-2 text-lg text-semibold", activeStyles)}>
         {children}
         <AnimatePresence>
           {expand && <motion.div
@@ -74,7 +74,7 @@ const AddElementsMenu: FC = () => {
   );
 };
 
-const ElementMenu: FC<{id: string, title: string}> = ({id, title}) => {
+const ElementMenu: FC<{ id: string, title: string }> = ({ id, title }) => {
   const handleRemove = () => {
     window.APIFrontend.elements.removeElement(id);
   }
@@ -98,7 +98,7 @@ const SidebarElementButton: FC<{ id: string }> = memo(({ id }) => {
       {type === ElementType.image && <RiImageFill />}
     </SideBarButton>
   </Dropdown>
-  
+
 });
 
 const ElementList: FC = () => {
@@ -122,9 +122,9 @@ const Sidebar: FC = () => {
     setTab(v);
   }, [tab, show]);
 
-  return <div className="flex h-full z-50">
+  return <div className="flex h-full z-10">
     <sidebarContext.Provider value={{ show, expand, tab, changeTab }}>
-      <div className="z-10 flex-none overflow-y-scroll scrollbar-hide">
+      <div className="flex-none overflow-y-scroll scrollbar-hide">
         <div className="w-max">
           <ul className="menu p-3 space-y-2">
             <button className={classNames("swap swap-flip btn btn-ghost btn-sm self-start", { "swap-active": expand })} onClick={() => setExpand(e => !e)}>
@@ -132,20 +132,19 @@ const Sidebar: FC = () => {
               <TbArrowBarToRight className="swap-off" />
             </button>
             <SideBarButton tab={{ tab: Services.stt }} tooltip="Speech to Text"><RiMicFill /></SideBarButton>
-            <SideBarButton tab={{ tab: Services.tts }} tooltip="Text to Speech"><RiVoiceRecognitionFill /></SideBarButton>
+            <SideBarButton tab={{ tab: Services.tts }} tooltip="Text to Speech"><RiChatVoiceFill /></SideBarButton>
+            <SideBarButton tab={{ tab: Services.stt }} tooltip="Translation"><RiTranslate2 /></SideBarButton>
             <SideBarButton tab={{ tab: Services.vrc }} tooltip="VRChat OSC"><RiMessage2Fill /></SideBarButton>
             <SideBarButton tab={{ tab: Services.twitch }} tooltip="Twitch Integration"><RiTwitchFill /></SideBarButton>
             <SideBarButton tab={{ tab: "settings" }} tooltip="Settings & About"><RiSettings2Fill /></SideBarButton>
             <Divider />
             <SideBarButton tab={{ tab: "scenes" }} tooltip="Canvas & Scenes"><RiStackFill /></SideBarButton>
             <ElementList />
-            {/* <SideBarButton tab={{ tab: ElementType.text }} tooltip="Text element"><TbTextResize /></SideBarButton>
-            <SideBarButton tab={{ tab: ElementType.image }} tooltip="Image element"><RiImageFill /></SideBarButton> */}
             <Dropdown placement="right" content={<AddElementsMenu />}>
               <SideBarButtonBase tooltip="Add element"><RiAddFill /></SideBarButtonBase>
             </Dropdown>
             <Divider />
-            <SideBarButtonBase tooltip="Files"><RiAddFill /></SideBarButtonBase>
+            <SideBarButton tab={{ tab: "files" }} tooltip="Files"><RiFolderMusicFill /></SideBarButton>
             <SideBarButtonBase tooltip="Fonts"><RiFontSize /></SideBarButtonBase>
           </ul>
         </div>

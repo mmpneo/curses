@@ -1,4 +1,3 @@
-import { globalShortcut } from "@tauri-apps/api";
 import { FC } from "react";
 import { RiSettings2Fill } from "react-icons/ri";
 import { useSnapshot } from "valtio";
@@ -46,10 +45,17 @@ const options = [
   { label: 'Dark', options: themesDark.map(theme => ({ value: theme, label: theme })) }
 ]
 
+const UI_SCALE_MIN = 0.8;
+const UI_SCALE_MAX = 1.5;
+
 const Inspector_Settings: FC = () => {
-  const {clientTheme, shortcuts} = useSnapshot(window.API.state);
+  const {clientTheme, uiScale, shortcuts} = useSnapshot(window.API.state);
   const handleChangeTheme = (v: string) => window.API.changeTheme(v);
-  
+  const handleChangeScale = (v: string | number) => {
+    const _v = typeof v === "string" ? parseFloat(v) : v;
+    window.API.changeScale(Math.max(UI_SCALE_MIN, Math.min(UI_SCALE_MAX, _v)));
+  }
+
   const handleShortcuts = (key: keyof BackendState["shortcuts"], v: string) => {
     window.API.state.shortcuts[key] = v;
   }
@@ -57,12 +63,27 @@ const Inspector_Settings: FC = () => {
   return <Inspector.Body>
     <Inspector.Header><RiSettings2Fill /> Settings</Inspector.Header>
     <Inspector.Content>
+      <Inspector.SubHeader>UI</Inspector.SubHeader>
       <Input.Select label="Theme" options={options} value={{ value: clientTheme, label: clientTheme }} onChange={(e: any) => handleChangeTheme(e.value)} />
-
-      {/* <Inspector.SubHeader>Shortcuts</Inspector.SubHeader>
-      <Input.Text onChange={e => handleShortcuts("start", e.target.value) } value={shortcuts.start} label="Start/Stop" />
-      <Input.Text onChange={e => handleShortcuts("muteMic", e.target.value) } value={shortcuts.muteMic} label="Mute microphone" />
-      <Input.Text onChange={e => handleShortcuts("muteSound", e.target.value) } value={shortcuts.muteSound} label="Mute editor" /> */}
+      <Input.Chips label="UI scale" value={uiScale} onChange={e => handleChangeScale(e)} options={[
+        {label: "S", value: .8},
+        {label: "M", value: 1},
+        {label: "L", value: 1.2},
+        {label: "X", value: 1.4},
+      ]}/>
+      <Inspector.SubHeader>Connection</Inspector.SubHeader>
+      <Input.Checkbox label="Network share"/>
+      <Input.Container label="Connection"><span className=" font-semibold badge badge-success">active</span></Input.Container>
+      <Input.Container label="Remote Connection"><span className=" font-semibold badge badge-neutral">disconnected</span></Input.Container>
+      {/* <Input.Container label="Link">
+        <div className="btn-group">
+          <button className="btn btn-sm self-end">Copy</button>
+          <button className="btn btn-sm self-end">Copy remote</button>
+          <button className="btn btn-sm btn-warning self-end">Refresh</button>
+        </div>
+      </Input.Container> */}
+      
+      <div className="opacity-50">Made with 💗 by Mmp</div>
     </Inspector.Content>
   </Inspector.Body>
 }
