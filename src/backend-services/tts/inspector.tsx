@@ -1,41 +1,94 @@
 import { invoke } from "@tauri-apps/api/tauri";
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import { RiVoiceRecognitionFill } from "react-icons/ri";
+import { useSnapshot } from "valtio";
+import Input from "../../components/input";
 import Inspector from "../../components/inspector";
+import { TextEventSource } from "../../types";
+import ServiceButton from "../components/service-button";
+import { TTS_Backends, TTS_State } from "./schema";
+import { azureVoices } from "./service_data";
+import ServiceVoiceSelect from "./voice-select";
+
+type WindowsToken = {
+  id: string;
+  label: string;
+}
+type WindowsConfig = { devices: WindowsToken[], voices: WindowsToken[] };
+const Windows: FC = () => {
+  const pr = useSnapshot(window.API.state.services.tts.data.windows);
+  const handleUpdate = <K extends keyof TTS_State["windows"]>(key: K, v: TTS_State["windows"][K]) => window.API.patchService("tts", s => s.data.windows[key] = v);
+
+  const [config, setConfig] = useState<WindowsConfig>();
+
+  useEffect(() => {
+    invoke<WindowsConfig>("plugin:windows_tts|get_voices").then(setConfig);
+  }, []);
+
+  return <>
+    <Inspector.SubHeader>WindowsTTS options</Inspector.SubHeader>
+    <Input.Select
+      value={{ value: pr.device, label: pr.device }}
+      onChange={(e: any) => handleUpdate("device", e.value)}
+      getOptionLabel={({ value }: any) => config?.devices.find(d => d.id === value)?.label || value}
+      options={config?.devices.map(d => ({ ...d, value: d.id }))}
+      placeholder="Device"
+      label="Audio output" />
+
+    <Input.Select
+      value={{ value: pr.voice, label: pr.voice }}
+      onChange={(e: any) => handleUpdate("voice", e.value)}
+      getOptionLabel={({ value }: any) => config?.voices.find(d => d.id === value)?.label || value}
+      options={config?.voices.map(d => ({ ...d, value: d.id }))}
+      placeholder="Select voice"
+      label="Voice" />
+  </>
+}
+
+const Azure: FC = () => {
+  const pr = useSnapshot(window.API.state.services.tts.data.azure);
+  const handleUpdate = <K extends keyof TTS_State["azure"]>(key: K, v: TTS_State["azure"][K]) => window.API.state.services.tts.data.azure[key] = v;
+  return <>
+    <Inspector.SubHeader>Azure options</Inspector.SubHeader>
+
+    <ServiceVoiceSelect onChangeLang={e => handleUpdate("language", e)} onChangeVoice={e => handleUpdate("voice", e)} value={pr} library={azureVoices} />
+
+    <Input.Text label="Key" value={pr.key} onChange={e => handleUpdate("key", e.target.value)} />
+    <Input.Text label="Location" value={pr.location} onChange={e => handleUpdate("location", e.target.value)} />
+  </>
+}
 
 const Inspector_TTS: FC = () => {
+  const data = useSnapshot(window.API.state.services.tts);
+  const state = useSnapshot(window.API.tts.serviceState);
 
-  const handleSend = () => {
-    invoke("plugin:windows_tts|speak");
-  }
+  const handleBackend = (v: TTS_Backends) => window.API.patchService("tts", state => state.data.backend = v);
+  const handleSource = (v: TextEventSource) => {
+    console.log(v);
+    return window.API.patchService("tts", state => state.data.source = v);
+  };
 
-  const handleVoices = () => {
-    invoke("plugin:windows_tts|get_voices");
-  }
+  const handleStart = (v: boolean) => window.API.state.services.tts.autoStart = v;
+
   return <Inspector.Body>
     <Inspector.Header><RiVoiceRecognitionFill /> Text to Speech</Inspector.Header>
     <Inspector.Content>
-      <fieldset>
-        <label>Font size</label>
-        <input className="field-width" type="text" />
-      </fieldset>
-      <fieldset>
-        <label>Font color</label>
-        <input type="checkbox" className="toggle toggle-primary" />
-      </fieldset>
+      <Input.Checkbox label="Start with play button" onChange={handleStart} value={data.autoStart} />
 
-      <fieldset>
-        <label>asd2</label>
-        <select className="field-width"></select>
-      </fieldset>
+      <Input.Select value={{ value: data.data.source, label: data.data.source }} onChange={(e: any) => handleSource(e.value as any)} options={[
+        { label: 'STT', value: TextEventSource.stt },
+        { label: 'Translation', value: TextEventSource.translation },
+        { label: 'Text field', value: TextEventSource.textfield }
+      ]} placeholder="Text source" label="Text source" />
+      <Input.Select options={[
+        { label: "Windows", value: TTS_Backends.windows },
+        { label: "Azure", value: TTS_Backends.azure },
+      ]} label="Service" value={{ value: data.data.backend, label: data.data.backend }} onChange={(e: any) => handleBackend(e.value as TTS_Backends)} />
 
-      <fieldset>
-        <label>asd2</label>
-        <input type="range" className="field-width"></input>
-      </fieldset>
+      {data.data.backend === TTS_Backends.windows && <Windows />}
+      {data.data.backend === TTS_Backends.azure && <Azure />}
 
-      <button onClick={handleSend} className="btn btn-sm btn-primary">send</button>
-      <button onClick={handleVoices} className="btn btn-sm btn-primary">voices</button>
+      <ServiceButton status={state.status} onStart={() => window.API.tts.start()} onStop={() => window.API.tts.stop()} />
 
     </Inspector.Content>
   </Inspector.Body>

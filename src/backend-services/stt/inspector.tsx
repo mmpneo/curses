@@ -7,6 +7,7 @@ import { azureLanguages, deepGramLangs } from "./service_data";
 import Inspector from "../../components/inspector";
 import Input from "../../components/input";
 import { RiMicFill } from "react-icons/ri";
+import ServiceButton from "../components/service-button";
 
 const Browser: FC = () => {
   const pr = useSnapshot(window.API.state.services.stt.data);
@@ -86,10 +87,7 @@ const Inspector_STT: FC = () => {
       {data.data.backend === STT_Backends.azure && <Azure />}
       {data.data.backend === STT_Backends.deepgram && <Deepgram />}
 
-      {state.status === ServiceNetworkState.disconnected && <button className="btn btn-sm btn-primary" onClick={() => window.API.stt.start()}>Start</button>}
-      {state.status === ServiceNetworkState.connecting && <button className="btn btn-sm btn-primary loading">Connecting</button>}
-      {state.status === ServiceNetworkState.connected && <button className="btn btn-sm btn-primary" onClick={() => window.API.stt.stop()}>Disconnect</button>}
-      {state.status === ServiceNetworkState.error && <button className="btn btn-sm btn-error" onClick={() => window.API.stt.start()}>Disconnected, try again</button>}
+      <ServiceButton status={state.status} onStart={() => window.API.stt.start()} onStop={() => window.API.stt.stop()}/>
     </Inspector.Content>
   </Inspector.Body>
 }
