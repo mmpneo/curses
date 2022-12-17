@@ -27,7 +27,6 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
   const [active, setActive] = useState(false);
 
   const [_clearTimeoutReady, cancelClearTimer, startClearTimer] = useTimeoutFn(() => {
-    console.log(stateRef.current.behaviorClearTimer)
     setActive(false);
     if (sentenceQueue.current.length === 0)
       behaviorClearDelayCancelToken.current = setTimeout(() => {
@@ -95,15 +94,28 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
       value: `element.${id}`
     }
     window.API.pubsub.registerEvent(event)
-    return () => {window.API.pubsub.unregisterEvent(event);}
-}, [name]);
+    return () => { window.API.pubsub.unregisterEvent(event); }
+  }, [name]);
 
   useEffect(() => {
-    const sub = window.API.pubsub.subscribeText(TextEventSource.textfield, event => {
-      enqueueSentence(event);
+    const sub = window.API.pubsub.subscribeText(state.sourceMain, event => {
+      if (!stateRef.current.sourceInterim && event?.type === TextEventType.interim)
+        return;
+      event?.value && enqueueSentence(event);
     });
     return () => window.API.pubsub.unsubscribe(sub);
-  }, []);
+  }, [state.sourceMain]);
+
+  useEffect(() => {
+    if (!state.sourceInputField)
+      return;
+    const sub = window.API.pubsub.subscribeText(TextEventSource.textfield, event => {
+      if (!stateRef.current.sourceInterim && event?.type === TextEventType.interim)
+        return;
+      event?.value && enqueueSentence(event);
+    });
+    return () => window.API.pubsub.unsubscribe(sub);
+  }, [state.sourceInputField]);
 
   const onComplete = useCallback(() => {
     isRunning.current = false;
@@ -127,7 +139,7 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
 
     // emit activity event
     if (stateRef.current.animateEvent) {
-      window.API.pubsub.publish(`element.${id}`);
+      window.API.pubsub.publishLocally({ topic: `element.${id}` });
     }
   }
 

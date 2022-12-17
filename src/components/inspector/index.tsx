@@ -1,10 +1,10 @@
-import { useId } from "@floating-ui/react-dom-interactions";
 import classNames from "classnames";
 import { AnimatePresence, motion } from "framer-motion";
 import { ButtonHTMLAttributes, FC, forwardRef, memo, PropsWithChildren } from "react";
 import SimpleBar from "simplebar-react";
 import { Services } from "../../backend-services";
 import Inspector_STT from "../../backend-services/stt/inspector";
+import Inspector_Translation from "../../backend-services/translation/inspector";
 import Inspector_TTS from "../../backend-services/tts/inspector";
 import Inspector_Twitch from "../../backend-services/twitch/inspector";
 import Inspector_VRC from "../../backend-services/vrc/inspector";
@@ -19,10 +19,11 @@ import Inspector_Scenes from "./inspector_scenes";
 import Inspector_Settings from "./inspector_settings";
 
 const Base: FC<{ path?: InspectorTabPath }> = ({ path }) => {
-  return <div style={{ width: '20rem' }} className="relative h-full flex-none bg-base-100 rounded-box flex flex-col overflow-hidden">
+  return <div style={{ width: '20rem' }} className="relative h-full flex-none bg-base-200 rounded-box flex flex-col overflow-hidden">
     <AnimatePresence initial={false}>
       {path?.tab === Services.stt && <Inspector_STT key="stt" />}
       {path?.tab === Services.tts && <Inspector_TTS key="tts" />}
+      {path?.tab === Services.translation && <Inspector_Translation key="translation" />}
       {path?.tab === Services.twitch && <Inspector_Twitch key="twitch" />}
       {path?.tab === Services.vrc && <Inspector_VRC key="vrc" />}
       {path?.tab === "settings" && <Inspector_Settings key="settings" />}
@@ -97,7 +98,7 @@ const TabsContent: FC<PropsWithChildren<{ tabKey: number | string, direction: nu
 });
 
 const Tabs: FC<PropsWithChildren> = ({children}) => {
-  return <div className="bg-base-100 -mx-1 px-1 sticky top-0 pt-3 pb-2 z-10 grid grid-cols-7 gap-2">
+  return <div className="bg-base-200 -mx-1 px-1 sticky top-0 pt-3 pb-2 z-10 grid grid-cols-7 gap-2">
     {children}
   </div>
 }

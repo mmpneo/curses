@@ -1,8 +1,11 @@
 import { proxy } from "valtio";
-import { IServiceInterface } from "../../types";
+import { BaseEvent, IServiceInterface } from "../../types";
 import { PeerjsProvider as PeerProvider } from "./provider";
 
 class Service_Network implements IServiceInterface {
+  broadcast(msg: BaseEvent) {
+    this.#provider?.broadcastPubSub(msg);
+  }
   #provider?: PeerProvider;
 
   state = proxy({

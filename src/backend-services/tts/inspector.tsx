@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api/tauri";
 import { FC, useEffect, useState } from "react";
-import { RiVoiceRecognitionFill } from "react-icons/ri";
+import { RiChatVoiceFill } from "react-icons/ri";
 import { useSnapshot } from "valtio";
 import Input from "../../components/input";
 import Inspector from "../../components/inspector";
@@ -48,13 +48,24 @@ const Windows: FC = () => {
 const Azure: FC = () => {
   const pr = useSnapshot(window.API.state.services.tts.data.azure);
   const handleUpdate = <K extends keyof TTS_State["azure"]>(key: K, v: TTS_State["azure"][K]) => window.API.state.services.tts.data.azure[key] = v;
+  const [outputDevices, setOutputDevices] = useState<MediaDeviceInfo[]>([]);
+
+  const updateDevices = async () => {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    console.log(devices.filter(device => device.kind === "audiooutput"))
+    setOutputDevices(devices.filter(device => device.kind === "audiooutput"));
+  }
+  useEffect(() => {
+    updateDevices();
+  }, []);
+
   return <>
     <Inspector.SubHeader>Azure options</Inspector.SubHeader>
 
+    <Input.Select options={outputDevices.map(d => ({label: d.label, value: d.deviceId}))} label="Audio Output" onChange={(e: any) => handleUpdate("device", e.value as TTS_Backends)} />
     <ServiceVoiceSelect onChangeLang={e => handleUpdate("language", e)} onChangeVoice={e => handleUpdate("voice", e)} value={pr} library={azureVoices} />
-
-    <Input.Text label="Key" value={pr.key} onChange={e => handleUpdate("key", e.target.value)} />
-    <Input.Text label="Location" value={pr.location} onChange={e => handleUpdate("location", e.target.value)} />
+    <Input.Text type="password" label="Key" value={pr.key} onChange={e => handleUpdate("key", e.target.value)} />
+    <Input.Text type="password" label="Location" value={pr.location} onChange={e => handleUpdate("location", e.target.value)} />
   </>
 }
 
@@ -71,7 +82,7 @@ const Inspector_TTS: FC = () => {
   const handleStart = (v: boolean) => window.API.state.services.tts.autoStart = v;
 
   return <Inspector.Body>
-    <Inspector.Header><RiVoiceRecognitionFill /> Text to Speech</Inspector.Header>
+    <Inspector.Header><RiChatVoiceFill /> Text to Speech</Inspector.Header>
     <Inspector.Content>
       <Input.Checkbox label="Start with play button" onChange={handleStart} value={data.autoStart} />
 

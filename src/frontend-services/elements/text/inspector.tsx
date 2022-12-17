@@ -10,7 +10,6 @@ import { TbTextResize } from "react-icons/tb";
 import { VscSettings } from "react-icons/vsc";
 import { useCopyToClipboard } from "react-use";
 import { useGetState, useUpdateState } from "../..";
-import Tooltip from "../../../components/dropdown/Tooltip";
 import Input from "../../../components/input";
 import Inspector from "../../../components/inspector";
 import { TextEventSource } from "../../../types";
@@ -19,7 +18,7 @@ import TransformInput from "../../components/transform-input";
 import { Element_TextState, FlexAlign, FontCase } from "./schema";
 
 const SourceInspector: FC<{ id: string }> = ({ id }) => {
-  const data = useGetState(state => state.elements[id].scenes["main"].data);
+  const data: Element_TextState = useGetState(state => state.elements[id].scenes["main"].data);
   const update = useUpdateState();
   const up = <K extends keyof Element_TextState>(key: K, v: Element_TextState[K]) => update(state => {
     state.elements[id].scenes["main"].data[key] = v;
@@ -27,13 +26,12 @@ const SourceInspector: FC<{ id: string }> = ({ id }) => {
 
   return <>
     <Inspector.SubHeader>Source</Inspector.SubHeader>
-    <Input.Select value={data.sourceMain} onChange={e => up("sourceMain", e as any)} options={[
+    <Input.Select value={data.sourceMain} onChange={(e: any) => up("sourceMain", e.value as any)} options={[
       { label: 'STT', value: TextEventSource.stt },
       { label: 'Translation', value: TextEventSource.translation }
     ]} placeholder="Text source" label="Main text source" />
-    <Input.Text label="Text source mask" />
+    <Input.Checkbox label="Interim results" value={data.sourceInterim} onChange={e => up("sourceInterim", e)} />
     <Input.Checkbox label="Input field" />
-    <Input.Text label="Input field mask" />
   </>
 }
 

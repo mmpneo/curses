@@ -1,0 +1,299 @@
+<html>
+
+<head>
+  <style>
+    :root {
+      font-size: 10px;
+      --opacity: 1;
+      --element-size: 4rem;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    .container {
+      background-color: #000;
+      font-family: "Segoe UI";
+      height: 100vh;
+      width: 100vw;
+      border-radius: 0.8rem;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      color: #fff;
+      opacity: var(--opacity);
+      transition: opacity .1s ease-in-out;
+    }
+
+    .container:hover,
+    .container:focus-within {
+      opacity: 1;
+    }
+
+    .titlebar {
+      -webkit-app-region: drag;
+      height: 4.5rem;
+      border-bottom: 1px solid rgb(32, 32, 34);
+      user-select: none;
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      justify-content: space-between;
+    }
+
+    .titlebar-button {
+      -webkit-app-region: no-drag;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 30px;
+      height: 30px;
+    }
+
+    .titlebar-button:hover {
+      background: #5bbec3;
+    }
+
+    .titlebar-logo {
+      font-weight: 700;
+      font-size: 1.4rem;
+    }
+
+    #form {
+      width: 100%;
+      display: flex;
+      gap: 0.4rem;
+      padding: 0 1rem 1rem;
+      box-sizing: border-box;
+    }
+
+    #form input {
+      min-width: 0;
+      height: var(--element-size);
+      flex: 100%;
+      border-radius: 0.4rem;
+      padding: 0 1rem;
+      color: #fff;
+      outline-color: purple;
+      font-size: 1.8rem;
+
+      font-weight: 600;
+      background-color: rgb(28, 28, 30);
+      border: none;
+    }
+
+    #form input:focus-visible {
+      outline: 2px solid #fff;
+      border-radius: 3px;
+    }
+
+    #form button:hover {
+      background-color: rgb(58, 58, 60);
+    }
+
+    #form button {
+      transition: background-color .1s ease-in-out;
+      background-color: transparent;
+      flex: none;
+      color: #fff;
+      border: none;
+      width: var(--element-size);
+      height: var(--element-size);
+
+      font-weight: 600;
+      border-radius: 50%;
+    }
+
+    .list-container {
+      display: flex;
+      flex-direction: column-reverse;
+      flex: 100%;
+      overflow-y: scroll;
+    }
+
+    .list-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    #list {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      font-size: 1.8rem;
+      padding: 1rem;
+    }
+
+    #list>div {
+      display: flex;
+      flex-direction: column;
+      padding: .5rem 1rem;
+      /* border-radius: 0.4rem; */
+      border-bottom: 1px solid rgb(28, 28, 30);
+      /* background-color: rgb(28,28,30); */
+    }
+
+    #list>div:last-child {
+      border: none;
+    }
+
+    #list>div .event {
+      color: rgb(99, 99, 102);
+      font-size: 1.2rem;
+    }
+
+    .titlebar-opacity {
+      width: 60px;
+      -webkit-app-region: no-drag;
+    }
+
+    input[type=range].titlebar-opacity::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 1em;
+      height: 1em;
+      border-radius: 1em;
+      background: #007cf8;
+      border: none;
+      box-shadow: 0 0 2px black;
+      margin-top: calc(max((0.3em - 1px - 1px) * 0.5, 0px) - 1em * 0.5);
+    }
+
+    input[type=range].titlebar-opacity::-webkit-slider-runnable-track {
+      height: 0.3em;
+      border: 1px solid #333;
+      border-radius: 0.5em;
+      background: #333;
+      box-shadow: none;
+    }
+
+    input[type=range].titlebar-opacity::-webkit-slider-thumb:hover {
+      background: #0061c3;
+    }
+
+    input[type=range].titlebar-opacity:hover::-webkit-slider-runnable-track {
+      background: #333;
+      border-color: #333;
+    }
+
+    input[type=range].titlebar-opacity::-webkit-slider-thumb:active {
+      background: #2f98f9;
+    }
+
+    input[type=range].titlebar-opacity:active::-webkit-slider-runnable-track {
+      background: #f5f5f5;
+      border-color: #c1c1c1;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div data-tauri-drag-region class="titlebar">
+      <div class="titlebar-logo" l>SimpleSTT</div>
+      <input id="opacity" class="titlebar-opacity" type="range" min="0.1" max="1" step="0.05">
+      <div id="btn-close" class="titlebar-button" id="titlebar-close">
+        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="2rem" width="2rem"
+          xmlns="http://www.w3.org/2000/svg" data-darkreader-inline-stroke=""
+          style="--darkreader-inline-stroke:currentColor; --darkreader-inline-fill:currentColor;"
+          data-darkreader-inline-fill="">
+          <g>
+            <path fill="none" d="M0 0h24v24H0z"></path>
+            <path
+              d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-11.414L9.172 7.757 7.757 9.172 10.586 12l-2.829 2.828 1.415 1.415L12 13.414l2.828 2.829 1.415-1.415L13.414 12l2.829-2.828-1.415-1.415L12 10.586z">
+            </path>
+          </g>
+        </svg>
+      </div>
+    </div>
+    <div class="list-container">
+      <div id="list"></div>
+    </div>
+    <form id="form">
+      <input autoComplete="off" id="inputfield" placeholder="Send text" class="input" />
+      <button type="submit">
+        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="2rem" width="2rem"
+          xmlns="http://www.w3.org/2000/svg" data-darkreader-inline-fill="" data-darkreader-inline-stroke=""
+          style="--darkreader-inline-fill:currentColor; --darkreader-inline-stroke:currentColor;">
+          <g>
+            <path fill="none" d="M0 0h24v24H0z"></path>
+            <path
+              d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z">
+            </path>
+          </g>
+        </svg>
+      </button>
+    </form>
+  </div>
+  <script>
+    window.addEventListener('contextmenu', function (e) {
+      e.preventDefault();
+    }, false);
+    const listElement = document.getElementById("list");
+    const input = document.getElementById("inputfield");
+    const inputOpacity = document.getElementById("opacity");
+    const closeBtn = document.getElementById("btn-close");
+    closeBtn.onclick = () => {
+      const w = window.__TAURI__?.window?.getCurrent()
+      w && w.hide();
+    };
+
+    function applyOpacity(value) {
+      inputOpacity.value = value;
+      let root = document.documentElement;
+      root.style.setProperty('--opacity', value);
+      localStorage.setItem("simple-stt-inputfield-opacity", value);
+    }
+
+    const opacity = localStorage.getItem("simple-stt-inputfield-opacity")
+    opacity && applyOpacity(opacity)
+
+    inputOpacity.oninput = e => {
+      applyOpacity(e.target.value);
+    }
+
+    function addRowNode(value, event) {
+      if (listElement.childElementCount >= 20)
+        listElement.firstChild.remove()
+      const newDiv = document.createElement("div");
+      newDiv.innerHTML = `
+      <span class="event">${event}</span>
+      <span class="value">${value}</span>
+      `
+      listElement.append(newDiv);
+    }
+
+    const socket = new WebSocket(`ws://localhost:3030/pubsub?id=${Math.random()}-${Date.now()}`);
+    socket.onopen = () => {
+      socket.onmessage = (msg) => {
+        try {
+          const {topic, data: {type, value}} = JSON.parse(msg.data);
+          if (topic !== "text.textfield" && topic !== "text.stt" || type !== 0 || typeof value !== "string")
+            return;
+          addRowNode(value, topic);
+        } catch(err) {console.log(err)}
+      }
+    };
+
+    const form = document.getElementById("form");
+
+    function send(obj) {
+      (socket.OPEN === socket.readyState) && socket.send(JSON.stringify(obj));
+    }
+
+    form.onsubmit = e => {
+      e.preventDefault();
+      if (!input.value)
+        return;
+      send({topic: "text.textfield",data: {type: 0, value: input.value}});
+      input.value = "";
+    }
+
+    input.oninput = e => {
+      send({topic: "text.textfield", data: {type: 1, value: e.target.value}});
+    }
+  </script>
+</body>
+
+</html>

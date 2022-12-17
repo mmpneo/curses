@@ -13,7 +13,7 @@ class Service_VRC implements IServiceInterface {
     }
     window.API.pubsub.subscribeText(TextEventSource.stt, (value) => {
       if (!this.#state.sendStt) return;
-      if (value.type === TextEventType.final) {
+      if (value && value.type === TextEventType.final) {
         this.#sendText(value.value);
         this.#state.indicator && this.#sendIndicator(false);
       } else {
@@ -23,7 +23,7 @@ class Service_VRC implements IServiceInterface {
     });
     window.API.pubsub.subscribeText(TextEventSource.textfield, (value) => {
       if (!this.#state.sendText) return;
-      if (value.type === TextEventType.final) {
+      if (value && value.type === TextEventType.final) {
         this.#sendText(value.value, true);
         this.#state.indicator && this.#sendIndicator(false);
       } else {

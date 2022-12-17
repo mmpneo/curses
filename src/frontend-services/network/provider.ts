@@ -3,6 +3,7 @@ import Peer, {DataConnection}                                                   
 import {decoding, encoding}                                                                 from "lib0";
 import {messageYjsSyncStep1, messageYjsSyncStep2, readSyncMessage, readUpdate, writeUpdate} from 'y-protocols/sync'
 import {nanoid}                                                                             from "nanoid";
+import { BaseEvent } from "../../types";
 export class PeerjsProvider {
   constructor(
     private document: Doc,
@@ -104,7 +105,7 @@ export class PeerjsProvider {
       try {
         const topicStr = decoding.readVarString(decoder);
         const dataStr = decoding.readVarString(decoder);
-        window.API.pubsub.publish(topicStr, JSON.parse(dataStr), {replicate: false});
+        window.API.pubsub.publishLocally({topic: topicStr, data: JSON.parse(dataStr)});
       } catch (error) {console.error(error)}
     }
   }
@@ -116,7 +117,7 @@ export class PeerjsProvider {
     return encoding.toUint8Array(encoder);
   }
 
-  broadcastPubSub (msg: { topic: string, data: any }) {
+  broadcastPubSub (msg: BaseEvent) {
     try {
       const encoder = encoding.createEncoder();
       encoding.writeVarInt(encoder, 1);

@@ -15,6 +15,7 @@ export type TTS_State = {
     voice: string;
   };
   azure: {
+    device: string;
     language: string;
     voice: string;
     key: string;
@@ -36,17 +37,20 @@ const Schema_STT: JSONSchemaType<TTS_State> = {
       },
       required: ["device", "voice"],
       default: {} as any,
+      additionalProperties: false,
     },
     azure: {
       type: "object",
       properties: {
+        device: { type: "string", default: "" },
         language: { type: "string", default: "" },
         voice: { type: "string", default: "" },
         key: { type: "string", default: "" },
         location: { type: "string", default: "" },
       },
-      required: ["language", "voice", "key", "location"],
+      required: ["device", "language", "voice", "key", "location"],
       default: {} as any,
+      additionalProperties: false,
     },
   },
   required: [

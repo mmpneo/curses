@@ -133,7 +133,7 @@ const Sidebar: FC = () => {
             </button>
             <SideBarButton tab={{ tab: Services.stt }} tooltip="Speech to Text"><RiMicFill /></SideBarButton>
             <SideBarButton tab={{ tab: Services.tts }} tooltip="Text to Speech"><RiChatVoiceFill /></SideBarButton>
-            <SideBarButton tab={{ tab: Services.stt }} tooltip="Translation"><RiTranslate2 /></SideBarButton>
+            <SideBarButton tab={{ tab: Services.translation }} tooltip="Translation"><RiTranslate2 /></SideBarButton>
             <SideBarButton tab={{ tab: Services.vrc }} tooltip="VRChat OSC"><RiMessage2Fill /></SideBarButton>
             <SideBarButton tab={{ tab: Services.twitch }} tooltip="Twitch Integration"><RiTwitchFill /></SideBarButton>
             <SideBarButton tab={{ tab: "settings" }} tooltip="Settings & About"><RiSettings2Fill /></SideBarButton>

@@ -1,9 +1,9 @@
 import { IServiceInterface } from "../../types";
 
-class Service_Twitch implements IServiceInterface {
-  init(): void {
+class Service_Translation implements IServiceInterface {
+  async init() {
   }
 
 }
 
-export default Service_Twitch;
+export default Service_Translation;

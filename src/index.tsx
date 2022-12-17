@@ -12,7 +12,7 @@ declare global {
     APIFrontend: Frontend;
     mode: "host" | "client";
     platform: "app" | "web";
-    "__TAURI_METADATA__": any
+    // "__TAURI_METADATA__": any
   }
 }
 

@@ -9,6 +9,12 @@ export enum TextEventType {
   final,
   interim,
 }
+
+export type BaseEvent<Data = unknown> = {
+  topic: string,
+  data?: Data
+}
+
 export type TextEvent = {
   type: TextEventType;
   value: string;

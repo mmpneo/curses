@@ -7,32 +7,35 @@ type SoundEffects = {
   playbackMax?: number;
   detuneMin?: number;
   detuneMax?: number;
-}
+};
 
 class Service_Sound implements IServiceInterface {
-  constructor() {
-    this.audioContext = new AudioContext();
-  }
-  async init() {
+  constructor() {}
+  private audioContext!: AudioContext;
 
+  async init() {
+    this.audioContext = new AudioContext();
   }
   public state = proxy({
     micMuted: false,
     soundMuted: false,
   });
-  private audioContext!: AudioContext;
 
   async playUniqueBuffer(buffer: ArrayBuffer) {
     if (this.state.soundMuted) return;
+    // await (this.voiceAudio as any).setSinkId("default");
+
     return new Promise(async (res, rej) => {
       try {
         const audio = await this.audioContext.decodeAudioData(buffer);
         const source = this.audioContext.createBufferSource();
         source.buffer = audio;
-        source.connect(this.audioContext.destination);
+        let conn = source.connect(this.audioContext.destination);
+        source.onended = () => {
+          conn.disconnect();
+          res(null);
+        };
         source.start();
-        ``;
-        source.onended = res;
       } catch (error) {
         rej(error);
       }
@@ -45,26 +48,21 @@ class Service_Sound implements IServiceInterface {
     Math.random() * (max - min) + min;
   async playFromFile(fileId: string, effects?: SoundEffects) {
     if (this.state.soundMuted) return;
-    if (!this.#audioFiles[fileId]) {
+    
+    if (!this.#audioFiles[fileId]) try {
       const buffer = window.APIFrontend.files.getFileBuffer(fileId);
       if (!buffer) return;
-      try {
-        this.#audioFiles[fileId] = await this.audioContext.decodeAudioData(
-          buffer.buffer.slice(0)
-        );
-      } catch (error) {
-        return;
-      }
+      this.#audioFiles[fileId] = await this.audioContext.decodeAudioData(buffer.buffer.slice(0));
+    } catch (error) {
+      return;
     }
-
-    const source = this.audioContext.createBufferSource();
-
-    source.buffer = this.#audioFiles[fileId];
-
+    
     const gainNode = this.audioContext.createGain();
     gainNode.gain.value = effects?.volume || 1; // 10 %
-    gainNode.connect(this.audioContext.destination);
+    const conn = gainNode.connect(this.audioContext.destination);
 
+    const source = this.audioContext.createBufferSource();
+    source.buffer = this.#audioFiles[fileId];
     source.connect(gainNode);
 
     // region effects
@@ -81,6 +79,9 @@ class Service_Sound implements IServiceInterface {
         Math.min(3, effects.playbackMax ?? 1)
       );
     }
+    source.onended = () => {
+      conn.disconnect();
+    };
     // endregion
 
     source.start();

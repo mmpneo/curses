@@ -72,7 +72,7 @@ impl WindowsTTSPlugin {
         let Some(cur_token) = tokens.get(token.get()) else {
             return Err("Invalid token");
         };
-        let Some(cur_id) = (unsafe {cur_token.Id()}.ok()) else {
+        let Some(cur_id) = unsafe {cur_token.Id()}.ok() else {
             return Err("Cannot retrieve token id");
         };
 

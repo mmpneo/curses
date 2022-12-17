@@ -1,7 +1,7 @@
 import { useId } from "@floating-ui/react-dom-interactions";
 import classNames from "classnames/bind";
-import { FC, InputHTMLAttributes, memo, PropsWithChildren, ReactNode, useEffect, useState } from "react";
-import Select, { Props as SelectProps } from 'react-select';
+import { FC, InputHTMLAttributes, memo, PropsWithChildren, ReactNode, useEffect, useRef, useState } from "react";
+import Select, { MenuListProps, MenuProps, OptionProps, Props as SelectProps } from 'react-select';
 import styles from "./style.module.css"
 import { RgbaColorPicker, RgbaColor } from "react-colorful";
 import Dropdown from "../dropdown/Dropdown";
@@ -9,7 +9,7 @@ import { FileState, FileType } from "../../frontend-services/files/schema";
 import FileElement from "../../frontend-services/components/file-element";
 import NiceModal from "@ebay/nice-modal-react";
 import { RiUpload2Fill } from "react-icons/ri";
-
+import SimpleBar from "simplebar-react";
 const cx = classNames.bind(styles);
 
 interface InputBaseProps {
@@ -110,13 +110,42 @@ const Chips: FC<ChipsProps> = memo(({ label, value, options, onChange }) => {
   </Container>
 });
 
+const SelectMenu: FC<MenuProps> = ({innerRef, innerProps, ...props}) => {
+  return <>
+    <div {...innerProps} ref={innerRef as any} className="absolute flex flex-col justify-start w-56 z-50 right-0 top-10 bg-base-100 rounded-box shadow-lg">
+      <SimpleBar className="h-full max-h-64 flex flex-col">
+        {props.children}
+      </SimpleBar>
+    </div>
+  </>
+};
+const SelectMenuList: FC<MenuListProps> = ({innerRef, innerProps, ...props}) => {
+  return <ul className="flex flex-col menu menu-compact p-2 w-full">
+    {props.children}
+  </ul>
+};
+const SelectOption: FC<OptionProps> = ({innerRef, innerProps, ...props}) => {
+  const ref = useRef<HTMLDivElement>()
+  useEffect(() => {
+    if (props.isFocused)
+      ref.current?.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+  }, [props.isFocused])
+  return <li><a onClick={() => {props.selectOption(props.data); console.log(props)}} ref={ref as any} className={cx("font-medium", {
+    disabled: props.isDisabled,
+    "bg-neutral/20": props.isFocused,
+    active: props.isSelected})}>{props.children}</a></li>
+};
 
 interface NewSelectProps extends SelectProps, InputBaseProps { }
 const NewSelect: FC<NewSelectProps> = ({ label, ...props }) => {
   const id = useId();
   return (
     <Container label={label} id={id}>
-      <Select className="react-select field-width"
+      <Select components={{
+        Menu: SelectMenu,
+        MenuList: SelectMenuList,
+        Option: SelectOption,
+      }} className="react-select field-width"
         inputId={id}
         {...props}
         menuPlacement="auto"
@@ -134,40 +163,9 @@ const NewSelect: FC<NewSelectProps> = ({ label, ...props }) => {
             height: "2rem",
             minHeight: "2rem",
           }),
-          menu: base => ({
-            ...base,
-            zIndex: 1000,
-            justifySelf: 'end',
-            placeSelf: 'end',
-            alignSelf: 'end',
-            right: 0,
-            overflow: 'hidden',
-            borderRadius: 'var(--rounded-box, 0.5rem)',
-            width: 200,
-            backgroundColor: 'hsl(var(--b1) / var(--tw-bg-opacity))',
-          }),
-          menuList: base => ({
-            ...base,
-            "::-webkit-scrollbar": {
-              display: 'none'
-            },
-          }),
-          option: (base, state) => ({
-            ...base,
-            cursor: 'pointer',
-            textTransform: 'capitalize',
-            backgroundColor: state.isSelected ? 'hsl(var(--p) / var(--tw-bg-opacity))' :
-              (state.isFocused ? 'hsl(var(--p) / 0.5)' : 'hsl(var(--b1) / var(--tw-bg-opacity))'),
-            color: state.isSelected ? 'hsl(var(--pc) / var(--tw-text-opacity))' : 'inherit',
-            '--tw-bg-opacity': 1,
-            '--tw-text-opacity': 1,
-            '&:hover': {
-              // color: 'hsl(var(--pc) / var(--tw-text-opacity))',
-              backgroundColor: state.isSelected ? 'hsl(var(--p) / var(--tw-bg-opacity))' : 'hsl(var(--p) / 0.2)',
-            },
-          }),
           valueContainer: (baseStyles, state) => ({
             ...baseStyles,
+            paddingRight: 0,
             fontSize: "0.875rem",
             height: "2rem",
             minHeight: "2rem",
@@ -183,6 +181,7 @@ const NewSelect: FC<NewSelectProps> = ({ label, ...props }) => {
           }),
           indicatorsContainer: (baseStyles, state) => ({
             ...baseStyles,
+            paddingLeft: 0,
             fontSize: "0.875rem",
             height: "2rem",
             minHeight: "2rem",
@@ -249,7 +248,7 @@ const File: FC<FileProps> = ({ label, type, onChange, value }) => {
       if (resp?.[0]) {
         onChange(resp[0]);
       }
-    } catch (error) {}
+    } catch (error) { }
   }
 
   const handleSelect = async () => {
@@ -264,7 +263,7 @@ const File: FC<FileProps> = ({ label, type, onChange, value }) => {
     ]} data={file} />}
     {!file && <div className="flex space-x-2">
       <div onClick={handleAdd} className="text-base-content p-2 flex-none relative bg-base-200 rounded-lg w-14 h-14 flex items-center justify-center overflow-hidden">
-        <RiUpload2Fill/>
+        <RiUpload2Fill />
       </div>
       <div className="flex flex-col">
         <span>Select file</span>
@@ -280,7 +279,7 @@ interface EventProps extends InputBaseProps {
 }
 const Event: FC<EventProps> = memo(({ label, value, onChange }) => {
   const events = Array.from(window.API.pubsub.registeredEvents.values());
-  return <NewSelect options={events} label={label} defaultValue={events.find(e => e.value === value)} onChange={(e: any) => {console.log(e);onChange(e.value || "")}} />
+  return <NewSelect options={events} label={label} defaultValue={events.find(e => e.value === value)} onChange={(e: any) => { console.log(e); onChange(e.value || "") }} />
 });
 
 // import "ace-builds/src-noconflict/mod";
@@ -297,17 +296,17 @@ interface CodeProps extends InputBaseProps {
 const Code: FC<CodeProps> = memo(({ label, ...rest }) => {
   return <Container label={label} vertical>
     <AceEditor
-    showGutter={false}
-    enableLiveAutocompletion
-    width="100%"
-    className="w-full"
-    mode="css"
-    theme="twilight"
-    value={rest.value}
-    onChange={rest.onChange}
-    name="UNIQUE_ID_OF_DIV"
-    editorProps={{ $blockScrolling: true }}
-  />
+      showGutter={false}
+      enableLiveAutocompletion
+      width="100%"
+      className="w-full"
+      mode="css"
+      theme="twilight"
+      value={rest.value}
+      onChange={rest.onChange}
+      name="UNIQUE_ID_OF_DIV"
+      editorProps={{ $blockScrolling: true }}
+    />
   </Container>
 });
 

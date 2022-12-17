@@ -23,23 +23,31 @@ const ServiceVoiceSelect: FC<{value: Readonly<TTS_State["azure"]>, onChangeVoice
   const handleSelectLang = (langGroup: string) => {
     const l = getDialectList(library, langGroup);
     setDialectList(l as [string, string][]);
+    console.log(langGroup, l)
     onChangeLang(langGroup);
+    onChangeVoice(l[0][1]);
   }
   
   const handleSelectVoice = (langName: string) => {
     onChangeVoice(langName);
   };
 
+  const lang = library.find(l => l[1] === value.language);
+  const langOption = lang ? {label: lang?.[0], value: lang?.[1]} : null;
+
+  const voice = lang?.[2].find(l => l[1] === value.voice);
+  const voiceOption = lang ? {label: voice?.[0], value: voice?.[1]} : null;
+
   return <>
     <Input.Select
       options={library.map((lang, i) => ({ label: lang[0], value: lang[1] }))}
       label="Language"
-      value={{ value: value.language, label: value.language }}
+      value={langOption}
       onChange={(e: any) => handleSelectLang(e.value)} />
-    {voiceList.length > 1 && <Input.Select
-      options={voiceList.map((lang, i) => ({ label: lang[1], value: lang[0] }))}
+    {<Input.Select
+      options={voiceList.map((lang, i) => ({ label: lang[0], value: lang[1] }))}
       label="Voice"
-      value={{ value: value.voice, label: value.voice }}
+      value={voiceOption}
       onChange={(e: any) => handleSelectVoice(e.value)} />}
   </>
 }

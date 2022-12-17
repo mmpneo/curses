@@ -23,7 +23,7 @@ class Service_TTS implements IServiceInterface {
   #subscribeToTextEvent(v: TextEventSource) {
     this.#sourceSubKey && window.API.pubsub.unsubscribe(this.#sourceSubKey);
     this.#sourceSubKey = window.API.pubsub.subscribeText(v, (data) => {
-      if (data.type === TextEventType.final) {
+      if (data && data.type === TextEventType.final) {
         this.#serviceInstance?.play(data.value);
       }
     });
