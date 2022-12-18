@@ -65,7 +65,7 @@ const ColorSelectDropdown: FC<any> = ({ onChange, value }) => {
     onChange(rgbaToString({ ...rgba, [k]: parseFloat(e) }))
   }
 
-  return <div className="flex flex-col space-y-2 dropdown p-4">
+  return <div className="flex flex-col space-y-2 dropdown p-2">
     <RgbaColorPicker onChange={handleChange} color={stringToRgba(value)} />
     <div className="flex space-x-1">
       <input type="number" value={rgba.r} onChange={e => handlePartialChange("r", e.target.value)} className={cx(styles.clearAppearance, "w-full input input-xs input-bordered font-semibold leading-none")} />
@@ -80,9 +80,14 @@ interface InputColorProps extends InputBaseProps {
   value: string
 }
 const Color: FC<InputColorProps> = memo(({ label, ...rest }) => {
-  return <Dropdown targetOffset={24} placement="right" content={<ColorSelectDropdown {...rest} />}><Container label={label} id={label}>
-    <button className="btn-circle btn btn-sm" style={{ backgroundColor: rest.value as string }} />
-  </Container></Dropdown>
+  return <Dropdown targetOffset={24} placement="right" content={<ColorSelectDropdown {...rest} />}>
+    <Container label={label} id={label}>
+      <div className="field-width grid grid-cols-2 gap-2">
+        <div></div>
+        <div className="btn btn-sm" style={{ backgroundColor: rest.value as string }}></div>
+      </div>
+    </Container>
+  </Dropdown>
 });
 
 //margin: 0.375rem 0;
@@ -130,9 +135,9 @@ const SelectOption: FC<OptionProps> = ({innerRef, innerProps, ...props}) => {
     if (props.isFocused)
       ref.current?.scrollIntoView({block: 'nearest', behavior: 'smooth'});
   }, [props.isFocused])
-  return <li><a onClick={() => {props.selectOption(props.data); console.log(props)}} ref={ref as any} className={cx("font-medium", {
+  return <li><a onClick={() => props.selectOption(props.data)} ref={ref as any} className={cx("font-medium", {
     disabled: props.isDisabled,
-    "bg-neutral/20": props.isFocused,
+    "bg-neutral/60 text-neutral-content": props.isFocused,
     active: props.isSelected})}>{props.children}</a></li>
 };
 
@@ -261,13 +266,14 @@ const File: FC<FileProps> = ({ label, type, onChange, value }) => {
       { label: "Clear", fn: () => onChange("") },
       { label: "Change", fn: handleSelect },
     ]} data={file} />}
-    {!file && <div className="flex space-x-2">
-      <div onClick={handleAdd} className="text-base-content p-2 flex-none relative bg-base-200 rounded-lg w-14 h-14 flex items-center justify-center overflow-hidden">
-        <RiUpload2Fill />
+    {!file && <div className="flex items-center space-x-2">
+      <div onClick={handleAdd} className="cursor-pointer text-base-content p-2 flex-none relative border-2 border-primary/10 border-dashed bg-base-100 rounded-lg w-14 h-14 flex items-center justify-center overflow-hidden">
+        <RiUpload2Fill className="text-xl" />
       </div>
-      <div className="flex flex-col">
-        <span>Select file</span>
-        <button onClick={handleSelect} className="flex-grow btn btn-sm btn-primary">Select file</button>
+      <div className="flex flex-col items-start text-sm">
+        <span className="font-medium link link-accent link-hover">Upload file</span>
+        <span className="font-medium">or select from <span onClick={handleSelect} className="link link-accent link-hover">exising</span></span>
+        {/* <button onClick={handleSelect} className="flex-grow btn btn-sm btn-primary">Select existing file</button> */}
       </div>
     </div>}
   </Container>
@@ -282,17 +288,58 @@ const Event: FC<EventProps> = memo(({ label, value, onChange }) => {
   return <NewSelect options={events} label={label} defaultValue={events.find(e => e.value === value)} onChange={(e: any) => { console.log(e); onChange(e.value || "") }} />
 });
 
+const sourceOptions = [
+  { label: 'STT', value: TextEventSource.stt },
+  { label: 'Translation', value: TextEventSource.translation },
+]
+interface TextSourceProps extends InputBaseProps {
+  onChange: (value: TextEventSource) => void,
+  value: string
+}
+const TextSource: FC<TextSourceProps> = memo(({ label, value, onChange }) => {
+  return <NewSelect label={label} value={sourceOptions.find(o => o.value === value)} options={sourceOptions} onChange={(e: any) => onChange(e.value as any)} placeholder="Text source"  />
+});
+
 // import "ace-builds/src-noconflict/mod";
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-css";
 import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/theme-twilight";
+import { TextEventSource } from "../../types";
+import { ServiceNetworkState } from "../../backend-services/tts/types";
 
 interface CodeProps extends InputBaseProps {
   value: string,
   language: string,
   onChange: (value: string | undefined) => void
 }
+
+interface NetworkStatusProps extends InputBaseProps {
+  value: ServiceNetworkState
+}
+const NetworkStatus: FC<NetworkStatusProps> = ({label, value}) => {
+  return <Container label={label}>
+    <div className="self-end flex space-x-2 items-center pl-2 pr-3 h-8 py-1 rounded-full border-2 border-dashed border-neutral">
+      {value === ServiceNetworkState.disconnected && <>
+        <span className="text-xs font-semibold text-error leading-none">Disconnected</span>
+        <div className="rounded-full ring-2 bg-error ring-error ring-offset-base-100 ring-offset-2 w-2 h-2 "/>
+      </>}
+      {value === ServiceNetworkState.connecting && <>
+        <span className="text-xs font-semibold text-erroneutralr leading-none">Connecting..</span>
+        <div className="rounded-full ring-2 bg-neutral ring-neutral ring-offset-base-100 ring-offset-2 w-2 h-2 "/>
+      </>}
+      {value === ServiceNetworkState.connected && <>
+        <span className="text-xs font-semibold text-success leading-none">Connected</span>
+        <div className="rounded-full ring-2 bg-success ring-success ring-offset-base-100 ring-offset-2 w-2 h-2 "/>
+      </>}
+      {value === ServiceNetworkState.error && <>
+        <span className="text-xs font-semibold text-red-500 leading-none">Error</span>
+        <div className="rounded-full ring-2 bg-red-500 ring-red-500 ring-offset-base-100 ring-offset-2 w-2 h-2 "/>
+      </>}
+      </div>
+  </Container>
+}
+
 const Code: FC<CodeProps> = memo(({ label, ...rest }) => {
   return <Container label={label} vertical>
     <AceEditor
@@ -310,4 +357,4 @@ const Code: FC<CodeProps> = memo(({ label, ...rest }) => {
   </Container>
 });
 
-export default { BaseText, Text, Chips, Range, Color, Select: NewSelect, Checkbox, File, Event, Code, Container, DoubleCountainer };
+export default { BaseText, Text, Chips, Range, Color, Select: NewSelect, Checkbox, File, Event, Code, TextSource, Container, DoubleCountainer, NetworkStatus };

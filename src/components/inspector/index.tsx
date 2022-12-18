@@ -54,6 +54,12 @@ const SubHeader: FC<PropsWithChildren> = ({ children }) => {
   </span>
 }
 
+const Description: FC<PropsWithChildren> = ({ children }) => {
+  return <span>
+    <span className="-mt-2 text-xs text-base-content/60 flex justify-between items-center gap-2 whitespace-nowrap">{children}</span>
+  </span>
+}
+
 export const Content: FC<PropsWithChildren> = ({ children }) => {
   return <div className="flex flex-col p-4 space-y-2">{children}</div>
 }
@@ -110,4 +116,4 @@ const Tab: FC<PropsWithChildren<ButtonHTMLAttributes<HTMLButtonElement> & { tool
   </Tooltip>
 })
 
-export default { Base, Body, Header, SubHeader, Content, TabsContent, Tabs, Tab };
+export default { Base, Body, Header, SubHeader, Description, Content, TabsContent, Tabs, Tab };

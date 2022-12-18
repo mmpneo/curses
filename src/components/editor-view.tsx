@@ -1,15 +1,19 @@
+import NiceModal from "@ebay/nice-modal-react";
 import { FC, FormEvent, useState } from "react";
-import Sidebar from "./sidebar";
-import Actionbar from "./actionbar";
-import Canvas from "./canvas";
-import { TextEventSource, TextEventType } from "../types";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-import NiceModal from "@ebay/nice-modal-react";
+import { TextEventSource, TextEventType } from "../types";
+import Actionbar from "./actionbar";
+import Canvas from "./canvas";
+import Sidebar from "./sidebar";
 
+import { useSnapshot } from "valtio";
 import "./file-modal";
+import OverlayInput from "./overlay-input";
+import { AnimatePresence } from "framer-motion";
 
 const EditorView: FC = () => {
+  const {fullscreenInput} = useSnapshot(window.API.ui);
   return <div className="relative bg-base-300 w-screen h-screen flex overflow-hidden">
     <NiceModal.Provider>
       <Sidebar />
@@ -17,6 +21,9 @@ const EditorView: FC = () => {
       <div className="absolute top-3 right-4">
         <Actionbar />
       </div>
+      <AnimatePresence>
+        {fullscreenInput && <OverlayInput onClose={() => window.API.ui.fullscreenInput = false} />}
+      </AnimatePresence>
       <ToastContainer />
     </NiceModal.Provider>
   </div>
@@ -63,7 +70,7 @@ const STTInput: FC = () => {
   return <div className="flex items-center space-x-2 w-96">
     {/* <button className="btn btn-circle btn-ghost"><RiChatDeleteFill/></button> */}
     <form onSubmit={submit} className="w-full">
-      <input type="text" autoComplete="off" name="sttimput" placeholder="Type something and press [Enter]" className="w-full textarea" value={inputValue} onChange={e => handleChange(e.target.value)}/>
+      <input type="text" autoComplete="off" name="sttimput" placeholder="Type something and press [Enter]" className="w-full textarea" value={inputValue} onChange={e => handleChange(e.target.value)} />
     </form>
   </div>
 }

@@ -1,41 +1,33 @@
 import { toast } from "react-toastify";
 import { proxy } from "valtio";
-import { subscribeKey } from "valtio/utils";
-import { IServiceInterface, TextEventSource, TextEventType } from "../../types";
+import { IServiceInterface, TextEventType } from "../../types";
+import { serviceSubscibeToInput, serviceSubscibeToSource } from "../../utils";
 import { TTS_Backends } from "./schema";
 import { TTS_AzureService } from "./services/azure";
 import { TTS_WindowsService } from "./services/windows";
 import {
   ITTSService,
   ServiceNetworkState,
-  TTSServiceEventBindings,
+  TTSServiceEventBindings
 } from "./types";
 
 class Service_TTS implements IServiceInterface {
   #serviceInstance?: ITTSService;
 
-  #sourceSubKey?: string;
-
   serviceState = proxy({
     status: ServiceNetworkState.disconnected,
   });
 
-  #subscribeToTextEvent(v: TextEventSource) {
-    this.#sourceSubKey && window.API.pubsub.unsubscribe(this.#sourceSubKey);
-    this.#sourceSubKey = window.API.pubsub.subscribeText(v, (data) => {
-      if (data && data.type === TextEventType.final) {
-        this.#serviceInstance?.play(data.value);
-      }
-    });
-  }
-
   async init() {
-    subscribeKey(window.API.state.services.tts.data, "source", (v) => {
-      console.log("changed");
-      this.#subscribeToTextEvent(v);
+    serviceSubscibeToSource(window.API.state.services.tts.data, "source", data => {
+      if (data?.type === TextEventType.final)
+        this.#serviceInstance?.play(data.value);
     });
-    window.API.state.services.tts.data.source &&
-      this.#subscribeToTextEvent(window.API.state.services.tts.data.source);
+
+    serviceSubscibeToInput(window.API.state.services.tts.data, "inputField", data => {
+      if (data?.type === TextEventType.final)
+        this.#serviceInstance?.play(data.value);
+    });
   }
 
   get data() {

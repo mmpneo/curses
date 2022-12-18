@@ -2,27 +2,38 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { listen } from '@tauri-apps/api/event'
 import PubSub from "pubsub-js";
 import { proxyMap } from "valtio/utils";
-import { BaseEvent, IServiceInterface, TextEvent, TextEventSource } from "../../types";
+import { BaseEvent, IServiceInterface, PartialWithRequired, TextEvent, TextEventSource, TextEvent_Schema } from "../../types";
+import Ajv from "ajv";
+
 type RegisteredEvent = {
   label: string;
   description?: string;
   value: string;
 };
 
-function log(...args: any) {
-  console.log("[pubsub]", ...args);
-}
-
 class Service_PubSub implements IServiceInterface {
   constructor() {
+    this.#ajv = new Ajv({
+      strict: false,
+      useDefaults: "empty",
+      removeAdditional: true,
+    });
+    const textEventValidator = this.#ajv.compile(TextEvent_Schema)
     window.platform === "app" && listen('pubsub', (event) => {
       if (typeof event.payload === "string") try {
-        const {topic, data} = JSON.parse(event.payload);
-        this.receivePubSub({topic, data});
+        const {topic, data}: BaseEvent = JSON.parse(event.payload);
+        if (typeof data !== "object")
+          return;
+        const validated = data;
+        textEventValidator(validated);
+        console.log(validated)
+        const textEvent = this.applyEmotes(validated as TextEvent);
+        this.receivePubSub({topic, data: textEvent});
       } catch (error) {}
     })
   }
-
+  
+  #ajv: Ajv;
   #pubsub = PubSub;
 
   public registeredEvents = proxyMap<string, RegisteredEvent>([]);
@@ -35,6 +46,15 @@ class Service_PubSub implements IServiceInterface {
     this.registerEvent({label: "Translation",value: TextEventSource.translation});
     this.registerEvent({label: "Input field",value: TextEventSource.textfield});
     this.registerEvent({label: "Any text source",value: TextEventSource.any});
+  }
+
+  private applyEmotes(data: PartialWithRequired<TextEvent, "type" | "value">) {
+    if (!data.emotes) {
+      let emotes = window.API.twitch.scanForEmotes(data.value);
+      return  {...data, emotes};
+    }
+    else
+      return data;
   }
 
   receivePubSub(msg: BaseEvent) {
@@ -55,14 +75,17 @@ class Service_PubSub implements IServiceInterface {
     window.APIFrontend.network.broadcast(msg);
   }
 
-  publishText(topic: TextEventSource, data: TextEvent) {
+  publishText(topic: TextEventSource, textData: PartialWithRequired<TextEvent, "type" | "value">) {
+    if (!textData.value)
+      return;
+    let data = this.applyEmotes(textData)
     this.#publishLocally({topic, data});
     this.#publishToClients({topic, data});
     this.#publishPubSub({topic, data});
   }
 
-  public unsubscribe(key: string) {
-    PubSub.unsubscribe(key);
+  public unsubscribe(key?: string) {
+    key && PubSub.unsubscribe(key);
   }
 
   public subscribe(eventname: string, fn: (value: unknown) => void) {

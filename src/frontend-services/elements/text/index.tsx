@@ -7,7 +7,7 @@ import { useGetState } from "../..";
 import { TextEvent, TextEventSource, TextEventType } from "../../../types";
 import Inspector_ElementText from "./inspector";
 import { Element_TextState, Element_TextStateSchema } from "./schema";
-import TextSentence, { TextSentenceData, TextSentenceTest } from "./sentence";
+import TextSentence, { sentenceCtx, TextSentenceData, TextSentenceTest } from "./sentence";
 import { elementStyle } from "./style";
 
 const Element_Text: FC<{ id: string }> = memo(({ id }) => {
@@ -55,6 +55,7 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
     const data: TextSentenceData = {
       id: nanoid(),
       value: event.value.trim(),
+      emotes: event.emotes,
       interim: stateRef.current.animateEnable ? false : isInterim,
       state: { ...stateRef.current }
     };
@@ -77,6 +78,7 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
       if (lookForInterim >= 0) { // update last interim sentence
         setSentences(produce(t => {
           t[lookForInterim].value = event.value;
+          t[lookForInterim].emotes = event.emotes;
           t[lookForInterim].interim = isInterim;
         }));
       }
@@ -156,6 +158,7 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
       background-color: ${state.boxColor};
       width: ${state.boxAutoWidth ? 'auto' : '100%'};
       height: ${state.boxAutoHeight ? 'auto' : '100%'};
+      border-style: solid;
       border-radius: ${state.boxBorderRadius}px;
       border-width: ${state.boxBorderWidth}px;
       border-color: ${state.boxBorderColor};
@@ -191,11 +194,14 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
     .text img {
       height: ${state.textFontSize}px;
     }
+    .profanity {
+      color: ${state.textProfanityColor}
+    }
     .interim {
       color: ${state.textColorInterim}
     }
-    .profanity {
-      color: ${state.textProfanityColor}
+    .interim.profanity {
+      color: ${state.textProfanityInterimColor}
     }
     .scroll-container {
       min-height: calc((${state.textFontSize}px + (${state.boxPadding}px * 2)) * ${state.textLineHeight});
@@ -206,7 +212,9 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
       <BoxElement className={classNames("box", { active: active || state.previewMode, animateScroll: state.animateScroll })}>
         <span className="text">
           {state.previewMode && <TextSentenceTest />}
-          {sentences.map(sentence => <TextSentence onComplete={onComplete} onActivity={onActivity} key={sentence.id} data={sentence} />)}
+          {sentences.map(data => <sentenceCtx.Provider key={data.id} value={{data, onActivity, onComplete}}>
+            <TextSentence key={data.id} />
+          </sentenceCtx.Provider>)}
         </span>
       </BoxElement>
     </div>

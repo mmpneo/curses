@@ -1,10 +1,9 @@
-import classNames from "classnames";
-import { ButtonHTMLAttributes, FC, memo, PropsWithChildren, useState } from "react";
+import { FC, memo, useState } from "react";
 import { BsTextareaResize } from "react-icons/bs";
 import { GrTextAlignCenter, GrTextAlignLeft, GrTextAlignRight } from "react-icons/gr";
 import { HiOutlineMusicNote } from "react-icons/hi";
 import { IoIosRadio } from "react-icons/io";
-import { RiAlignBottom, RiAlignTop, RiAlignVertically, RiFontSize } from "react-icons/ri";
+import { RiAlignBottom, RiAlignTop, RiAlignVertically, RiFileCopyLine, RiFontSize } from "react-icons/ri";
 import { SiCsswizardry } from "react-icons/si";
 import { TbTextResize } from "react-icons/tb";
 import { VscSettings } from "react-icons/vsc";
@@ -12,7 +11,6 @@ import { useCopyToClipboard } from "react-use";
 import { useGetState, useUpdateState } from "../..";
 import Input from "../../../components/input";
 import Inspector from "../../../components/inspector";
-import { TextEventSource } from "../../../types";
 import NameInput from "../../components/name-input";
 import TransformInput from "../../components/transform-input";
 import { Element_TextState, FlexAlign, FontCase } from "./schema";
@@ -26,12 +24,10 @@ const SourceInspector: FC<{ id: string }> = ({ id }) => {
 
   return <>
     <Inspector.SubHeader>Source</Inspector.SubHeader>
-    <Input.Select value={data.sourceMain} onChange={(e: any) => up("sourceMain", e.value as any)} options={[
-      { label: 'STT', value: TextEventSource.stt },
-      { label: 'Translation', value: TextEventSource.translation }
-    ]} placeholder="Text source" label="Main text source" />
+    <Input.TextSource label="Source" value={data.sourceMain} onChange={e => up("sourceMain", e)} />
     <Input.Checkbox label="Interim results" value={data.sourceInterim} onChange={e => up("sourceInterim", e)} />
-    <Input.Checkbox label="Input field" />
+    <Input.Checkbox label="Input field" value={data.sourceInputField} onChange={e => up("sourceInputField", e)} />
+    <Input.Text label="Profanity Mask" value={data.textProfanityMask} onChange={e => up("textProfanityMask", e.target.value)} />
   </>
 }
 
@@ -46,6 +42,8 @@ const TextInspector: FC<{ id: string }> = ({ id }) => {
     <Inspector.SubHeader>Font</Inspector.SubHeader>
     <Input.Color label="Color" value={data.textColor} onChange={e => up("textColor", e)} />
     <Input.Color label="Interim Color" value={data.textColorInterim} onChange={e => up("textColorInterim", e)} />
+    <Input.Color label="Profanity Color" value={data.textProfanityColor} onChange={e => up("textProfanityColor", e)} />
+    <Input.Color label="Profanity interim" value={data.textProfanityInterimColor} onChange={e => up("textProfanityInterimColor", e)} />
     <Input.Text label="Size" type="number" value={data.textFontSize} onChange={e => up("textFontSize", parseFloat(e.target.value))} />
     <Input.Text label="Family" value={data.textFontFamily} onChange={e => up("textFontFamily", e.target.value)} />
     <Input.Range label="Weight" step="100" min="100" max="900" value={data.textFontWeight} onChange={e => up("textFontWeight", parseFloat(e.target.value))} />
@@ -81,11 +79,6 @@ const TextInspector: FC<{ id: string }> = ({ id }) => {
       { label: <RiAlignVertically />, value: FlexAlign.center },
       { label: <RiAlignBottom />, value: FlexAlign.end },
     ]} label="Vertical" value={data.textAlignV} onChange={e => up("textAlignV", e as FlexAlign)} />
-
-    <Inspector.SubHeader>Profanity Mask</Inspector.SubHeader>
-    <Input.Text label="Mask" value={data.textProfanityMask} onChange={e => up("textProfanityMask", e.target.value)} />
-    <Input.Color label="Color" value={data.textProfanityColor} onChange={e => up("textProfanityColor", e)} />
-    <Input.Color label="Interim Color" value={data.textProfanityInterimColor} onChange={e => up("textProfanityInterimColor", e)} />
   </>
 }
 
@@ -138,11 +131,8 @@ const BehaviourInspector: FC<{ id: string }> = ({ id }) => {
     <Inspector.SubHeader>Animation</Inspector.SubHeader>
     <Input.Checkbox label="Enable animation" value={data.animateEnable} onChange={e => up("animateEnable", e)} />
     <Input.Checkbox label="Emit event" value={data.animateEvent} onChange={e => up("animateEvent", e)} />
-    {data.animateEvent && <Input.Container label="Copy event as">
-      <div className="btn-group">
-        <button className="btn btn-neutral btn-xs">css</button>
-        <button onClick={handleCopyCss} className="btn btn-neutral btn-xs">name</button>
-      </div>
+    {data.animateEvent && <Input.Container label="Copy event css">
+      <button onClick={handleCopyCss} className="btn btn-neutral btn-sm gap-1">Copy <RiFileCopyLine/></button>
     </Input.Container>}
     <Input.Text label="Characters delay" type="number" value={data.animateDelayChar} onChange={e => up("animateDelayChar", parseFloat(e.target.value))} />
     <Input.Text label="Words delay" type="number" value={data.animateDelayWord} onChange={e => up("animateDelayWord", parseFloat(e.target.value))} />

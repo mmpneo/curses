@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Twitch auth</title>
+</head>
+<body>
+
+<script>
+  const bc = new BroadcastChannel('twitch_oauth');
+  if (document.location.hash && document.location.hash != '') {
+    var parsedHash = new URLSearchParams(window.location.hash.substring(1));
+    if (parsedHash.get('access_token')) {
+      var access_token = parsedHash.get('access_token');
+      parsedHash.get('access_token') && bc.postMessage(access_token ?? null);
+      access_token && window.opener?.postMessage(`smplstt_tw_auth:${access_token}`, '*');
+    }
+  }
+  window.close();
+</script>
+</body>
+</html>

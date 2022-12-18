@@ -27,17 +27,17 @@ export const FilePicker: FC = () => {
 
 const FileContainer: FC<PropsWithChildren> = memo(({ children }) => {
   const file = useContext(fileCtx);
-  return <div className="flex space-x-2 text-sm">
-    <div className="text-base-content p-2 flex-none relative bg-base-200 rounded-lg w-14 h-14 flex items-center justify-center overflow-hidden">
+  return <div className="flex space-x-2">
+    <div className="text-base-content p-2 flex-none relative border-2 border-primary/10 border-dashed bg-base-100 rounded-lg w-14 h-14 flex items-center justify-center overflow-hidden">
       {children}
     </div>
-    <div className="flex flex-col overflow-hidden">
+    <div className="flex flex-col overflow-hidden text-sm">
       <span className="font-bold text-ellipsis whitespace-nowrap overflow-hidden">{file?.data.name}</span>
-      {/* <span className="font-semibold opacity-50">{data.type}</span> */}
-      <span className="font-semibold opacity-50 text-xs">{formatBytes(file!.data.size)}</span>
+      <span className="text-xs opacity-50">{file?.data.type} • {formatBytes(file!.data.size)}</span>
+      {/* <span className="font-medium opacity-50 text-xs">{formatBytes(file!.data.size)}</span> */}
 
       <span className="flex space-x-2 font-semibold">
-        {file?.actions?.map((action, i) => <span key={i} className="link link-primary" onClick={() => action.fn(file?.data.id)}>{action.label}</span>)}
+        {file?.actions?.map((action, i) => <span key={i} className="link link-hover link-primary" onClick={() => action.fn(file?.data.id)}>{action.label}</span>)}
       </span>
     </div>
   </div>

@@ -190,6 +190,10 @@ fn get_voices(state: State<WindowsTTSPlugin>) -> Result<RpcWindowsTTSConfig, &st
 
 #[command]
 fn speak(data: RpcWindowsTTSSpeak, state: State<WindowsTTSPlugin>) -> Result<(), &str> {
+    if data.value == "" {
+        return Ok(());
+    }
+
     let Some(sp) = &state.intf else {
         return Err("Plugin is not initialized");
     };

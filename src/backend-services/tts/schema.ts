@@ -8,7 +8,7 @@ export enum TTS_Backends {
 
 export type TTS_State = {
   source: TextEventSource;
-  input_field: boolean;
+  inputField: boolean;
   backend: TTS_Backends;
   windows: {
     device: string;
@@ -27,7 +27,7 @@ const Schema_STT: JSONSchemaType<TTS_State> = {
   type: "object",
   properties: {
     source: { type: "string", default: TextEventSource.stt },
-    input_field: { type: "boolean", default: true },
+    inputField: { type: "boolean", default: true },
     backend: { type: "string", default: TTS_Backends.windows },
     windows: {
       type: "object",
@@ -55,7 +55,7 @@ const Schema_STT: JSONSchemaType<TTS_State> = {
   },
   required: [
     "source",
-    "input_field",
+    "inputField",
     "backend",
     "windows",
     "azure",

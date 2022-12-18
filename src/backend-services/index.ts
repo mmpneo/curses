@@ -5,8 +5,10 @@ import Service_Shortcuts from "./shortcuts";
 import Service_State from "./state";
 import Service_STT from "./stt";
 import Service_TTS from "./tts";
-import Service_Translation from "./twitch";
+import Service_Translation from "./translation";
 import Service_VRC from "./vrc";
+import Service_Twitch from "./twitch";
+import { proxy } from "valtio";
 
 export enum Services {
   vrc = "vrc",
@@ -23,6 +25,7 @@ class Backend {
   public readonly stt = new Service_STT();
   public readonly tts = new Service_TTS();
   public readonly translation = new Service_Translation();
+  public readonly twitch = new Service_Twitch();
   public readonly vrc = new Service_VRC();
   public readonly pubsub = new Service_PubSub();
   public readonly shortcuts = new Service_Shortcuts();
@@ -30,6 +33,10 @@ class Backend {
   get state() {
     return this._state.state;
   }
+
+  ui = proxy({
+    fullscreenInput: false
+  });
 
   patchService<Key extends keyof BackendState["services"]>(
     service: Key,
@@ -73,6 +80,7 @@ class Backend {
     this.initInputWIndow();
     await this._state.init();
     await this.pubsub.init();
+    await this.twitch.init();
     await this.stt.init();
     await this.tts.init();
     await this.translation.init();
