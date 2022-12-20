@@ -16,15 +16,11 @@ class Service_Sound implements IServiceInterface {
   async init() {
     this.audioContext = new AudioContext();
   }
-  public state = proxy({
-    micMuted: false,
-    soundMuted: false,
+  public serviceState = proxy({
+    muted: false,
   });
 
-  async playUniqueBuffer(buffer: ArrayBuffer) {
-    if (this.state.soundMuted) return;
-    // await (this.voiceAudio as any).setSinkId("default");
-
+  async playVoiceBuffer(buffer: ArrayBuffer) {
     return new Promise(async (res, rej) => {
       try {
         const audio = await this.audioContext.decodeAudioData(buffer);
@@ -46,8 +42,8 @@ class Service_Sound implements IServiceInterface {
 
   private random = (min: number, max: number) =>
     Math.random() * (max - min) + min;
-  async playFromFile(fileId: string, effects?: SoundEffects) {
-    if (this.state.soundMuted) return;
+  async playFile(fileId: string, effects?: SoundEffects) {
+    if (this.serviceState.muted) return;
     
     if (!this.#audioFiles[fileId]) try {
       const buffer = window.APIFrontend.files.getFileBuffer(fileId);

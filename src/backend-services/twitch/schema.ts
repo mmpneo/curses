@@ -8,7 +8,6 @@ export type Twitch_State = {
   chatPostSource: TextEventSource,
   chatPostMask: string,
   chatPostInput: boolean,
-  chatPostInputMask: string,
   chatReceiveEnable: boolean,
   chatReceiveMask: string,
 };
@@ -22,7 +21,6 @@ const Schema_Twitch: JSONSchemaType<Twitch_State> = {
     chatPostSource: { type: "string", default: TextEventSource.stt },
     chatPostMask: { type: "string", default: "" },
     chatPostInput: { type: "boolean", default: false },
-    chatPostInputMask: { type: "string", default: "" },
     
     chatReceiveEnable: { type: "boolean", default: false },
     chatReceiveMask: { type: "string", default: "" },
@@ -34,7 +32,6 @@ const Schema_Twitch: JSONSchemaType<Twitch_State> = {
     "chatPostSource",
     "chatPostMask",
     "chatPostInput",
-    "chatPostInputMask",
 
     "chatReceiveEnable",
     "chatReceiveMask",

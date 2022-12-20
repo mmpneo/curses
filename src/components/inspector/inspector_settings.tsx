@@ -1,3 +1,5 @@
+import { emit } from "@tauri-apps/api/event";
+import { invoke } from "@tauri-apps/api/tauri";
 import { FC } from "react";
 import { RiSettings2Fill } from "react-icons/ri";
 import { useSnapshot } from "valtio";
@@ -6,25 +8,26 @@ import { BackendState } from "../../backend-services/schema";
 import Input from "../input";
 
 const themesLight = [
+  'customblack',
   'light',
   'lofi',
   'cupcake',
-  'bumblebee',
-  'emerald',
   'corporate',
   'retro',
   'valentine',
   'garden',
   'aqua',
   'pastel',
-  'fantasy',
-  'cmyk',
-  'autumn',
-  'acid',
   'wireframe',
-  'lemonade',
   'winter',
   'cyberpunk',
+  // 'bumblebee',
+  // 'emerald',
+  // 'fantasy',
+  // 'cmyk',
+  // 'autumn',
+  // 'acid',
+  // 'lemonade',
 ]
 
 const themesDark = [
@@ -60,6 +63,10 @@ const Inspector_Settings: FC = () => {
     window.API.state.shortcuts[key] = v;
   }
 
+  const getIP = () => {
+    invoke("plugin:web|config");
+  }
+
   return <Inspector.Body>
     <Inspector.Header><RiSettings2Fill /> Settings</Inspector.Header>
     <Inspector.Content>
@@ -75,6 +82,8 @@ const Inspector_Settings: FC = () => {
       <Input.Checkbox label="Network share"/>
       <Input.Container label="Connection"><span className=" font-semibold badge badge-success">active</span></Input.Container>
       <Input.Container label="Remote Connection"><span className=" font-semibold badge badge-neutral">disconnected</span></Input.Container>
+
+      <button onClick={getIP}>get ip</button>
       {/* <Input.Container label="Link">
         <div className="btn-group">
           <button className="btn btn-sm self-end">Copy</button>

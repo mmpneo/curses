@@ -24,12 +24,15 @@ windows = { version = "0.43.0", features = [
   "Win32_Foundation",
   "Win32_Media_Speech",
   "Win32_Media_Audio",
-  # "Media_SpeechSynthesis",
   "Win32_System_Com",
   "Win32_System_Ole",
   "Win32_System_WindowsProgramming",
 ] }
+clap = { version = "4.0.29", features = ["derive"] }
 
 [features]
 default = ["custom-protocol"]
 custom-protocol = ["tauri/custom-protocol"]
+
+[profile.dev.package."*"]
+opt-level = 3

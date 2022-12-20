@@ -1,5 +1,5 @@
 import { FC, HTMLAttributes, HtmlHTMLAttributes, PropsWithChildren, ReactNode, useRef, useState } from "react";
-import { arrow, autoPlacement, autoUpdate, offset, shift, useFloating, useHover, useInteractions } from "@floating-ui/react-dom-interactions";
+import { arrow, autoPlacement, autoUpdate, FloatingPortal, offset, shift, useFloating, useHover, useInteractions } from "@floating-ui/react-dom-interactions";
 import { Placement } from "@floating-ui/dom";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -30,26 +30,29 @@ const Tooltip: FC<PropsWithChildren<HtmlHTMLAttributes<HTMLSpanElement> & Props>
     useHover(context, { restMs: 0 }),
   ])
 
+
   return <>
     <span {...props} {...getReferenceProps({
       onClick: () => setOpen(false)
     })} ref={reference}>{children}</span>
-    {enable && <AnimatePresence>
-      {open && <motion.span
-        key="inspector"
-        initial={{ y: 5, scale: 0.95, opacity: 0 }}
-        transition={{ ease: "anticipate", duration: 0.15 }}
-        exit={{ y: 5, scale: 0.95, opacity: 0 }}
-        animate={{ y: 0, scale: 1, opacity: 1 }}
-        className="fixed z-50 p-1" {...getFloatingProps()} ref={floating} style={{ margin: 0, position: strategy, top: y ?? 0, left: x ?? 0 }}>
-        <div style={{ top: arrowY ?? 0, left: arrowX ?? 0 }} className="custom-tooltip-arrow" ref={arrowRef}></div>
-        <div className="custom-tooltip flex flex-col">
-          <span>{content}</span>
-          {body && <span className="text-xs font-normal opacity-70">{body}</span>}
-        </div>
-      </motion.span>
-      }
-    </AnimatePresence>}
+    <FloatingPortal id="floating-elements">
+      {enable && <AnimatePresence>
+        {open && <motion.span
+          key="inspector"
+          initial={{ y: 5, scale: 0.95, opacity: 0 }}
+          transition={{ ease: "anticipate", duration: 0.15 }}
+          exit={{ y: 5, scale: 0.95, opacity: 0 }}
+          animate={{ y: 0, scale: 1, opacity: 1 }}
+          className="block fixed p-1" {...getFloatingProps()} ref={floating} style={{zIndex: 10000, margin: 0, position: strategy, top: y ?? 0, left: x ?? 0 }}>
+          <div style={{ top: arrowY ?? 0, left: arrowX ?? 0 }} className="custom-tooltip-arrow" ref={arrowRef}></div>
+          <div className="custom-tooltip flex flex-col">
+            <span>{content}</span>
+            {body && <span className="text-xs font-normal opacity-70">{body}</span>}
+          </div>
+        </motion.span>
+        }
+      </AnimatePresence>}
+    </FloatingPortal>
   </>
 }
 

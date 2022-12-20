@@ -51,7 +51,7 @@ const Inspector_Twitch: FC = () => {
       <Input.Text label="Source mask" value={pr.chatPostMask} onChange={e => up("chatPostMask", e.target.value)} />
 
       <Input.Checkbox label="Input field" value={pr.chatPostInput} onChange={e => up("chatPostInput", e)} />
-      <Input.Text label="Input field mask" value={pr.chatPostInputMask} onChange={e => up("chatPostInputMask", e.target.value)} />
+      {/* <Input.Text label="Input field mask" value={pr.chatPostInputMask} onChange={e => up("chatPostInputMask", e.target.value)} /> */}
 
       <Inspector.SubHeader>Post from chat</Inspector.SubHeader>
       <Inspector.Description>Use your chat messages as text source</Inspector.Description>

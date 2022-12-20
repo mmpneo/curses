@@ -50,7 +50,7 @@ const Dropdown: FC<PropsWithChildren<Props>> = memo(({ children, content, intera
   return <dropdownContext.Provider value={{ close: () => setOpen(false) }}>
     <span onContextMenu={handleContext} {...getReferenceProps()} ref={reference}>{children}</span>
 
-    <FloatingPortal id="custom-root-id">
+    <FloatingPortal id="floating-elements">
       <AnimatePresence initial={false}>
         {open && <motion.span
           key="inspector"

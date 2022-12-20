@@ -3,24 +3,21 @@ import { FC, FormEvent, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { TextEventSource, TextEventType } from "../types";
-import Actionbar from "./actionbar";
 import Canvas from "./canvas";
 import Sidebar from "./sidebar";
 
+import { AnimatePresence, motion } from "framer-motion";
 import { useSnapshot } from "valtio";
 import "./file-modal";
 import OverlayInput from "./overlay-input";
-import { AnimatePresence } from "framer-motion";
+import ActionBar from "./actionbar";
 
 const EditorView: FC = () => {
-  const {fullscreenInput} = useSnapshot(window.API.ui);
-  return <div className="relative bg-base-300 w-screen h-screen flex overflow-hidden">
+  const { fullscreenInput } = useSnapshot(window.API.ui);
+  return <div className="relative rounded-lg bg-base-200 w-screen h-screen flex overflow-hidden">
     <NiceModal.Provider>
       <Sidebar />
       <EditorViewport />
-      <div className="absolute top-3 right-4">
-        <Actionbar />
-      </div>
       <AnimatePresence>
         {fullscreenInput && <OverlayInput onClose={() => window.API.ui.fullscreenInput = false} />}
       </AnimatePresence>
@@ -31,6 +28,7 @@ const EditorView: FC = () => {
 
 export const EditorViewport: FC = () => {
   const [[x, y], setTranslate] = useState([0, 0]);
+  const { fullscreenInput } = useSnapshot(window.API.ui);
 
   const handleStartPan = (e: any) => {
     const onUp = () => {
@@ -42,13 +40,20 @@ export const EditorViewport: FC = () => {
     document.addEventListener("mousemove", onMove);
   }
 
-  return <div onMouseDown={event => event.button === 1 && handleStartPan(event)} className="relative flex flex-grow items-center justify-center overflow-hidden">
-    <div className="rounded-lg border-2 border-dashed border-base-100" style={{
-      transform: `translate3d(${x}px, ${y}px, 0px)`,
-    }}>
-      <Canvas />
+  return <div className="flex flex-col w-full overflow-hidden">
+    <ActionBar/>
+    <div onMouseDown={event => event.button === 1 && handleStartPan(event)} className="w-full relative bg-base-300 rounded-tl-box flex flex-grow items-center justify-center overflow-hidden">
+      <div className="absolute top-0 left-0">
+      </div>
+      <div className="rounded-lg border border-dashed border-primary/50" style={{
+        transform: `translate3d(${x}px, ${y}px, 0px)`,
+      }}>
+        <Canvas />
+      </div>
+      <AnimatePresence initial={false}>
+        {!fullscreenInput && <div className="absolute bottom-4"><STTInput /></div>}
+      </AnimatePresence>
     </div>
-    <div className="absolute bottom-4"><STTInput /></div>
   </div>
 }
 
@@ -67,12 +72,18 @@ const STTInput: FC = () => {
     setInputValue(value);
   }
 
-  return <div className="flex items-center space-x-2 w-96">
+  return <motion.div
+    key="overlay-input"
+    initial={{opacity: 0, y: 10}}
+    exit={{opacity: 0, y: 10}}
+    animate={{opacity: 1, y: 0}}
+    transition={{ ease: "anticipate", duration: 0.5 }}
+    className="flex items-center space-x-2 w-96">
     {/* <button className="btn btn-circle btn-ghost"><RiChatDeleteFill/></button> */}
     <form onSubmit={submit} className="w-full">
       <input type="text" autoComplete="off" name="sttimput" placeholder="Type something and press [Enter]" className="w-full textarea" value={inputValue} onChange={e => handleChange(e.target.value)} />
     </form>
-  </div>
+  </motion.div>
 }
 
 export default EditorView;

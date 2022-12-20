@@ -7,15 +7,15 @@ import { VRC_State } from "./schema";
 
 const Inspector_VRC: FC = () => {
   const state = useSnapshot(window.API.state.services.vrc.data);
-  const handleUpdate = (key: keyof VRC_State, v: boolean) => window.API.state.services.vrc.data[key] = v;
+  const up = <K extends keyof VRC_State>(key: K, v: VRC_State[K]) => window.API.patchService("vrc", s => s.data[key] = v);
 
   return <Inspector.Body>
     <Inspector.Header><RiMessage2Fill /> Vrchat text bubble</Inspector.Header>
     <Inspector.Content>
-      <Input.Checkbox label="Send from STT" value={state.sendStt} onChange={e => handleUpdate("sendStt", e)} />
-      <Input.Checkbox label="Send from input field" value={state.sendText} onChange={e => handleUpdate("sendText", e)} />
-      <Input.Checkbox label="Show indicator" value={state.indicator} onChange={e => handleUpdate("indicator", e)} />
-      {/* <Input.Checkbox label="Use interim results" value={state.interim} onChange={e => handleUpdate("interim", e)} /> */}
+      <Input.TextSource label="Source" value={state.source} onChange={e => up("source", e)} />
+      <Input.Checkbox label="Send from input field" value={state.inputField} onChange={e => up("inputField", e)} />
+      <Input.Checkbox label="Show indicator" value={state.indicator} onChange={e => up("indicator", e)} />
+      {/* <Input.Checkbox label="Use interim results" value={state.interim} onChange={e => up("interim", e)} /> */}
       <button className="btn btn-sm" onClick={() => window.API.vrc.sendTest("Test test test!")}>Send Test</button>
     </Inspector.Content>
   </Inspector.Body>

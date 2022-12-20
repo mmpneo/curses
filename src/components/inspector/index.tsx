@@ -19,7 +19,7 @@ import Inspector_Scenes from "./inspector_scenes";
 import Inspector_Settings from "./inspector_settings";
 
 const Base: FC<{ path?: InspectorTabPath }> = ({ path }) => {
-  return <div style={{ width: '20rem' }} className="relative h-full flex-none bg-base-200 rounded-box flex flex-col overflow-hidden">
+  return <div style={{ width: '19rem' }} className="relative h-full flex-none bg-base-100 rounded-t-box flex flex-col overflow-hidden">
     <AnimatePresence initial={false}>
       {path?.tab === Services.stt && <Inspector_STT key="stt" />}
       {path?.tab === Services.tts && <Inspector_TTS key="tts" />}
@@ -86,33 +86,33 @@ const variants = {
 const TabsContent: FC<PropsWithChildren<{ tabKey: number | string, direction: number }>> = forwardRef(({ children, tabKey, direction }, ref: any) => {
   return <div>
     <AnimatePresence initial={false} custom={direction} mode="popLayout">
-    <motion.div
-      key={tabKey}
-      ref={ref}
-      variants={variants}
-      custom={direction}
-      transition={{ ease: "anticipate", duration: 0.3 }}
-      exit="exit"
-      initial="enter"
-      animate="center"
-      className="flex flex-col space-y-2"
-    >
-      {children}
-    </motion.div>
-  </AnimatePresence>
+      <motion.div
+        key={tabKey}
+        ref={ref}
+        variants={variants}
+        custom={direction}
+        transition={{ ease: "anticipate", duration: 0.3 }}
+        exit="exit"
+        initial="enter"
+        animate="center"
+        className="flex flex-col space-y-2"
+      >
+        {children}
+      </motion.div>
+    </AnimatePresence>
   </div>
 });
 
-const Tabs: FC<PropsWithChildren> = ({children}) => {
-  return <div className="bg-base-200 -mx-1 px-1 sticky top-0 pt-3 pb-2 z-10 grid grid-cols-7 gap-2">
+const Tabs: FC<PropsWithChildren> = ({ children }) => {
+  return <div className="-mx-1 bg-base-100 px-1 sticky top-0 pt-3 pb-2 z-10 grid grid-cols-6 gap-2">
     {children}
   </div>
 }
 
 const Tab: FC<PropsWithChildren<ButtonHTMLAttributes<HTMLButtonElement> & { tooltip: string, tooltipBody?: string, active: boolean }>> = memo(({ children, tooltipBody, tooltip, active, ...props }) => {
-  const colorClasses = active ? "text-primary-content bg-primary hover:bg-primary/80" : "text-base-content bg-neutral/20 hover:bg-neutral/30";
+  const colorClasses = active ? "btn-secondary" : "text-base-content bg-neutral/10 hover:bg-neutral/30";
   return <Tooltip className="relative aspect-square" placement={["bottom"]} content={tooltip} body={tooltipBody}>
-    <button {...props} className={classNames("w-full transition-colors h-full rounded-btn aspect-square text-base-content flex justify-center items-center", colorClasses)}>{children}</button>
+    <button {...props} className={classNames("btn btn-circle text-lg min-h-full border-none w-full h-full", colorClasses)}>{children}</button>
   </Tooltip>
 })
 

@@ -1,21 +1,20 @@
 import {JSONSchemaType} from "ajv";
+import { TextEventSource } from "../../types";
 
 export type VRC_State = {
-  sendStt: boolean,
-  sendText: boolean,
-  indicator: boolean,
-  // interim: boolean
+  source: TextEventSource,
+  inputField: boolean,
+  indicator: boolean
 };
 
 const Schema_VRC: JSONSchemaType<VRC_State> = {
   type: "object",
   properties: {
-    sendStt: {type: "boolean", default: false},
-    sendText: {type: "boolean", default: false},
+    source: {type: "string", default: TextEventSource.stt},
+    inputField: {type: "boolean", default: false},
     indicator: {type: "boolean", default: false},
-    // interim: {type: "boolean", default: false},
   },
-  required: ["sendStt", "sendText", "indicator"],
+  required: ["source", "inputField", "indicator"],
   default: {},
   additionalProperties: false
 }

@@ -60,10 +60,11 @@
     "windows": [
       {
         "fullscreen": false,
+        "transparent": true,
         "height": 600,
         "resizable": true,
         "title": "simple-stt",
-        "decorations": true,
+        "decorations": false,
         "width": 800
       }
     ]

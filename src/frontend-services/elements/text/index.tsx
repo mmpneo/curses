@@ -106,7 +106,7 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
       event?.value && enqueueSentence(event);
     });
     return () => window.API.pubsub.unsubscribe(sub);
-  }, [state.sourceMain]);
+  }, [state.sourceMain, state.behaviorClearTimer]);
 
   useEffect(() => {
     if (!state.sourceInputField)
@@ -117,7 +117,7 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
       event?.value && enqueueSentence(event);
     });
     return () => window.API.pubsub.unsubscribe(sub);
-  }, [state.sourceInputField]);
+  }, [state.sourceInputField, state.behaviorClearTimer]);
 
   const onComplete = useCallback(() => {
     isRunning.current = false;
@@ -125,12 +125,12 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
       setTimeout(() => tryDequeue(), stateRef.current.animateDelaySentence)
     else
       startClearTimer();
-  }, []);
+  }, [state.behaviorClearTimer]);
 
   const onActivity = () => {
     // play sound
     if (stateRef.current.soundEnable && stateRef.current.soundFile) {
-      window.APIFrontend.sound.playFromFile(stateRef.current.soundFile, {
+      window.APIFrontend.sound.playFile(stateRef.current.soundFile, {
         volume: stateRef.current.soundVolume || 1,
         detuneMin: stateRef.current.soundDetuneMin || 0,
         detuneMax: stateRef.current.soundDetuneMax || 0,
@@ -211,7 +211,7 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
     <div className="container">
       <BoxElement className={classNames("box", { active: active || state.previewMode, animateScroll: state.animateScroll })}>
         <span className="text">
-          {state.previewMode && <TextSentenceTest />}
+          {state.previewMode && <TextSentenceTest state={state} />}
           {sentences.map(data => <sentenceCtx.Provider key={data.id} value={{data, onActivity, onComplete}}>
             <TextSentence key={data.id} />
           </sentenceCtx.Provider>)}

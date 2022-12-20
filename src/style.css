@@ -1,11 +1,11 @@
 @import "simplebar-react/dist/simplebar.min.css";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap'); */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-html, :root {
-  background-color: transparent;
+:root, html, body {
+  background-color: transparent !important;
 }
 
 @font-face {
@@ -29,16 +29,13 @@ html, :root {
 :root {
   margin: 0;
   /* font-size: 16px; */
-  font-family: 'Hubot Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+  font-family: 'Mona Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
   "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
   sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: calc(16px * var(--uiscale));
-}
-
-body {
-  
+  transition: font-size .1s ease-in-out;
 }
 
 * {

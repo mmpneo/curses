@@ -1,6 +1,7 @@
 import { invoke } from "@tauri-apps/api/tauri";
-import { IServiceInterface, TextEventSource, TextEventType } from "../../types";
 import throttle from "lodash/throttle";
+import { IServiceInterface, TextEventType } from "../../types";
+import { serviceSubscibeToInput, serviceSubscibeToSource } from "../../utils";
 
 class Service_VRC implements IServiceInterface {
   get #state() {
@@ -11,38 +12,28 @@ class Service_VRC implements IServiceInterface {
     if (window.platform === "web" || window.mode === "client") {
       return;
     }
-    window.API.pubsub.subscribeText(TextEventSource.stt, (value) => {
-      if (!this.#state.sendStt) return;
-      if (value && value.type === TextEventType.final) {
-        this.#sendText(value.value);
+
+    serviceSubscibeToSource(this.#state, "source", data => {
+      if (data && data.type === TextEventType.final) {
+        this.#sendText(data.value, true);
         this.#state.indicator && this.#sendIndicator(false);
       } else {
-        // this.state.interim && this.#sendTextThrottled(value.value);
         this.#state.indicator && this.#sendIndicatorThrottled(true);
       }
     });
-    window.API.pubsub.subscribeText(TextEventSource.textfield, (value) => {
-      if (!this.#state.sendText) return;
-      if (value && value.type === TextEventType.final) {
-        this.#sendText(value.value, true);
+    serviceSubscibeToInput(this.#state, "inputField", data => {
+      if (data?.type === TextEventType.final) {
+        this.#sendText(data.value, true);
         this.#state.indicator && this.#sendIndicator(false);
       } else {
-        // this.state.interim && this.#sendTextThrottled(value.value);
         this.#state.indicator && this.#sendIndicatorThrottled(true);
       }
     });
-    // this.eventsSubs.push(window.API.pubsub.subscribe("twitch.chat.mymessage", (value) => {
-    //   if (this.bFromChat){
-    //     this.SendText(value as string);
-    //     this.bShowIndicator && this.SendIndicator(false);
-    //   }
-    // }));
   }
   sendTest(value: string): void {
     this.#sendText(value, true);
   }
 
-  #sendTextThrottled = throttle(this.#sendText, 800);
   #sendIndicatorThrottled = throttle(this.#sendIndicator, 800);
 
   #sendText(value: string, isFinal: boolean = false) {

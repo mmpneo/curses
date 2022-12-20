@@ -16,6 +16,7 @@ class Service_STT implements IServiceInterface {
 
   serviceState = proxy({
     status: ServiceNetworkState.disconnected,
+    muted: false
   });
 
   get data() {
@@ -27,6 +28,7 @@ class Service_STT implements IServiceInterface {
   }
 
   #sendFinal(value: string) {
+    !this.serviceState.muted &&
     window.API.pubsub.publishText(TextEventSource.stt, {
       value,
       type: TextEventType.final,
@@ -34,6 +36,7 @@ class Service_STT implements IServiceInterface {
   }
 
   #sendInterim(value: string) {
+    !this.serviceState.muted &&
     window.API.pubsub.publishText(TextEventSource.stt, {
       value,
       type: TextEventType.interim,

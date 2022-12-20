@@ -1,7 +1,6 @@
-import { data } from "autoprefixer";
 import classNames from "classnames";
-import { FC, memo, useEffect, useRef, useState } from "react";
-import { useDebounce, useEffectOnce } from "react-use";
+import { FC, memo, useCallback, useEffect, useRef, useState } from "react";
+import { useEffectOnce } from "react-use";
 import { useGetState } from "../..";
 import { StyleToEventController } from "../utils";
 import Inspector_ElementImage from "./inspector";
@@ -21,22 +20,20 @@ const Element_Image: FC<{ id: string }> = memo(({ id }) => {
 
   const [active, setActive] = useState(false);
 
-
-  const [, cancel] = useDebounce(
-    () => {setActive(false);},
-    state.activeDuration,
-    [active]
-  );
+  const timeoutN = useRef(-1 as any);
+  const debounce = useCallback(() => {
+    setActive(true);
+    clearTimeout(timeoutN.current);
+    timeoutN.current = setTimeout(() => setActive(false), state.activeDuration);
+  }, [state.activeDuration])
 
   useEffect(() => {
     const hasEvent = !!state.activeEvent;
     if (hasEvent) {
-      const sub = window.API.pubsub.subscribe(state.activeEvent, _ => {
-        setActive(true);
-      });
+      const sub = window.API.pubsub.subscribe(state.activeEvent, _ => debounce());
       return () => window.API.pubsub.unsubscribe(sub);
     }
-  }, [state.activeEvent]);
+  }, [state.activeEvent, state.activeDuration]);
 
   useEffect(() => {
     attributeController.current?.OnStyleChange(state.styleCss)
@@ -71,5 +68,5 @@ const Element_Image: FC<{ id: string }> = memo(({ id }) => {
   </>
 });
 
-export { Inspector_ElementImage, Element_ImageStateSchema }
+export { Inspector_ElementImage, Element_ImageStateSchema };
 export default Element_Image;

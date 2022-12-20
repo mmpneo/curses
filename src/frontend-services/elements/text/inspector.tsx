@@ -193,7 +193,7 @@ const Inspector_ElementText: FC<{ id: string }> = memo(({ id }) => {
     state.elements[id].scenes["main"].data[key] = v;
   });
 
-  const [[tab, direction], setTab] = useState<[number, number]>([0, 0]);
+  const [[tab, direction], setTab] = useState<[number, number]>([1, 0]);
 
   const handleTab = (v: number) => {
     setTab([v, Math.sign(v - tab)]);

@@ -49,14 +49,14 @@ const checkProfanity = (word: string, mask?: string) => {
 
 type WordDataSegment = { classes: string, value: string, type: TextWordType };
 
-export const TextSentenceTest: FC = () => {
+export const TextSentenceTest: FC<{state: Element_TextState}> = ({state}) => {
   return <>
     <span className="word"><span className="char">Normal Test, </span></span>
-    <span className="word profanity"><span className="char">[redacted]</span></span>
+    <span className="word profanity"><span className="char">{state.textProfanityMask}</span></span>
     <span className="word"><span className="char">, test!!!1 </span></span>
     <br/>
     <span className="word interim"><span className="char">Interim Test, </span></span>
-    <span className="word interim profanity"><span className="char">[redacted]</span></span>
+    <span className="word interim profanity"><span className="char">{state.textProfanityMask}</span></span>
     <span className="word interim"><span className="char">, test!!!1 </span></span>
   </>
 }

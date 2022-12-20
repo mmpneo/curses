@@ -44,7 +44,7 @@ export class TTS_AzureService implements ITTSService {
     if (!clip) return;
 
     this.#isPlaying = true;
-    await window.APIFrontend.sound.playUniqueBuffer(clip);
+    await window.APIFrontend.sound.playVoiceBuffer(clip);
     this.#isPlaying = false;
     this.#tryDequeueAndPlay();
   }
