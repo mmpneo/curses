@@ -10,7 +10,7 @@ const Inspector_VRC: FC = () => {
   const up = <K extends keyof VRC_State>(key: K, v: VRC_State[K]) => window.API.patchService("vrc", s => s.data[key] = v);
 
   return <Inspector.Body>
-    <Inspector.Header><RiMessage2Fill /> Vrchat text bubble</Inspector.Header>
+    <Inspector.Header><RiMessage2Fill /> Vrchat chatbox</Inspector.Header>
     <Inspector.Content>
       <Input.TextSource label="Source" value={state.source} onChange={e => up("source", e)} />
       <Input.Checkbox label="Send from input field" value={state.inputField} onChange={e => up("inputField", e)} />

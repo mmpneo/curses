@@ -2,6 +2,7 @@ import { FC, useState } from "react";
 import { RiImageFill, RiImageLine } from "react-icons/ri";
 import { SiCsswizardry } from "react-icons/si";
 import { useGetState, useUpdateState } from "../..";
+import { useInspectorTabs } from "../../../backend-services/twitch/inspector";
 import Input from "../../../components/input";
 import Inspector from "../../../components/inspector";
 import NameInput from "../../components/name-input";
@@ -59,11 +60,7 @@ const CssInspector: FC<{ id: string }> = ({ id }) => {
 }
 
 const Inspector_ElementImage: FC<{ id: string }> = ({ id }) => {
-  const [[tab, direction], setTab] = useState<[number, number]>([0, 0]);
-
-  const handleTab = (v: number) => {
-    setTab([v, Math.sign(v - tab)]);
-  }
+  const [[tab, direction], handleTab] = useInspectorTabs();
 
   return <Inspector.Body>
     <Inspector.Header><RiImageFill /> <NameInput id={id} /></Inspector.Header>

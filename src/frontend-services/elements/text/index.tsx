@@ -66,7 +66,7 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
       } else { // queue add
         sentenceQueue.current.push(data);
         tryDequeue();
-      } 3
+      }
     }
     else {
       const lookForInterim = sentencesRef.current.findIndex(s => s.interim); // todo cache index
@@ -209,7 +209,7 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
     `}</style>
     <style>{state.css}</style>
     <div className="container">
-      <BoxElement className={classNames("box", { active: active || state.previewMode, animateScroll: state.animateScroll })}>
+      <BoxElement className={classNames("box", { active: active || state.previewMode })}>
         <span className="text">
           {state.previewMode && <TextSentenceTest state={state} />}
           {sentences.map(data => <sentenceCtx.Provider key={data.id} value={{data, onActivity, onComplete}}>

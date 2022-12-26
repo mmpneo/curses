@@ -14,11 +14,11 @@ export class STT_DeepgramService implements ISpeechRecognitionService {
   private recorder?: MediaRecorder;
 
   start(p: STT_State): void {
-    if (!p.lang_name)
+    if (!p.deepgram.language)
       return this.bindings.onStop("[STT:Deepgram] Missing language");
-    if (!p.deepgram_key)
+    if (!p.deepgram.key)
       return this.bindings.onStop("[STT:Deepgram] Missing key");
-    if (!p.deepgram_tier)
+    if (!p.deepgram.tier)
       return this.bindings.onStop("[STT:Deepgram] Missing tier");
 
     navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
@@ -28,8 +28,8 @@ export class STT_DeepgramService implements ISpeechRecognitionService {
       // $0.87/h base
 
       this.socket = new WebSocket(
-        `wss://api.deepgram.com/v1/listen?punctuate=${!!p.deepgram_punctuate}&interim_results=${!!p.interim}&language=${!!p.lang_name}&tier=${!!p.deepgram_tier}`,
-        ["token", p.deepgram_key]
+        `wss://api.deepgram.com/v1/listen?punctuate=${!!p.deepgram.punctuate}&interim_results=${!!p.deepgram.interim}&language=${!!p.deepgram.language}&tier=${!!p.deepgram.tier}`,
+        ["token", p.deepgram.key]
       );
       this.socket.onopen = () => {
         this.bindings.onStart();

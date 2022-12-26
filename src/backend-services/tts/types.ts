@@ -1,12 +1,5 @@
 import { TTS_State } from "./schema";
 
-export enum ServiceNetworkState {
-  disconnected,
-  connecting,
-  connected,
-  error
-}
-
 export type TTSServiceEventBindings = {
   onStart: () => void,
   onStop: (value?: string) => void,

@@ -1,12 +1,5 @@
 import { STT_State } from "./schema";
 
-export enum ServiceNetworkState {
-  disconnected,
-  connecting,
-  connected,
-  error
-}
-
 export type SpeechServiceEventBindings = {
   onStart: () => void,
   onStop: (value?: string) => void,

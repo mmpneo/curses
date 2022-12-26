@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { createContext, FC, memo, useContext, useEffect, useState } from "react";
+import { createContext, FC, memo, useCallback, useContext, useEffect, useState } from "react";
 import { TextEvent } from "../../../types";
 import { Element_TextState } from "./schema";
 
@@ -35,7 +35,7 @@ const enum TextWordType {
 
 export const sentenceCtx = createContext<{
   data: TextSentenceData,
-  onActivity: () => void,
+  onActivity: (rect?: DOMRect) => void,
   onComplete: () => void
 }>({
   data: {} as unknown as any,
@@ -119,104 +119,74 @@ const TextSentenceRenderSimple: FC = memo(() => {
 
 
 // type, value, delay, index sentence, index word
-type CharData = [TextSymbolType, string, number, number, number];
-type WordData = { classes: string, symbols: CharData[] };
+type CharData = [TextSymbolType, string, number, boolean];
 
-function loopEventSequence(timers: number[], index: number, onActivity?: () => void) {
+function nativeLoop(chars: CharData[], index: number, container: HTMLSpanElement, onActivity: (rect: DOMRect) => void, onComplete: () => void) {
+  if (!container) // skip when destroying sentence ele
+    return;
+  const char = chars[index];
   setTimeout(() => {
-    if (index + 2 <= timers.length)
-      loopEventSequence(timers, index + 1, onActivity)
-    onActivity?.()
-  }, timers[index]);
+    let newNode: Element;
+    if (char[0] === 0 || char[0] === 2) {
+      newNode = document.createElement("span");
+      newNode.innerHTML = char[1];
+    }
+    else {
+      newNode = document.createElement("img");
+      (newNode as HTMLImageElement).src = char[1];
+    }
+    newNode.className = "char animate";
+    container.appendChild(newNode);
+    char[3] && onActivity(newNode.getBoundingClientRect());
+    if (index + 2 <= chars.length)
+      nativeLoop(chars, index + 1, container, onActivity, onComplete);
+    else onComplete()
+  }, index === 0 ? 0 : char[2])
 }
+
+
 
 const TextSentenceRenderAnimated: FC = memo(() => {
   const { data, onComplete, onActivity } = useContext(sentenceCtx);
-  const [words, setWords] = useState<WordData[]>([]);
-  const [animated, setAnimated] = useState(false); // animate only once
 
-  useEffect(() => {
+  const onContainerReady = useCallback((ref: HTMLSpanElement) => {
     let wordsList = data.value.split(' ');
-    let eventTimers: number[] = [];
-
-    let totalTimeMs = 0 - (data.value[0] === ' ' ? data.state.animateDelayWord : data.state.animateDelayChar); // shift initial time to match 0
-    let totalSymbols = 0;
-
-    const words: WordData[] = wordsList.map((word, wordIndex) => {
+  
+    const flatChars: CharData[] = [];
+  
+     wordsList.forEach((word, wordIndex) => {
       let _word = word;
-
-      if (wordIndex in data.emotes) {
-        const symbols: CharData[] = '_ '.split('').map((char, charIndex) => {
-          totalSymbols++;
+  
+      if (wordIndex in (data.emotes || {})) {
+        '_ '.split('').forEach((char, charIndex) => {
           // skip animation of last space in sentence
           if (wordsList.length == wordIndex + 1 && char === ' ') {
-            return [TextSymbolType.char, char, 0, totalSymbols - 1, charIndex] as CharData
+            flatChars.push([TextSymbolType.char, char, 0, false]);
           }
-          const delay = char === ' ' ? data.state.animateDelayWord : data.state.animateDelayChar;
-          totalTimeMs += delay;
-          eventTimers.push(delay);
-          if (charIndex === 0)
-            return [TextSymbolType.img, data.emotes[wordIndex], totalTimeMs, totalSymbols - 1, charIndex] as CharData
-          else 
-            return [TextSymbolType.char, char, totalTimeMs, totalSymbols - 1, charIndex] as CharData
+          else {
+            const delay = char === ' ' ? data.state.animateDelayChar : data.state.animateDelayWord;
+            if (charIndex === 0)
+              flatChars.push([TextSymbolType.img, data.emotes[wordIndex], delay, true]);
+            else flatChars.push([TextSymbolType.char, char, delay, false]);
+          }
         });
-        return { classes: '', symbols }
+        return;
       }
-
-      // check for profanity
-      let profanity = data.state.textProfanityMask && word[0] === '*';
-      let classes = classNames({ profanity });
-      if (profanity)
-        _word = data.state.textProfanityMask;
-
-      //todo  check for emotes
-
-      const symbols: CharData[] = (_word + ' ').split('').map((char, charIndex) => {
-        totalSymbols++;
+  
+      (_word + ' ').split('').map((char, charIndex) => {
         // skip animation of last space in sentence
         if (wordsList.length == wordIndex + 1 && char === ' ') {
-          return [TextSymbolType.char, char, 0, totalSymbols - 1, charIndex] as CharData
+          flatChars.push([TextSymbolType.char, char, 0, false]);
+          return;
         }
         const delay = char === ' ' ? data.state.animateDelayWord : data.state.animateDelayChar;
-        totalTimeMs += delay;
-        eventTimers.push(delay);
-        return [TextSymbolType.char, char, totalTimeMs, totalSymbols - 1, charIndex] as CharData
+        flatChars.push([TextSymbolType.char, char, delay, char !== ' ']);
       });
-      return { classes, symbols }
     });
-    setWords(words);
+    nativeLoop(flatChars, 0, ref, rect => onActivity(rect), () => onComplete());
+  }, []);
 
-    eventTimers.splice(0, 1) // remove first timer and replace it with 0 later
-    eventTimers = eventTimers.filter(t => t); // collapse zero timers
-    eventTimers.unshift(0);
-    loopEventSequence(eventTimers, 0, onActivity);
-
-    setTimeout(() => {
-      onComplete?.();
-      setAnimated(true);
-    }, totalTimeMs);
-
-  }, [data.value, data.interim]);
-
-  const renderSymbol = (symbol: CharData) => {
-    switch (symbol[0]) {
-      case TextSymbolType.profanity:
-      case TextSymbolType.char:
-        return <span className="char">{symbol[1]}</span>
-      case TextSymbolType.img:
-        return <span className="char"><img src={symbol[1]} /></span>
-    }
-  }
-
-  return <>
-    {words.map((word, i) => <span className={classNames("word animate", { animated, interim: data.interim }, word.classes)} key={i}>
-      {word.symbols.map((symbol, lI) => <span className="char-internal" key={lI} style={{ '--index': symbol[3], '--wordindex': symbol[4], '--time': `${symbol[2]}ms` }}>
-        {renderSymbol(symbol)}
-        {/* <span className="char">{symbol[1]}</span> */}
-      </span>)}
-    </span>)}
-    {data.state.behaviorBreakLine && <br />}
-  </>
+  return <span ref={onContainerReady}></span>
 })
 
 const TextSentence: FC = memo(() => {

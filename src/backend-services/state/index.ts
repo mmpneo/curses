@@ -25,6 +25,7 @@ class Service_State implements IServiceInterface {
     }
     validate(data);
     this.state = proxy<BackendState>(data as BackendState);
+    console.log("loaded state", data);
 
     !hasData && this.#save_state();
 

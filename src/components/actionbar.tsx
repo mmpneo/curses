@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { FC, HtmlHTMLAttributes, PropsWithChildren, ReactNode } from "react";
-import { RiFileCopyLine, RiMicFill, RiMicOffFill, RiVolumeMuteFill } from "react-icons/ri";
+import { RiFileCopyLine, RiMicFill, RiMicOffFill, RiVolumeMuteFill, RiVolumeUpFill } from "react-icons/ri";
 import { RxInput } from "react-icons/rx";
 import { TbAppWindow } from "react-icons/tb";
 import { VscChromeClose, VscChromeMaximize, VscChromeMinimize } from "react-icons/vsc";
@@ -39,14 +39,14 @@ const AppActions: FC = () => {
 
   return <div className="flex items-center space-x-2">
     <Button tooltip="Fullscreen input" onClick={handleSwitchFullscreenInput} ><RxInput /></Button>
-    <Button tooltip="Input window" body="Floating window with input and history" onClick={handleSwitchInputWindow} ><TbAppWindow /></Button>
-    <Button className={vfxMute ? "btn-error" : "btn-ghost"} tooltip="Mute sound effects" body={<>Mute effects like text typing sound <b>in this window</b>. <br/> Does not affect text-to-speech</>} onClick={handleSwitchSound}><RiVolumeMuteFill /></Button>
+    {/* <Button tooltip="Input window" body="Floating window with input and history" onClick={handleSwitchInputWindow} ><TbAppWindow /></Button> */}
+    <Button className={vfxMute ? "btn-error" : "btn-ghost"} tooltip="Mute sound effects" body={<>Mute effects like text typing sound <b>in this window</b>. <br/> Does not affect text-to-speech</>} onClick={handleSwitchSound}>{vfxMute ? <RiVolumeMuteFill /> : <RiVolumeUpFill/>}</Button>
     <Button className={sttMute ? "btn-error" : "btn-ghost"} tooltip="Mute speech to text" body="Prevents speech-to-text from sending any output" onClick={handleSwitchSTT}>
       {sttMute ? <RiMicOffFill /> : <RiMicFill />}
       </Button>
     {/* <Divider /> */}
     {/* <Button tooltip="Start"><RiPlayFill/></Button> */}
-    <Button tooltip="Copy link"><RiFileCopyLine /></Button>
+    {/* <Button tooltip="Copy link"><RiFileCopyLine /></Button> */}
 
     {/* <div className="flex items-center justify-between text-xs font-medium opacity-50">Host <div className="w-2 h-2 rounded-full bg-success"></div></div>
       <div className="flex items-center justify-between text-xs font-medium opacity-50">STT <div className="w-2 h-2 rounded-full bg-success"></div></div>

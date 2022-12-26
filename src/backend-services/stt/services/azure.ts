@@ -22,21 +22,21 @@ export class STT_AzureService implements ISpeechRecognitionService {
 
   start(params: STT_State): void {
 
-    if (!params.lang_name)
+    if (!params.azure.language)
       return this.bindings.onStop("[STT:Azure] Missing language");
-    if (!params.azure_key)
+    if (!params.azure.key)
       return this.bindings.onStop("[STT:Azure] Missing key");
-    if (!params.azure_location)
+    if (!params.azure.location)
       return this.bindings.onStop("[STT:Azure] Missing location");
 
     const speechConfig = SpeechConfig.fromSubscription(
-      params.azure_key,
-      params.azure_location
+      params.azure.key,
+      params.azure.location
     );
-    speechConfig.speechRecognitionLanguage = params.lang_name;
+    speechConfig.speechRecognitionLanguage = params.azure.language;
     speechConfig.setProperty(
       PropertyId.SpeechServiceResponse_ProfanityOption as any,
-      params.azure_profanity
+      params.azure.profanity
     );
     speechConfig.setProperty(
       PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs as any,
@@ -49,9 +49,9 @@ export class STT_AzureService implements ISpeechRecognitionService {
     speechConfig.enableDictation();
 
     const langConfig = AutoDetectSourceLanguageConfig.fromLanguages([
-      params.lang_name,
+      params.azure.language,
     ]);
-    const audioConfig = AudioConfig.fromMicrophoneInput(params.device);
+    const audioConfig = AudioConfig.fromMicrophoneInput(params.azure.device);
     this.#instance = SpeechRecognizer.FromConfig(
       speechConfig,
       langConfig,
@@ -66,7 +66,7 @@ export class STT_AzureService implements ISpeechRecognitionService {
     };
 
     this.#instance.recognizing = (s, e) =>
-      params.interim &&
+      params.azure.interim &&
       !!e.result.text &&
       this.bindings.onInterim(e.result.text);
     this.#instance.recognized = (s, e) => this.bindings.onFinal(e.result.text);

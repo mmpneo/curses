@@ -2,7 +2,6 @@ import { useId } from "@floating-ui/react-dom-interactions";
 import classNames from "classnames/bind";
 import { FC, InputHTMLAttributes, memo, PropsWithChildren, ReactNode, useEffect, useRef, useState } from "react";
 import Select, { MenuListProps, MenuProps, OptionProps, Props as SelectProps } from 'react-select';
-import styles from "./style.module.css"
 import { RgbaColorPicker, RgbaColor } from "react-colorful";
 import Dropdown from "../dropdown/Dropdown";
 import { FileState, FileType } from "../../frontend-services/files/schema";
@@ -10,6 +9,15 @@ import FileElement from "../../frontend-services/components/file-element";
 import NiceModal from "@ebay/nice-modal-react";
 import { RiUpload2Fill } from "react-icons/ri";
 import SimpleBar from "simplebar-react";
+
+// import "ace-builds/src-noconflict/mod";
+import AceEditor from "react-ace";
+import "ace-builds/src-noconflict/mode-css";
+import "ace-builds/src-noconflict/ext-language_tools";
+import "ace-builds/src-noconflict/theme-twilight";
+import { ServiceNetworkState, TextEventSource } from "../../types";
+
+import styles from "./style.module.css"
 const cx = classNames.bind(styles);
 
 interface InputBaseProps {
@@ -289,7 +297,7 @@ const Event: FC<EventProps> = memo(({ label, value, onChange }) => {
 });
 
 const sourceOptions = [
-  { label: 'STT', value: TextEventSource.stt },
+  { label: 'Speech to Text', value: TextEventSource.stt },
   { label: 'Translation', value: TextEventSource.translation },
 ]
 interface TextSourceProps extends InputBaseProps {
@@ -299,14 +307,6 @@ interface TextSourceProps extends InputBaseProps {
 const TextSource: FC<TextSourceProps> = memo(({ label, value, onChange }) => {
   return <NewSelect label={label} value={sourceOptions.find(o => o.value === value)} options={sourceOptions} onChange={(e: any) => onChange(e.value as any)} placeholder="Text source"  />
 });
-
-// import "ace-builds/src-noconflict/mod";
-import AceEditor from "react-ace";
-import "ace-builds/src-noconflict/mode-css";
-import "ace-builds/src-noconflict/ext-language_tools";
-import "ace-builds/src-noconflict/theme-twilight";
-import { TextEventSource } from "../../types";
-import { ServiceNetworkState } from "../../backend-services/tts/types";
 
 interface CodeProps extends InputBaseProps {
   value: string,
@@ -319,7 +319,7 @@ interface NetworkStatusProps extends InputBaseProps {
 }
 const NetworkStatus: FC<NetworkStatusProps> = ({label, value}) => {
   return <Container label={label}>
-    <div className="self-end flex space-x-2 items-center pl-2 pr-3 h-8 py-1 rounded-full border-2 border-dashed border-neutral">
+    <div className="self-end flex space-x-2 items-center pl-2 pr-3 h-8 py-1 rounded-full bg-neutral/50 border-dashed border-neutral">
       {value === ServiceNetworkState.disconnected && <>
         <span className="text-xs font-semibold text-error leading-none">Disconnected</span>
         <div className="rounded-full ring-2 bg-error ring-error ring-offset-base-100 ring-offset-2 w-2 h-2 "/>

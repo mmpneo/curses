@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { ServiceNetworkState } from "../tts/types";
+import { ServiceNetworkState } from "../../types";
 
 const ServiceButton: FC<{status: ServiceNetworkState, onStart: () => void, onStop: () => void}> = ({status, onStart, onStop}) => {
   return <>

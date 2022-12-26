@@ -4,9 +4,8 @@ import { StaticAuthProvider } from "@twurple/auth";
 import { ChatClient } from "@twurple/chat";
 import { DataObject, rawDataSymbol } from "@twurple/common";
 import { proxy } from "valtio";
-import { IServiceInterface, TextEvent, TextEventSource, TextEventType } from "../../types";
+import { IServiceInterface, ServiceNetworkState, TextEvent, TextEventSource, TextEventType } from "../../types";
 import { serviceSubscibeToInput, serviceSubscibeToSource } from "../../utils";
-import { ServiceNetworkState } from "../stt/types";
 import { Load_7TV_CHANNEL, Load_7TV_GLOBAL, Load_BTTV_CHANNEL, Load_BTTV_GLOBAL, Load_FFZ_CHANNEL, Load_FFZ_GLOBAL } from "./emote_loaders";
 const scope = [
   'chat:read',
@@ -49,6 +48,8 @@ class Service_Twitch implements IServiceInterface {
     });
     serviceSubscibeToInput(this.#state.data, "chatPostInput", data => {
       this.chatClient?.isConnected 
+      && this.#state.data.chatPostEnable
+      && data?.textFieldType !== "twitchChat"
       && data?.value 
       && data?.type === TextEventType.final
       && this.say(data.value);
@@ -98,14 +99,12 @@ class Service_Twitch implements IServiceInterface {
     let emotes: TextEvent["emotes"] = {}
     const wl = sentence.split(" ");
     for (let i = 0; i < wl.length; i++) {
-      if (wl[i] in window.API.twitch.emotes) {
-        emotes[i] = window.API.twitch.emotes[wl[i]];
+      if (wl[i] in this.emotes) {
+        emotes[i] = this.emotes[wl[i]];
       }
     }
     return emotes;
   }
-
-  
 
   addTwitchEmotes(data:  DataObject<HelixEmoteData>[]) {
     const newEmotes = Object.fromEntries(data.map(e => [e[rawDataSymbol].name, e[rawDataSymbol].images.url_1x]))
@@ -123,9 +122,9 @@ class Service_Twitch implements IServiceInterface {
 
       const authProvider = new StaticAuthProvider(import.meta.env.VITE_TWITCH_CLIENT_ID, token);
       try {
-        
         this.apiClient = new ApiClient({authProvider});
         const me        = await this.apiClient.users.getMe();
+        const stream = await me.getStream();
         
         this.state.user = {
           id:     me.id,
@@ -157,7 +156,11 @@ class Service_Twitch implements IServiceInterface {
         this.chatClient.onMessage((channel, user, message, msg) => {
           if (msg.userInfo.userId === this.state.user?.id) {
             if (this.#state.data.chatReceiveEnable) {
-              window.API.pubsub.publishText(TextEventSource.textfield, {type: TextEventType.final, value: msg.content.value})
+              window.API.pubsub.publishText(TextEventSource.textfield, {
+                type: TextEventType.final,
+                value: msg.content.value,
+                textFieldType: "twitchChat"
+              })
             }
           }
         });

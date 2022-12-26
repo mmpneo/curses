@@ -1,14 +1,13 @@
 import { toast } from "react-toastify";
 import { proxy } from "valtio";
-import { IServiceInterface, TextEventSource, TextEventType } from "../../types";
+import { IServiceInterface, ServiceNetworkState, TextEventSource, TextEventType } from "../../types";
 import { STT_AzureService } from "./services/azure";
 import { STT_BrowserService } from "./services/browser";
 import { STT_DeepgramService } from "./services/deepgram";
 import { STT_Backends } from "./schema";
 import {
   ISpeechRecognitionService,
-  SpeechServiceEventBindings,
-  ServiceNetworkState,
+  SpeechServiceEventBindings
 } from "./types";
 
 class Service_STT implements IServiceInterface {

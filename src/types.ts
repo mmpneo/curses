@@ -6,6 +6,13 @@ export interface IServiceInterface {
   init(): void;
 }
 
+export enum ServiceNetworkState {
+  disconnected,
+  connecting,
+  connected,
+  error
+}
+
 export enum TextEventType {
   final,
   interim,
@@ -23,12 +30,15 @@ export type TextEvent = {
   value: string;
   //<wordIndex, url>
   emotes: Record<number, string>
+  textFieldType: "textField" | "twitchChat"
 };
+
 export const TextEvent_Schema: JSONSchemaType<TextEvent> = {
   type:       "object",
   properties: {
     type: {type: "number", default: TextEventType.final},
     value: {type: "string", default: ""},
+    textFieldType: {type: "string", default: "", nullable: true} as any, // fucking over it,
     emotes: {type: "object", additionalProperties: true, required: []},
   },
   additionalProperties: false,

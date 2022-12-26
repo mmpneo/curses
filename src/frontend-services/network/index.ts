@@ -16,11 +16,11 @@ class Service_Network implements IServiceInterface {
     if (window.mode === "client") {
       // try connect
       this.#initializePeer();
-      await this.#provider?.connectClient("123");
+      await this.#provider?.connectClient("local");
     } else {
       // idle
       this.#initializePeer();
-      this.#provider?.connectHost("123");
+      this.#provider?.connectHost("local");
     }
   }
 

@@ -33,7 +33,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 const SideBarButtonBase: FC<PropsWithChildren<Omit<ButtonProps, "tab"> & { active?: boolean }>> = memo(({ active, tooltip, children, ...props }) => {
   const { expand } = useContext(sidebarContext);
   const activeStyles = active ? "btn-secondary" : "btn-ghost";
-  return <Tooltip enable={!expand} placement={["right"]} content={tooltip}>
+  return <Tooltip enable={!expand} placement="right" content={tooltip}>
     <button {...props} className={classNames("w-full btn border-none justify-start min-h-fit h-auto flex-nowrap whitespace-nowrap px-0 gap-1 overflow-hidden", activeStyles)}>
       <div className="flex flex-none w-10 h-10 items-center justify-center text-xl">
         {children}
@@ -122,7 +122,7 @@ const Sidebar: FC = memo(() => {
       <div className="bg-base-200 flex-none overflow-y-scroll scrollbar-hide">
         <motion.div transition={{ ease: "anticipate", duration: 0.2 }} initial={{ width: "3.5rem" }} animate={{ width: expand ? "13rem" : "3.5rem" }} className="flex flex-col space-y-2 py-2 px-2">
           <button className="w-full btn btn-ghost border-none justify-start min-h-fit h-auto flex-nowrap whitespace-nowrap px-0 gap-1 overflow-hidden" onClick={() => setExpand(e => !e)}>
-            <span className={classNames("flex-none w-10 h-8 items-center justify-center text-lg swap swap-flip", { "swap-active": expand })}>
+            <span className={classNames("flex-none w-10 h-8 items-center justify-center text-lg text-base-content/50 swap swap-flip", { "swap-active": expand })}>
               <TbArrowBarToLeft className="swap-on" />
               <TbArrowBarToRight className="swap-off" />
             </span>
@@ -131,7 +131,7 @@ const Sidebar: FC = memo(() => {
           <SideBarButton tab={{ tab: Services.stt }} tooltip="Speech to Text"><RiMicFill /></SideBarButton>
           <SideBarButton tab={{ tab: Services.tts }} tooltip="Text to Speech"><RiChatVoiceFill /></SideBarButton>
           <SideBarButton tab={{ tab: Services.translation }} tooltip="Translation"><RiTranslate2 /></SideBarButton>
-          <SideBarButton tab={{ tab: Services.vrc }} tooltip="VRChat OSC"><RiMessage2Fill /></SideBarButton>
+          <SideBarButton tab={{ tab: Services.vrc }} tooltip="VRChat chatbox"><RiMessage2Fill /></SideBarButton>
           <SideBarButton tab={{ tab: Services.twitch }} tooltip="Twitch Integration"><RiTwitchFill /></SideBarButton>
           <SideBarButton tab={{ tab: "settings" }} tooltip="Settings & About"><RiSettings2Fill /></SideBarButton>
           <Divider />

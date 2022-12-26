@@ -1,14 +1,14 @@
 {
+  "package": {
+    "productName": "simple-stt",
+    "version": "0.0.0"
+  },
   "build": {
     "beforeDevCommand": "yarn dev",
     "beforeBuildCommand": "yarn build",
     "devPath": "http://localhost:1420",
     "distDir": "../dist",
     "withGlobalTauri": true
-  },
-  "package": {
-    "productName": "simple-stt",
-    "version": "0.0.0"
   },
   "tauri": {
     "allowlist": {
@@ -20,7 +20,7 @@
     },
     "bundle": {
       "active": true,
-      "category": "DeveloperTool",
+      "category": "Entertainment",
       "copyright": "",
       "deb": {
         "depends": []

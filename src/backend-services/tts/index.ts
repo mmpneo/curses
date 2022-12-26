@@ -1,13 +1,12 @@
 import { toast } from "react-toastify";
 import { proxy } from "valtio";
-import { IServiceInterface, TextEventType } from "../../types";
+import { IServiceInterface, ServiceNetworkState, TextEventType } from "../../types";
 import { serviceSubscibeToInput, serviceSubscibeToSource } from "../../utils";
 import { TTS_Backends } from "./schema";
 import { TTS_AzureService } from "./services/azure";
 import { TTS_WindowsService } from "./services/windows";
 import {
   ITTSService,
-  ServiceNetworkState,
   TTSServiceEventBindings
 } from "./types";
 

@@ -58,24 +58,4 @@ export const elementStyle = `
           content: " ";
           width: 100%;
         }
-        
-        @keyframes letterAppear {
-          0%{
-            width: 0;
-            height: 0;
-            overflow:hidden;
-          }
-          0.001%{
-            width: auto;
-            height: auto;
-            overflow:visible;
-            opacity: 0;
-          }
-          100%{
-            width: auto;
-            height: auto;
-            overflow: visible;
-            opacity: 1;
-          }
-        }
       `

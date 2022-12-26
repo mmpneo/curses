@@ -1,7 +1,6 @@
 import { FC } from "react";
 import { useSnapshot } from "valtio";
 import { STT_Backends, STT_State } from "./schema";
-import { ServiceNetworkState } from "./types";
 import ServiceLanguageSelect from "./language-select";
 import { azureLanguages, deepGramLangs } from "./service_data";
 import Inspector from "../../components/inspector";
@@ -14,18 +13,18 @@ const Browser: FC = () => {
   const handleUpdate = <K extends keyof STT_State>(key: K, v: STT_State[K]) => window.API.state.services.stt.data[key] = v;
   return <>
     <Inspector.SubHeader>Browser options</Inspector.SubHeader>
-    <Input.Checkbox label="Interim result" onChange={e => handleUpdate("interim", e)} value={pr.interim} />
+    {/* <Input.Checkbox label="Interim result" onChange={e => handleUpdate("interim", e)} value={pr.interim} /> */}
   </>
 }
 
 
 const Azure: FC = () => {
   const pr = useSnapshot(window.API.state.services.stt.data);
-  const handleUpdate = <K extends keyof STT_State>(key: K, v: STT_State[K]) => window.API.state.services.stt.data[key] = v;
+  const handleUpdate = <K extends keyof STT_State["azure"]>(key: K, v: STT_State["azure"][K]) => window.API.state.services.stt.data.azure[key] = v;
   return <>
     <Inspector.SubHeader>Azure options</Inspector.SubHeader>
-    <Input.Text label="Location" value={pr.azure_location} onChange={e => handleUpdate("azure_location", e.target.value)} />
-    <Input.Text label="Key" type="password" value={pr.azure_key} onChange={e => handleUpdate("azure_key", e.target.value)} />
+    <Input.Text label="Location" value={pr.azure.location} onChange={e => handleUpdate("location", e.target.value)} />
+    <Input.Text label="Key" type="password" value={pr.azure.key} onChange={e => handleUpdate("key", e.target.value)} />
 
     <ServiceLanguageSelect library={azureLanguages} />
 
@@ -33,25 +32,25 @@ const Azure: FC = () => {
       { label: 'Masked', value: 'masked' },
       { label: 'Removed', value: 'removed' },
       { label: 'Raw', value: 'raw' },
-    ]} label="Profanity" value={{ value: pr.azure_profanity, label: pr.azure_profanity }} onChange={(e: any) => handleUpdate("azure_profanity", e.value)} />
+    ]} label="Profanity" value={{ value: pr.azure.profanity, label: pr.azure.profanity }} onChange={(e: any) => handleUpdate("profanity", e.value)} />
 
-    <Input.Checkbox label="Interim result" onChange={e => handleUpdate("interim", e)} value={pr.interim} />
+    <Input.Checkbox label="Interim result" onChange={e => handleUpdate("interim", e)} value={pr.azure.interim} />
   </>
 }
 
 const Deepgram: FC = () => {
   const pr = useSnapshot(window.API.state.services.stt.data);
-  const handleUpdate = <K extends keyof STT_State>(key: K, v: STT_State[K]) => window.API.state.services.stt.data[key] = v;
+  const handleUpdate = <K extends keyof STT_State["deepgram"]>(key: K, v: STT_State["deepgram"][K]) => window.API.state.services.stt.data.deepgram[key] = v;
   return <>
     <Inspector.SubHeader>Deepgram options</Inspector.SubHeader>
-    <Input.Text label="Key" type="password" value={pr.deepgram_key} onChange={e => handleUpdate("deepgram_key", e.target.value)} />
+    <Input.Text label="Key" type="password" value={pr.deepgram.key} onChange={e => handleUpdate("key", e.target.value)} />
 
     <ServiceLanguageSelect library={deepGramLangs} />
 
     <Input.Select options={[
       { label: 'Base', value: 'base' },
       { label: 'Enchanced', value: 'enchanced' },
-    ]} label="Quality" value={{ value: pr.deepgram_tier, label: pr.deepgram_tier }} onChange={(e: any) => handleUpdate("deepgram_tier", e.value)} />
+    ]} label="Quality" value={{ value: pr.deepgram.tier, label: pr.deepgram.tier }} onChange={(e: any) => handleUpdate("tier", e.value)} />
 
     <span className="text-base-content/60 text-xs">
       Some languages cannot be used with "enchanced" quality option
@@ -59,9 +58,9 @@ const Deepgram: FC = () => {
       <a className="link link-primary link-hover" target="_blank" href="https://developers.deepgram.com/documentation/features/language/#language-options">See language table</a>
     </span>
 
-    <Input.Checkbox label="Interim result" onChange={e => handleUpdate("interim", e)} value={pr.interim} />
-    <Input.Checkbox label="Profanity filter" onChange={e => handleUpdate("deepgram_profanity", e)} value={pr.deepgram_profanity} />
-    <Input.Checkbox label="Punctuate" onChange={e => handleUpdate("deepgram_punctuate", e)} value={pr.deepgram_punctuate} />
+    <Input.Checkbox label="Interim result" onChange={e => handleUpdate("interim", e)} value={pr.deepgram.interim} />
+    <Input.Checkbox label="Profanity filter" onChange={e => handleUpdate("profanity", e)} value={pr.deepgram.profanity} />
+    <Input.Checkbox label="Punctuate" onChange={e => handleUpdate("punctuate", e)} value={pr.deepgram.punctuate} />
   </>
 }
 

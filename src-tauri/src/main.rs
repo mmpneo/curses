@@ -3,6 +3,7 @@
 use std::env;
 
 use clap::Parser;
+use tauri::{command, State};
 
 use crate::services::AppConfiguration;
 
@@ -14,10 +15,16 @@ struct InitArguments {
     port: u16,
 }
 
+#[command]
+fn get_port(state: State<'_, InitArguments>) -> u16 {
+    state.port
+}
+
 fn main() {
     let args = InitArguments::parse();
     tauri::Builder::default()
         .manage(AppConfiguration { port: args.port })
+        .invoke_handler(tauri::generate_handler![get_port])
         .plugin(services::osc::init())
         .plugin(services::web::init())
         .plugin(services::windows_tts::init())

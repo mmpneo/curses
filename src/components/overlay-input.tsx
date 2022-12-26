@@ -46,7 +46,7 @@ const OverlayInput: FC<{ onClose: () => void }> = forwardRef(({ onClose }, ref: 
     initial="hidden"
     animate="show"
     exit="hidden" className="absolute z-50 h-screen inset-x-0 pointer-events-none">
-    <div className="absolute pointer-events-none top-0 h-12 bg-base-300/40 w-full"></div>
+    <div className="absolute pointer-events-none top-0 h-12 bg-base-300/50 w-full"></div>
     <div className="absolute pointer-events-auto top-12 bottom-0 w-screen bg-base-300/90 text-base-content">
       <textarea
         placeholder="Start typing ..now (◔◡◔)🔪"
