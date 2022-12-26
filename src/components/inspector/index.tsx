@@ -35,7 +35,7 @@ const Base: FC<{ path?: InspectorTabPath }> = ({ path }) => {
   </div>
 }
 
-export const Body: FC<PropsWithChildren<{ scrollable?: boolean }>> = ({ scrollable, children }) => {
+const Body: FC<PropsWithChildren<{ scrollable?: boolean }>> = ({ scrollable, children }) => {
   return <TabAnimation>
     <SimpleBar className="h-full">
       {children}
@@ -44,7 +44,7 @@ export const Body: FC<PropsWithChildren<{ scrollable?: boolean }>> = ({ scrollab
   </TabAnimation>
 }
 
-export const Header: FC<PropsWithChildren> = memo(({ children }) => {
+const Header: FC<PropsWithChildren> = memo(({ children }) => {
   return <div className="flex items-center gap-2 px-4 pt-5 text-xl font-bold">{children}</div>
 })
 
@@ -56,12 +56,26 @@ const SubHeader: FC<PropsWithChildren> = ({ children }) => {
 
 const Description: FC<PropsWithChildren> = ({ children }) => {
   return <span>
-    <span className="-mt-2 text-xs text-base-content/60 flex justify-between items-center gap-2 whitespace-nowrap">{children}</span>
+    <span className="-mt-2 text-xs text-base-content/60 flex justify-between items-center gap-2">{children}</span>
   </span>
 }
 
-export const Content: FC<PropsWithChildren> = ({ children }) => {
-  return <div className="flex flex-col p-4 space-y-2">{children}</div>
+const Content: FC<PropsWithChildren> = ({ children }) => {
+  return <div style={{ width: '19rem' }} className="flex flex-col p-4 space-y-2 overflow-hidden">{children}</div>
+}
+
+const Switchable: FC<PropsWithChildren<{ visible: boolean }>> = ({ visible, children }) => {
+  return <AnimatePresence initial={false}>
+    {visible && <motion.div
+    key="switchable"
+    initial={{marginTop: 0, height: 0, opacity: 0 }}
+    transition={{ ease: "anticipate", duration: 0.3 }}
+    exit={{ marginTop: 0, height: 0, opacity: 0 }}
+    animate={{ marginTop: ".5rem", height: "auto", opacity: 1 }}
+    className="flex flex-col w-full space-y-2">
+      {children}
+  </motion.div>}
+  </AnimatePresence>
 }
 
 const variants = {
@@ -111,9 +125,9 @@ const Tabs: FC<PropsWithChildren> = ({ children }) => {
 
 const Tab: FC<PropsWithChildren<ButtonHTMLAttributes<HTMLButtonElement> & { tooltip: string, tooltipBody?: string, active: boolean }>> = memo(({ children, tooltipBody, tooltip, active, ...props }) => {
   const colorClasses = active ? "btn-secondary" : "text-base-content bg-neutral/10 hover:bg-neutral/30";
-  return <Tooltip className="relative aspect-square" placement={["bottom"]} content={tooltip} body={tooltipBody}>
+  return <Tooltip className="relative aspect-square" placement="bottom" content={tooltip} body={tooltipBody}>
     <button {...props} className={classNames("btn btn-circle text-lg min-h-full border-none w-full h-full", colorClasses)}>{children}</button>
   </Tooltip>
 })
 
-export default { Base, Body, Header, SubHeader, Description, Content, TabsContent, Tabs, Tab };
+export default { Base, Body, Header, SubHeader, Description, Content, TabsContent, Tabs, Tab, Switchable };
