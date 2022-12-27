@@ -29,3 +29,9 @@ export function serviceSubscibeToInput<Obj extends object>(baseProxy: Obj, enabl
   if (baseProxy[enableKey])
     lastSub = window.API.pubsub.subscribeText(TextEventSource.textfield, fn)
 }
+
+export function isEmptyValue(value: any) {
+  return value === undefined 
+  || value === null 
+  || (typeof value === 'object' && Object.keys(value).length === 0) || (typeof value === 'string' && value.trim().length === 0)
+}

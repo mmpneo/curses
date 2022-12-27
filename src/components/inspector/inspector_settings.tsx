@@ -1,10 +1,8 @@
-import { emit } from "@tauri-apps/api/event";
-import { invoke } from "@tauri-apps/api/tauri";
 import { FC, useState } from "react";
 import { RiFileCopyLine, RiSettings2Fill } from "react-icons/ri";
+import { useCopyToClipboard } from "react-use";
 import { useSnapshot } from "valtio";
 import Inspector from ".";
-import { BackendState } from "../../backend-services/schema";
 import { ServiceNetworkState } from "../../types";
 import Input from "../input";
 
@@ -60,12 +58,15 @@ const Inspector_Settings: FC = () => {
     window.API.changeScale(Math.max(UI_SCALE_MIN, Math.min(UI_SCALE_MAX, _v)));
   }
 
-  const handleShortcuts = (key: keyof BackendState["shortcuts"], v: string) => {
-    window.API.state.shortcuts[key] = v;
-  }
+  const [,copy] = useCopyToClipboard();
 
-  const getIP = () => {
-    invoke("plugin:web|config");
+  const handleCopyLocalClient = () => {
+    const {host, port} = window.networkConfiguration;
+    copy(`${host}:${port}/client`);
+  }
+  const handleCopyPubsub = () => {
+    const {localIp, port} = window.networkConfiguration;
+    copy(`${localIp}:${port}`);
   }
 
   const [testSwitch, setSwitch] = useState(false);
@@ -83,20 +84,18 @@ const Inspector_Settings: FC = () => {
       ]} />
       <Inspector.SubHeader>Client</Inspector.SubHeader>
 
-      <Input.Container label="Client link">
+      <Input.Container label="Client url">
         <div className="field-width input-group">
-          <input disabled value="localhost:3030/client" className="w-full cursor-text font-medium input input-sm input-bordered" />
-          <button className="btn btn-sm text-lg">
-            <RiFileCopyLine/>
-          </button>
+          <input disabled value="copy link" className="w-full cursor-text font-medium input input-sm input-bordered" />
+          <button className="btn btn-sm text-lg" onClick={handleCopyLocalClient}><RiFileCopyLine/></button>
         </div>
       </Input.Container>
       <Input.Checkbox value={testSwitch} onChange={v => setSwitch(v)} label="Remote share" />
       <Inspector.Switchable visible={testSwitch}>
         <Input.NetworkStatus value={ServiceNetworkState.connected} label="Remote connection" />
-        <Input.Container label="Remote link">
+        <Input.Container label="Remote url">
           <div className="field-width input-group">
-            <input disabled value="asd.com:3030/client/6a9f0a-71d2w" className="w-full cursor-text font-medium input input-sm input-bordered" />
+            <input disabled value="copy link" className="w-full cursor-text font-medium input input-sm input-bordered" />
             <button className="btn btn-sm text-lg">
               <RiFileCopyLine/>
             </button>
@@ -104,12 +103,12 @@ const Inspector_Settings: FC = () => {
         </Input.Container>
       </Inspector.Switchable>
 
-      <Inspector.SubHeader>Link</Inspector.SubHeader>
-      <Inspector.Description>Sync source events with remote SimpleSTT instance</Inspector.Description>
-      <Input.Text label="Address" />
+      <Inspector.SubHeader>Link apps</Inspector.SubHeader>
+      <Inspector.Description>Sync text events with remote SimpleSTT instance</Inspector.Description>
+      <Input.Text label="Address" placeholder="127.0.0.1:3030" />
       <Input.NetworkStatus value={ServiceNetworkState.connected} label="Connection" />
       <button className="btn btn-sm btn-neutral">Connect</button>
-      <button className="btn btn-sm btn-ghost">Copy local address</button>
+      <button className="btn btn-sm btn-ghost" onClick={handleCopyPubsub}>Copy local address</button>
 
       {/* <Input.Container label="Link">
         <div className="btn-group">

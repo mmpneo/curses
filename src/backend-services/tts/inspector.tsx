@@ -4,11 +4,10 @@ import { RiChatVoiceFill } from "react-icons/ri";
 import { useSnapshot } from "valtio";
 import Input from "../../components/input";
 import Inspector from "../../components/inspector";
-import { TextEventSource } from "../../types";
+import { ServiceNetworkState } from "../../types";
 import ServiceButton from "../components/service-button";
 import { TTS_Backends, TTS_State } from "./schema";
 import { azureVoices } from "./service_data";
-import ServiceVoiceSelect from "./voice-select";
 
 type WindowsToken = {
   id: string;
@@ -48,6 +47,11 @@ const Windows: FC = () => {
 const Azure: FC = () => {
   const pr = useSnapshot(window.API.state.services.tts.data.azure);
   const handleUpdate = <K extends keyof TTS_State["azure"]>(key: K, v: TTS_State["azure"][K]) => window.API.state.services.tts.data.azure[key] = v;
+
+  const updateVoice = (value: { group: string, option: string }) => {
+    window.API.state.services.tts.data.azure.language = value.group;
+    window.API.state.services.tts.data.azure.voice = value.option;
+  };
   // const [outputDevices, setOutputDevices] = useState<MediaDeviceInfo[]>([]);
 
   // const updateDevices = async () => {
@@ -60,9 +64,14 @@ const Azure: FC = () => {
 
   return <>
     <Inspector.SubHeader>Azure options</Inspector.SubHeader>
+    <Input.MappedGroupSelect
+      labelGroup="Language"
+      labelOption="Voice"
+      value={{group: pr.language, option: pr.voice}}
+      onChange={updateVoice}
+      library={azureVoices} />
 
     {/* <Input.Select options={outputDevices.map(d => ({label: d.label, value: d.deviceId}))} label="Audio Output" onChange={(e: any) => handleUpdate("device", e.value as TTS_Backends)} /> */}
-    <ServiceVoiceSelect onChangeLang={e => handleUpdate("language", e)} onChangeVoice={e => handleUpdate("voice", e)} value={pr} library={azureVoices} />
     <Input.Text type="password" label="Key" value={pr.key} onChange={e => handleUpdate("key", e.target.value)} />
     <Input.Text type="password" label="Location" value={pr.location} onChange={e => handleUpdate("location", e.target.value)} />
   </>
@@ -86,12 +95,17 @@ const Inspector_TTS: FC = () => {
     <Inspector.Content>
       <Input.Checkbox label="Start with play button" value={data.autoStart} onChange={handleStart} />
 
-      <Input.TextSource label="Source" value={data.data.source} onChange={e => up("source", e)} />
-      <Input.Select value={serviceOptions.find(o => o.value === data.data.backend)} options={serviceOptions} label="Service" onChange={(e: any) => up("backend", e.value as TTS_Backends)} />
-      <Input.Checkbox label="Input field" value={data.data.inputField} onChange={e => up("inputField", e)} />
+      <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
+        <Input.Select value={serviceOptions.find(o => o.value === data.data.backend)} options={serviceOptions} label="Service" onChange={(e: any) => up("backend", e.value as TTS_Backends)} />
 
-      {data.data.backend === TTS_Backends.windows && <Windows />}
-      {data.data.backend === TTS_Backends.azure && <Azure />}
+        {data.data.backend === TTS_Backends.windows && <Windows />}
+        {data.data.backend === TTS_Backends.azure && <Azure />}
+        
+        <Inspector.SubHeader>Source</Inspector.SubHeader>
+        <Input.TextSource label="Source" value={data.data.source} onChange={e => up("source", e)} />
+        <Input.Checkbox label="Input field" value={data.data.inputField} onChange={e => up("inputField", e)} />
+      </Inspector.Deactivatable>
+
 
       <ServiceButton status={state.status} onStart={() => window.API.tts.start()} onStop={() => window.API.tts.stop()} />
 

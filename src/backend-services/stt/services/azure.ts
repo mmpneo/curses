@@ -1,17 +1,18 @@
 import {
   ISpeechRecognitionService,
-  SpeechServiceEventBindings,
+  SpeechServiceEventBindings
 } from "../types";
 
-import { STT_State } from "../schema";
 import {
   AudioConfig,
   AutoDetectSourceLanguageConfig,
   CancellationErrorCode,
   PropertyId,
   SpeechConfig,
-  SpeechRecognizer,
+  SpeechRecognizer
 } from "microsoft-cognitiveservices-speech-sdk";
+import { isEmptyValue } from "../../../utils";
+import { STT_State } from "../schema";
 
 export class STT_AzureService implements ISpeechRecognitionService {
   constructor(private bindings: SpeechServiceEventBindings) {}
@@ -20,53 +21,51 @@ export class STT_AzureService implements ISpeechRecognitionService {
 
   dispose(): void {}
 
-  start(params: STT_State): void {
-
-    if (!params.azure.language)
-      return this.bindings.onStop("[STT:Azure] Missing language");
-    if (!params.azure.key)
-      return this.bindings.onStop("[STT:Azure] Missing key");
-    if (!params.azure.location)
-      return this.bindings.onStop("[STT:Azure] Missing location");
+  start(state: STT_State): void {
+    // ignore device for now
+    const {device, ...rest} = state.azure;
+    if (Object.values(rest).some(isEmptyValue))
+      return this.bindings.onStop("Options missing");
 
     const speechConfig = SpeechConfig.fromSubscription(
-      params.azure.key,
-      params.azure.location
+      state.azure.key,
+      state.azure.location
     );
-    speechConfig.speechRecognitionLanguage = params.azure.language;
+    speechConfig.speechRecognitionLanguage = state.azure.language;
     speechConfig.setProperty(
-      PropertyId.SpeechServiceResponse_ProfanityOption as any,
-      params.azure.profanity
+      PropertyId.SpeechServiceResponse_ProfanityOption,
+      state.azure.profanity
     );
     speechConfig.setProperty(
-      PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs as any,
+      PropertyId.SpeechServiceConnection_InitialSilenceTimeoutMs,
       "60000"
     );
     speechConfig.setProperty(
-      PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs as any,
+      PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs,
       "20000"
     );
     speechConfig.enableDictation();
 
     const langConfig = AutoDetectSourceLanguageConfig.fromLanguages([
-      params.azure.language,
+      state.azure.language,
     ]);
-    const audioConfig = AudioConfig.fromMicrophoneInput(params.azure.device);
+    const audioConfig = AudioConfig.fromMicrophoneInput(state.azure.device);
     this.#instance = SpeechRecognizer.FromConfig(
       speechConfig,
       langConfig,
       audioConfig
     );
-
+    
     this.#instance.sessionStarted = () => this.bindings.onStart();
     this.#instance.sessionStopped = () => this.bindings.onStop();
     this.#instance.canceled = (r, e) => {
-      if (CancellationErrorCode.NoError === e.errorCode) this.bindings.onStop();
+      if (e.errorCode === CancellationErrorCode.NoError)
+        this.bindings.onStop();
       else this.bindings.onStop(`${CancellationErrorCode[e.errorCode]}`);
     };
 
     this.#instance.recognizing = (s, e) =>
-      params.azure.interim &&
+      state.azure.interim &&
       !!e.result.text &&
       this.bindings.onInterim(e.result.text);
     this.#instance.recognized = (s, e) => this.bindings.onFinal(e.result.text);
@@ -76,6 +75,8 @@ export class STT_AzureService implements ISpeechRecognitionService {
   stop(): void {
     this.#instance?.stopContinuousRecognitionAsync(() => {
       this.#instance?.close();
+    }, err => {
+      this.bindings.onStop(err);
     });
   }
 }

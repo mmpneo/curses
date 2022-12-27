@@ -1,10 +1,11 @@
-use std::{process::Command, sync::Arc};
+use std::{sync::Arc, process::Command};
 
+use local_ip_address::local_ip;
+use serde::{Serialize, Deserialize};
 use tauri::{
     async_runtime::Mutex,
     command,
     plugin::{Builder, TauriPlugin},
-    regex::Regex,
     Manager, Runtime, State,
 };
 use tokio::sync::mpsc;
@@ -32,36 +33,48 @@ async fn pubsub_broadcast(value: String, input: State<'_, PubSubInput>) -> Resul
     tx.send(value).await.map_err(|e| e.to_string())
 }
 
+#[derive(Serialize)]
+struct WebConfig {
+    pub local_ip: String,
+    pub port: String,
+    pub peer_path: String,
+    pub pubsub_path: String,
+}
+
 #[command]
-async fn config(_conf: State<'_, AppConfiguration>) -> Result<(), String> {
-    let output = Command::new("ifconfig")
-        .output()
-        .expect("failed to execute `ifconfig`");
+async fn config(config: State<'_, AppConfiguration>) -> Result<WebConfig, String> {
+    let Ok(ip) = local_ip() else {
+        return Err("Error retrieving local IP".to_string())
+    };
+    return Ok(WebConfig {
+        local_ip: ip.to_string(),
+        port: config.port.to_string(),
+        peer_path: "peer".to_string(),
+        pubsub_path: "pubsub".to_string(),
+    });
+}
 
-    let stdout = String::from_utf8(output.stdout).unwrap();
-
-    let re = Regex::new(r#"(?m)^.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*$"#).unwrap();
-    for cap in re.captures_iter(&stdout) {
-        if let Some(host) = cap.get(2) {
-            println!("{:?}", host);
-            // if host != "127.0.0.1" {
-            //     if let Ok(addr) = host.parse::<Ipv4Addr>() {
-            //         return Some(IpAddr::V4(addr));
-            //     }
-            //     if let Ok(addr) = host.parse::<Ipv6Addr>() {
-            //         return Some(IpAddr::V6(addr));
-            //     }
-            // }
-        }
+#[derive(Serialize, Deserialize)]
+struct OpenBrowserCommand {
+    browser: String,
+    url: String
+}
+#[command]
+fn open_browser(data: OpenBrowserCommand) {
+    println!("Open chrome");
+    if cfg!(target_os = "windows") {
+        Command::new("cmd")
+            .args(&["/C", format!("start {} {}", &data.browser, &data.url).as_str()])
+            .output()
+            .ok();
     }
-    Ok(())
 }
 
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     let (pubsub_input_tx, pubsub_input_rx) = mpsc::channel::<String>(1); // to pubsub
     let (pubsub_output_tx, mut pubsub_output_rx) = mpsc::channel::<String>(1); // to js
     Builder::new("web")
-        .invoke_handler(tauri::generate_handler![pubsub_broadcast, config])
+        .invoke_handler(tauri::generate_handler![open_browser, pubsub_broadcast, config])
         .setup(|app| {
             app.manage(WebPlugin::default());
             app.manage(PubSubInput {

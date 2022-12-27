@@ -2,8 +2,9 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { listen } from '@tauri-apps/api/event'
 import PubSub from "pubsub-js";
 import { proxyMap } from "valtio/utils";
-import { BaseEvent, IServiceInterface, PartialWithRequired, TextEvent, TextEventSource, TextEvent_Schema } from "../../types";
+import { BaseEvent, IServiceInterface, PartialWithRequired, ServiceNetworkState, TextEvent, TextEventSource, TextEvent_Schema } from "../../types";
 import Ajv from "ajv";
+import { proxy } from "valtio";
 
 type RegisteredEvent = {
   label: string;
@@ -96,7 +97,26 @@ class Service_PubSub implements IServiceInterface {
     return PubSub.subscribe(source, (_, data: TextEvent) => fn(data));
   }
 
-  Init() {}
+
+  getLocalNetworkLink() {}
+
+  linkState = proxy({
+    value: ServiceNetworkState.disconnected
+  })
+
+  private buildPubSubAddress = (a: string, p: string) => `${a}:${p}/pubsub`
+
+  linkConnect(address: string, port: string) {
+    if (window.platform === "app") {
+      const conf = window.networkConfiguration;
+      if (conf.localIp === address && conf.port === port) {
+        // prevent loop connect
+        return;
+      }
+    }
+    // const ws = new WebSocket("");
+  }
+  linkDisconnect() {}
 }
 
 export default Service_PubSub;

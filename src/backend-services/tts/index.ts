@@ -15,6 +15,7 @@ class Service_TTS implements IServiceInterface {
 
   serviceState = proxy({
     status: ServiceNetworkState.disconnected,
+    error: ""
   });
 
   async init() {
@@ -44,14 +45,17 @@ class Service_TTS implements IServiceInterface {
 
   start() {
     this.stop();
+    this.serviceState.error = "";
 
     let bindings: TTSServiceEventBindings = {
       onStart: () => this.#setStatus(ServiceNetworkState.connected),
       onStop: (error?: string) => {
-        if (error) toast(error, { type: "error" });
-        return this.#setStatus(
-          error ? ServiceNetworkState.error : ServiceNetworkState.disconnected
-        );
+        if (error) {
+          toast(error, { type: "error", autoClose: false });
+          this.serviceState.error = error;
+        }
+        this.#serviceInstance = undefined;
+        this.#setStatus(ServiceNetworkState.disconnected);
       },
     };
 

@@ -18,8 +18,8 @@ export class PeerjsProvider {
     this.document.on("update", update => this.broadcastUpdate(this.serializeUpdate(update)));
 
     this.#peer = new Peer(netId, {
-      host: "localhost",
-      port:   3030,
+      host: window.networkConfiguration.host,
+      port:   parseInt(window.networkConfiguration.port),
       key:    '',
       path:   'peer',
       secure: false,
@@ -49,8 +49,8 @@ export class PeerjsProvider {
 
   async internalConnectClient(netId: string, resolve: (v: any) => void, reject: (v: any) => void) {
     this.#peer = new Peer(nanoid(64), {
-      host: "localhost",
-      port:   3030,
+      host: window.networkConfiguration.host,
+      port:   parseInt(window.networkConfiguration.port),
       key:    '',
       path:   'peer',
       secure: false,

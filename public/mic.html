@@ -1,0 +1,504 @@
+<html>
+
+<head>
+  <script>
+    const chromeLangs = [
+      ['Afrikaans', ['af-ZA']],
+      ['አማርኛ', ['am-ET']],
+      ['Azərbaycanca',
+        ['az-AZ']
+      ],
+      ['বাংলা',
+        ['bn-BD', 'বাংলাদেশ'],
+        ['bn-IN', 'ভারত']],
+      ['Bahasa Indonesia', ['id-ID']],
+      ['Bahasa Melayu', ['ms-MY']],
+      ['Català', ['ca-ES']],
+      ['Čeština', ['cs-CZ']],
+      ['Dansk', ['da-DK']],
+      ['Deutsch', ['de-DE']],
+      ['English',
+        ['en-AU', 'Australia'],
+        ['en-CA', 'Canada'],
+        ['en-IN', 'India'],
+        ['en-KE', 'Kenya'],
+        ['en-TZ', 'Tanzania'],
+        ['en-GH', 'Ghana'],
+        ['en-NZ', 'New Zealand'],
+        ['en-NG', 'Nigeria'],
+        ['en-ZA', 'South Africa'],
+        ['en-PH', 'Philippines'],
+        ['en-GB', 'United Kingdom'],
+        ['en-US', 'United States']],
+      ['Español', ['es-AR', 'Argentina'],
+        ['es-BO', 'Bolivia'],
+        ['es-CL', 'Chile'],
+        ['es-CO', 'Colombia'],
+        ['es-CR', 'Costa Rica'],
+        ['es-EC', 'Ecuador'],
+        ['es-SV', 'El Salvador'],
+        ['es-ES', 'España'],
+        ['es-US', 'Estados Unidos'],
+        ['es-GT', 'Guatemala'],
+        ['es-HN', 'Honduras'],
+        ['es-MX', 'México'],
+        ['es-NI', 'Nicaragua'],
+        ['es-PA', 'Panamá'],
+        ['es-PY', 'Paraguay'],
+        ['es-PE', 'Perú'],
+        ['es-PR', 'Puerto Rico'],
+        ['es-DO', 'República Dominicana'],
+        ['es-UY', 'Uruguay'],
+        ['es-VE', 'Venezuela']],
+      ['Euskara', ['eu-ES']],
+      ['Filipino', ['fil-PH']],
+      ['Français', ['fr-FR']],
+      ['Basa Jawa', ['jv-ID']],
+      ['Galego', ['gl-ES']],
+      ['ગુજરાતી', ['gu-IN']],
+      ['Hrvatski', ['hr-HR']],
+      ['IsiZulu', ['zu-ZA']],
+      ['Íslenska', ['is-IS']],
+      ['Italiano', ['it-IT', 'Italia'],
+        ['it-CH', 'Svizzera']],
+      ['ಕನ್ನಡ', ['kn-IN']],
+      ['ភាសាខ្មែរ', ['km-KH']],
+      ['Latviešu', ['lv-LV']],
+      ['Lietuvių', ['lt-LT']],
+      ['മലയാളം', ['ml-IN']],
+      ['मराठी', ['mr-IN']],
+      ['Magyar', ['hu-HU']],
+      ['ລາວ', ['lo-LA']],
+      ['Nederlands', ['nl-NL']],
+      ['नेपाली भाषा', ['ne-NP']],
+      ['Norsk bokmål', ['nb-NO']],
+      ['Polski', ['pl-PL']],
+      ['Português', ['pt-BR', 'Brasil'],
+        ['pt-PT', 'Portugal']],
+      ['Română', ['ro-RO']],
+      ['සිංහල', ['si-LK']],
+      ['Slovenščina', ['sl-SI']],
+      ['Basa Sunda', ['su-ID']],
+      ['Slovenčina', ['sk-SK']],
+      ['Suomi', ['fi-FI']],
+      ['Svenska', ['sv-SE']],
+      ['Kiswahili', ['sw-TZ', 'Tanzania'],
+        ['sw-KE', 'Kenya']],
+      ['ქართული', ['ka-GE']],
+      ['Հայերեն', ['hy-AM']],
+      ['தமிழ்', ['ta-IN', 'இந்தியா'],
+        ['ta-SG', 'சிங்கப்பூர்'],
+        ['ta-LK', 'இலங்கை'],
+        ['ta-MY', 'மலேசியா']],
+      ['తెలుగు', ['te-IN']],
+      ['Tiếng Việt', ['vi-VN']],
+      ['Türkçe', ['tr-TR']],
+      ['اُردُو', ['ur-PK', 'پاکستان'],
+        ['ur-IN', 'بھارت']],
+      ['Ελληνικά', ['el-GR']],
+      ['български', ['bg-BG']],
+      ['Pусский', ['ru-RU']],
+      ['Српски', ['sr-RS']],
+      ['Українська', ['uk-UA']],
+      ['한국어', ['ko-KR']],
+      ['中文', ['cmn-Hans-CN', '普通话 (中国大陆)'],
+        ['cmn-Hans-HK', '普通话 (香港)'],
+        ['cmn-Hant-TW', '中文 (台灣)'],
+        ['yue-Hant-HK', '粵語 (香港)']],
+      ['日本語', ['ja-JP']],
+      ['हिन्दी', ['hi-IN']],
+      ['ภาษาไทย', ['th-TH']]];
+    const edgeLangs = [
+      // ['Afrikaans', ['af-ZA']],
+      // ['አማርኛ', ['am-ET']],
+      // ['Azərbaycanca', ['az-AZ']],
+      // ['বাংলা',
+      //   ['bn-BD', 'বাংলাদেশ'],
+      //   ['bn-IN', 'ভারত']],
+      // ['Bahasa Indonesia', ['id-ID']],
+      // ['Bahasa Melayu', ['ms-MY']],
+      // ['Català', ['ca-ES']],
+      // ['Čeština', ['cs-CZ']],
+      ['Dansk', ['da-DK']],
+      ['Deutsch', ['de-DE']],
+      ['English',
+        ['en-AU', 'Australia'],
+        ['en-CA', 'Canada'],
+        ['en-IN', 'India'],
+        // ['en-KE', 'Kenya'],
+        // ['en-TZ', 'Tanzania'],
+        // ['en-GH', 'Ghana'],
+        // ['en-IE', 'Ireland'],
+        // ['en-NZ', 'New Zealand'],
+        // ['en-NG', 'Nigeria'],
+        // ['en-ZA', 'South Africa'],
+        // ['en-PH', 'Philippines'],
+        ['en-GB', 'United Kingdom'],
+        ['en-US', 'United States']],
+      ['Español',
+        // ['es-AR', 'Argentina'],
+        // ['es-BO', 'Bolivia'],
+        // ['es-CL', 'Chile'],
+        // ['es-CO', 'Colombia'],
+        // ['es-CR', 'Costa Rica'],
+        // ['es-EC', 'Ecuador'],
+        // ['es-SV', 'El Salvador'],
+        ['es-ES', 'España'],
+        // ['es-US', 'Estados Unidos'],
+        // ['es-GT', 'Guatemala'],
+        // ['es-HN', 'Honduras'],
+        ['es-MX', 'México'],
+        // ['es-NI', 'Nicaragua'],
+        // ['es-PA', 'Panamá'],
+        // ['es-PY', 'Paraguay'],
+        // ['es-PE', 'Perú'],
+        // ['es-PR', 'Puerto Rico'],
+        // ['es-DO', 'República Dominicana'],
+        // ['es-UY', 'Uruguay'],
+        // ['es-VE', 'Venezuela']
+      ],
+      // ['Euskara', ['eu-ES']],
+      // ['Filipino', ['fil-PH']],
+      ['Français', ['fr-FR']],
+      // ['Basa Jawa', ['jv-ID']],
+      // ['Galego', ['gl-ES']],
+      // ['ગુજરાતી', ['gu-IN']],
+      // ['Hrvatski', ['hr-HR']],
+      // ['IsiZulu', ['zu-ZA']],
+      // ['Íslenska', ['is-IS']],
+      ['Italiano', ['it-IT']],
+      // ['it-IT', 'Italia'],
+      // ['it-CH', 'Svizzera']],
+      // ['ಕನ್ನಡ', ['kn-IN']],
+      // ['ភាសាខ្មែរ', ['km-KH']],
+      // ['Latviešu', ['lv-LV']],
+      // ['Lietuvių', ['lt-LT']],
+      // ['മലയാളം', ['ml-IN']],
+      // ['मराठी', ['mr-IN']],
+      // ['Magyar', ['hu-HU']],
+      // ['ລາວ', ['lo-LA']],
+      ['Nederlands', ['nl-NL']],
+      // ['नेपाली भाषा', ['ne-NP']],
+      ['Norsk bokmål', ['nb-NO']],
+      ['Polski', ['pl-PL']],
+      ['Português',
+        ['pt-BR', 'Brasil'],
+        ['pt-PT', 'Portugal']],
+      // ['Română', ['ro-RO']],
+      // ['සිංහල', ['si-LK']],
+      // ['Slovenščina', ['sl-SI']],
+      // ['Basa Sunda', ['su-ID']],
+      // ['Slovenčina', ['sk-SK']],
+      ['Suomi', ['fi-FI']],
+      ['Svenska', ['sv-SE']],
+      // ['Kiswahili',
+      //   ['sw-TZ', 'Tanzania'],
+      //   ['sw-KE', 'Kenya']],
+      // ['ქართული', ['ka-GE']],
+      // ['Հայերեն', ['hy-AM']],
+      // ['தமிழ்',
+      //   ['ta-IN', 'இந்தியா'],
+      //   ['ta-SG', 'சிங்கப்பூர்'],
+      //   ['ta-LK', 'இலங்கை'],
+      //   ['ta-MY', 'மலேசியா']],
+      // ['తెలుగు', ['te-IN']],
+      // ['Tiếng Việt', ['vi-VN']],
+      // ['Türkçe', ['tr-TR']],
+      // ['اُردُو',
+      //   ['ur-PK', 'پاکستان'],
+      //   ['ur-IN', 'بھارت']],
+      // ['Ελληνικά', ['el-GR']],
+      // ['български', ['bg-BG']],
+      ['Pусский', ['ru-RU']],
+      // ['Српски', ['sr-RS']],
+      // ['Українська', ['uk-UA']],
+      ['한국어', ['ko-KR']],
+      ['中文', ['cmn-Hans-CN']
+        // ['cmn-Hans-CN', '普通话 (中国大陆)'],
+        // ['cmn-Hans-HK', '普通话 (香港)'],
+        // ['cmn-Hant-TW', '中文 (台灣)'],
+        // ['yue-Hant-HK', '粵語 (香港)']],
+      ],
+      ['日本語', ['ja-JP']],
+      ['हिन्दी', ['hi-IN']],
+      ['ภาษาไทย', ['th-TH']]
+    ];
+    const langs = chromeLangs;
+  </script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    :root {
+      font-size: 10px;
+      --opacity: 1;
+      --element-size: 4rem;
+      --radius: 0.8rem;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      color: #fff;
+      background-color: #000;
+    }
+
+
+    .list {
+      display: flex;
+      flex: 100%;
+    }
+
+    .actionbar {
+      flex-wrap: wrap;
+      padding: 2rem 3rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .actionbar .actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.4rem;
+    }
+
+    select {
+      min-width: 0;
+      height: var(--element-size);
+      flex: 100%;
+      border-radius: var(--radius);
+      padding: 0 1rem;
+      color: #fff;
+      outline-color: purple;
+      font-size: 1.8rem;
+
+      font-weight: 600;
+      background-color: rgb(28, 28, 30);
+      border: none;
+    }
+
+    select:focus-visible {
+      outline: 2px solid #fff;
+      border-radius: 3px;
+    }
+
+    button:hover {
+      background-color: rgb(58, 58, 60);
+    }
+
+    button {
+      transition: background-color .1s ease-in-out;
+      background-color: transparent;
+      flex: none;
+      color: #fff;
+      border: none;
+      padding: 0 2rem;
+      background-color: seagreen;
+      height: var(--element-size);
+      font-weight: 600;
+      border-radius: var(--radius);
+    }
+
+    .list-container {
+      display: flex;
+      flex-direction: column-reverse;
+      flex: 100%;
+      overflow-y: scroll;
+    }
+
+    .list-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    #list {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      font-size: 1.8rem;
+      padding: 1rem;
+    }
+
+    #list>div {
+      display: flex;
+      flex-direction: column;
+      padding: .5rem 1rem;
+      border-bottom: 1px solid rgb(28, 28, 30);
+    }
+
+    #list>div:last-child {
+      border: none;
+    }
+
+    #list>div .event {
+      color: rgb(99, 99, 102);
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="list-container">
+    <div id="list"></div>
+  </div>
+  <div class="actionbar">
+    <div class="logo">SimpleSTT</div>
+    <div class="actions">
+      <select value="English" id="select-lang"></select>
+      <select id="select-dial"></select>
+      <button id="button-start" @click="pog()">Start</button>
+    </div>
+  </div>
+  <script>
+    (async () => {
+      let selectedDial = 'en-Us';
+      const selectLang = document.getElementById("select-lang");
+      const selectDial = document.getElementById("select-dial");
+      const buttonStart = document.getElementById("button-start");
+      const listElement = document.getElementById("list");
+
+      let host = location.hostname;
+      let port = location.port;
+      const q = new URLSearchParams(window.location.search.substring(1));
+      if (q.has("host"))
+        host = q.get("host");
+      if (q.has("port"))
+        port = q.get("port");
+
+      selectLang.oninput = e => handleSelectLang(e.target.value);
+      selectDial.oninput = e => handleSelectDial(e.target.value);
+      buttonStart.onclick = startSTT;
+
+      function getDialectList(list, langGroup) {
+        const langIndex = list.findIndex(l => l[0] === langGroup);
+        if (langIndex < 0)
+          return [];
+        const l = [...langs[langIndex]]
+        l.shift();
+        return l;
+      }
+
+
+      let sttInstance = null
+      let isStarted = false;
+
+      const ws = new WebSocket(`ws://${host}:${port}/pubsub?id=${Math.random()}-${Date.now()}`);
+      ws.onopen = () => console.log("opened");
+      ws.onmessage = (msg) => {
+        try {
+          const { topic, data } = JSON.parse(msg.data);
+          if (topic !== "inputfield.final" && topic !== "stt.final" || typeof data !== "string")
+            return;
+          addRowNode(data, topic);
+
+        } catch (error) {}
+      }
+      
+
+      function addRowNode(value, event) {
+        if (listElement.childElementCount >= 20)
+          listElement.firstChild.remove()
+        const newDiv = document.createElement("div");
+        newDiv.innerHTML = `
+      <span class="event">${event}</span>
+      <span class="value">${value}</span>
+      `
+        listElement.append(newDiv);
+      }
+
+      // add languages
+      function addOption(label, value, to) {
+        const option = document.createElement("option");
+        option.value = value;
+        option.innerText = label;
+        to.append(option);
+      }
+      langs.forEach(lang => addOption(lang[0], lang[0], selectLang));
+
+      function handleSelectLang(langGroup) {
+        const dialects = getDialectList(langs, langGroup);
+        while (selectDial.firstChild)
+          selectDial.removeChild(selectDial.firstChild);
+        dialects.forEach(lang => addOption(`${lang[1] ?? langGroup}`, lang[0], selectDial));
+        handleSelectDial(dialects[0][0]);
+      }
+
+      selectLang.value = 'English';
+      handleSelectLang('English');
+      function handleSelectDial(dialect) {
+        selectedDial = dialect;
+      }
+
+      function send(obj) {
+        (ws.OPEN === ws.readyState) && ws.send(JSON.stringify(obj));
+      }
+
+      async function spawnInstance() {
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+        sttInstance = new SpeechRecognition();
+        sttInstance.continuous = true;
+        sttInstance.interimResults = true;
+        sttInstance.lang = selectDial.value;
+        sttInstance.start();
+        sttInstance.onstart = () => {
+          buttonStart.textContent = "Listening..."
+        }
+        isStarted = true;
+
+        sttInstance.onend = () => sttInstance && sttInstance.start();
+
+        sttInstance.onresult = (event) => {
+          try {
+            let interim_transcript = '';
+            let final_transcript = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+              if (event.results[i].isFinal) {
+                final_transcript += event.results[i][0].transcript;
+                send({topic: "text.stt",data: {type: 0, value: final_transcript}});
+                addRowNode(final_transcript, 'stt.final');
+              }
+              else {
+                interim_transcript += event.results[i][0].transcript;
+                send({topic: "text.stt",data: {type: 1, value: interim_transcript}});
+              }
+            }
+          } catch (error) { }
+        }
+        sttInstance.onerror = (e) => console.log(e);
+
+        window.onbeforeunload = () => {
+          sttInstance && sttInstance.stop();
+        }
+      }
+
+      function startSTT() {
+        if (!isStarted)
+          spawnInstance();
+        else if (sttInstance) {
+          isStarted = false;
+          buttonStart.textContent = "Start"
+          sttInstance.onend = null;
+          sttInstance.stop();
+          sttInstance = undefined;
+        }
+      }
+    })();
+
+  </script>
+</body>
+
+</html>

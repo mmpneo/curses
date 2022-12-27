@@ -6,14 +6,23 @@ import Frontend from "./frontend-services";
 import EditorView from "./components/editor-view";
 import ClientView from "./components/client-view";
 import React from "react";
+import { invoke } from "@tauri-apps/api/tauri";
+
+type NetworkConfiguration = {
+  localIp: string,
+  host: string,
+  port: string
+}
 
 declare global {
   interface Window {
+    // api: API;
     API: Backend;
     APIFrontend: Frontend;
     mode: "host" | "client";
     platform: "app" | "web";
     remoteHost?: string // use this 
+    networkConfiguration: NetworkConfiguration
     // "__TAURI_METADATA__": any
   }
 }
@@ -39,17 +48,39 @@ window.addEventListener('contextmenu', e => e.preventDefault(), false);
 window.API = new Backend();
 window.APIFrontend = new Frontend();
 
-Promise.all([
-  window.API.init(),
-  window.APIFrontend.init()
-]).then(() => {
-  if (window.mode === "client")
-    ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(<ClientView />);
-  else
-    ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-      <React.StrictMode>
-        <EditorView />
-      </React.StrictMode>
-    );
-});
+async function buildNetworkConfiguration() {
+  if (window.platform === "app") {
+    const appConfig = await invoke<any>("plugin:web|config");
+    console.log(appConfig);
+    window.networkConfiguration = {
+      localIp: appConfig.local_ip,
+      host: "localhost",
+      port: appConfig.port
+    }
+  }
+  else {
+    // if client from app
+    window.networkConfiguration = {
+      localIp: "",
+      host: location.hostname,
+      port: location.port
+    }
+  }
+}
+buildNetworkConfiguration()
+  .then(() => {
+    Promise.all([
+      window.API.init(),
+      window.APIFrontend.init()
+    ]).then(() => {
+      if (window.mode === "client")
+        ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(<ClientView />);
+      else
+        ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
+          <React.StrictMode>
+            <EditorView />
+          </React.StrictMode>
+        );
+    });
+  })
 

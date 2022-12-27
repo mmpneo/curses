@@ -1,0 +1,61 @@
+import {
+  ISpeechRecognitionService,
+  SpeechServiceEventBindings,
+} from "../types";
+
+import { isEmptyValue } from "../../../utils";
+import { STT_State } from "../schema";
+import { BrowserClient, BrowserMicrophone, Segment } from "@speechly/browser-client";
+
+export class STT_SpeechlyService implements ISpeechRecognitionService {
+  constructor(private bindings: SpeechServiceEventBindings) {}
+  
+  #instance?: BrowserClient;
+  #initialized?: boolean;
+  
+  dispose(): void {}
+
+  async start(state: STT_State) {
+    // ignore device for now
+    if (Object.values(state.speechly).some(isEmptyValue))
+      return this.bindings.onStop("Options missing");
+
+    this.#instance = new BrowserClient({
+      appId: state.speechly.key,
+      vad: { enabled: true, noiseGateDb: -24.0 },
+    });
+
+    this.#instance.onStart(_ => {
+      if (this.#initialized)
+        return;
+      this.bindings.onStart();
+      this.#initialized = true;
+    });
+
+    const microphone = new BrowserMicrophone();
+    await microphone.initialize();
+    if (!microphone.mediaStream)
+      return this.bindings.onStop("Error initialising");
+    await this.#instance.attach(microphone.mediaStream);
+
+    this.#instance.onSegmentChange((segment: Segment) => {
+      let transcript = segment.words
+          .map(w => w.value.toLowerCase())
+          .join(" ").trim();
+      if (segment.isFinal)
+        transcript += ".";
+
+      if (!transcript)
+        return;
+      if (!segment.isFinal)
+        this.bindings.onInterim(transcript);
+      else
+        this.bindings.onFinal(transcript)
+    });
+  }
+
+  stop(): void {
+    this.#instance?.close();
+    this.bindings.onStop()
+  }
+}

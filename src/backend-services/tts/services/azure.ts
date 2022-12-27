@@ -1,10 +1,10 @@
-import { isEmpty, values } from "lodash";
+import { values } from "lodash";
 import {
-  OutputFormat,
   SpeechConfig,
   SpeechSynthesisOutputFormat,
   SpeechSynthesizer
 } from "microsoft-cognitiveservices-speech-sdk";
+import { isEmptyValue } from "../../../utils";
 import { TTS_State } from "../schema";
 import { ITTSService, TTSServiceEventBindings } from "../types";
 
@@ -18,7 +18,7 @@ export class TTS_AzureService implements ITTSService {
   #isPlaying = false;
 
   start(state: TTS_State): void {
-    if (values(state.azure).some(isEmpty)) return this.bindings.onStop();
+    if (values(state.azure).some(isEmptyValue)) return this.bindings.onStop("Options missing");
 
     try {
       // const audioConfig                     = AudioConfig.fromSpeakerOutput(p);
@@ -30,6 +30,9 @@ export class TTS_AzureService implements ITTSService {
       speechConfig.speechSynthesisVoiceName = state.azure.voice;
       speechConfig.speechSynthesisOutputFormat = SpeechSynthesisOutputFormat.Audio48Khz192KBitRateMonoMp3;
       this.#instance = new SpeechSynthesizer(speechConfig, null as any);
+
+      this.#instance.synthesisCompleted = (v,a) => console.log(v,a);
+
       this.bindings.onStart();
     } catch (error: any) {
       console.log(error);
@@ -53,12 +56,13 @@ export class TTS_AzureService implements ITTSService {
     value &&
       this.#instance?.speakTextAsync(
         value,
-        (e) => {
-          this.#audioQueue.push(e.audioData);
+        result => {
+          this.#audioQueue.push(result.audioData);
           this.#tryDequeueAndPlay();
         },
         (e) => {
-          console.log(e);
+          this.#instance?.close();
+          this.bindings.onStop(e);
         }
       );
   }

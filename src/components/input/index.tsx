@@ -1,6 +1,6 @@
 import { useId } from "@floating-ui/react-dom-interactions";
 import classNames from "classnames/bind";
-import { FC, InputHTMLAttributes, memo, PropsWithChildren, ReactNode, useEffect, useRef, useState } from "react";
+import { FC, InputHTMLAttributes, memo, PropsWithChildren, ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import Select, { MenuListProps, MenuProps, OptionProps, Props as SelectProps } from 'react-select';
 import { RgbaColorPicker, RgbaColor } from "react-colorful";
 import Dropdown from "../dropdown/Dropdown";
@@ -15,7 +15,7 @@ import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-css";
 import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/theme-twilight";
-import { ServiceNetworkState, TextEventSource } from "../../types";
+import { MappedGroupDictionary, ServiceNetworkState, TextEventSource } from "../../types";
 
 import styles from "./style.module.css"
 const cx = classNames.bind(styles);
@@ -123,7 +123,7 @@ const Chips: FC<ChipsProps> = memo(({ label, value, options, onChange }) => {
   </Container>
 });
 
-const SelectMenu: FC<MenuProps> = ({innerRef, innerProps, ...props}) => {
+const SelectMenu: FC<MenuProps> = ({ innerRef, innerProps, ...props }) => {
   return <>
     <div {...innerProps} ref={innerRef as any} className="absolute flex flex-col justify-start w-56 z-50 right-0 top-10 bg-base-100 rounded-box shadow-lg">
       <SimpleBar className="h-full max-h-64 flex flex-col">
@@ -132,21 +132,22 @@ const SelectMenu: FC<MenuProps> = ({innerRef, innerProps, ...props}) => {
     </div>
   </>
 };
-const SelectMenuList: FC<MenuListProps> = ({innerRef, innerProps, ...props}) => {
+const SelectMenuList: FC<MenuListProps> = ({ innerRef, innerProps, ...props }) => {
   return <ul className="flex flex-col menu menu-compact p-2 w-full">
     {props.children}
   </ul>
 };
-const SelectOption: FC<OptionProps> = ({innerRef, innerProps, ...props}) => {
+const SelectOption: FC<OptionProps> = ({ innerRef, innerProps, ...props }) => {
   const ref = useRef<HTMLDivElement>()
   useEffect(() => {
     if (props.isFocused)
-      ref.current?.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+      ref.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }, [props.isFocused])
   return <li><a onClick={() => props.selectOption(props.data)} ref={ref as any} className={cx("font-medium", {
     disabled: props.isDisabled,
     "bg-neutral/60 text-neutral-content": props.isFocused,
-    active: props.isSelected})}>{props.children}</a></li>
+    active: props.isSelected
+  })}>{props.children}</a></li>
 };
 
 interface NewSelectProps extends SelectProps, InputBaseProps { }
@@ -305,7 +306,7 @@ interface TextSourceProps extends InputBaseProps {
   value: string
 }
 const TextSource: FC<TextSourceProps> = memo(({ label, value, onChange }) => {
-  return <NewSelect label={label} value={sourceOptions.find(o => o.value === value)} options={sourceOptions} onChange={(e: any) => onChange(e.value as any)} placeholder="Text source"  />
+  return <NewSelect label={label} value={sourceOptions.find(o => o.value === value)} options={sourceOptions} onChange={(e: any) => onChange(e.value as any)} placeholder="Text source" />
 });
 
 interface CodeProps extends InputBaseProps {
@@ -317,28 +318,73 @@ interface CodeProps extends InputBaseProps {
 interface NetworkStatusProps extends InputBaseProps {
   value: ServiceNetworkState
 }
-const NetworkStatus: FC<NetworkStatusProps> = ({label, value}) => {
+const NetworkStatus: FC<NetworkStatusProps> = ({ label, value }) => {
   return <Container label={label}>
     <div className="self-end flex space-x-2 items-center pl-2 pr-3 h-8 py-1 rounded-full bg-neutral/50 border-dashed border-neutral">
       {value === ServiceNetworkState.disconnected && <>
         <span className="text-xs font-semibold text-error leading-none">Disconnected</span>
-        <div className="rounded-full ring-2 bg-error ring-error ring-offset-base-100 ring-offset-2 w-2 h-2 "/>
+        <div className="rounded-full ring-2 bg-error ring-error ring-offset-base-100 ring-offset-2 w-2 h-2 " />
       </>}
       {value === ServiceNetworkState.connecting && <>
         <span className="text-xs font-semibold text-erroneutralr leading-none">Connecting..</span>
-        <div className="rounded-full ring-2 bg-neutral ring-neutral ring-offset-base-100 ring-offset-2 w-2 h-2 "/>
+        <div className="rounded-full ring-2 bg-neutral ring-neutral ring-offset-base-100 ring-offset-2 w-2 h-2 " />
       </>}
       {value === ServiceNetworkState.connected && <>
         <span className="text-xs font-semibold text-success leading-none">Connected</span>
-        <div className="rounded-full ring-2 bg-success ring-success ring-offset-base-100 ring-offset-2 w-2 h-2 "/>
+        <div className="rounded-full ring-2 bg-success ring-success ring-offset-base-100 ring-offset-2 w-2 h-2 " />
       </>}
       {value === ServiceNetworkState.error && <>
         <span className="text-xs font-semibold text-red-500 leading-none">Error</span>
-        <div className="rounded-full ring-2 bg-red-500 ring-red-500 ring-offset-base-100 ring-offset-2 w-2 h-2 "/>
+        <div className="rounded-full ring-2 bg-red-500 ring-red-500 ring-offset-base-100 ring-offset-2 w-2 h-2 " />
       </>}
-      </div>
+    </div>
   </Container>
 }
+
+interface MappedGroupSelectProps {
+  labelGroup: string,
+  labelOption: string
+  library: MappedGroupDictionary,
+  value: { group: string, option: string },
+  onChange: (v: { group: string, option: string }) => void,
+}
+const MappedGroupSelect: FC<MappedGroupSelectProps> = memo(({ labelGroup, labelOption, value, onChange, library }) => {
+  const handleSelectGroup = (group: string) => {
+    onChange({ group, option: library[group]?.[0]?.[0] || "" });
+  }
+  const handleSelectOption = (opt: string) => onChange({ group: value.group, option: opt });
+
+  const getCurrentOption = useCallback(() => {
+    if (!library[value.group] || !value.option)
+      return null;
+    const v = library[value.group].find(l => l[0] === value.option);
+    return v ? { value: v[0], label: v[1] ?? v[0] } : null;
+  }, [value]);
+
+  const getGroupOptions = useCallback(() => {
+    return Object.keys(library).map((key) => ({ label: key, value: key }));
+  }, []);
+
+  const getCurrentOptions = useCallback(() => {
+    if (!value.group)
+      return [];
+    return library[value.group]?.map((v: any) => ({ value: v[0], label: v[1] ?? v[0] })) || [];
+  }, [value]);
+
+  return <>
+    <NewSelect
+      options={getGroupOptions()}
+      label={labelGroup}
+      value={{ label: value.group, value: value.group }}
+      onChange={(e: any) => handleSelectGroup(e.value)} />
+
+    {getCurrentOptions().length > 1 && <NewSelect
+      options={getCurrentOptions()}
+      label={labelOption}
+      value={getCurrentOption()}
+      onChange={(e: any) => handleSelectOption(e.value)} />}
+  </>
+});
 
 const Code: FC<CodeProps> = memo(({ label, ...rest }) => {
   return <Container label={label} vertical>
@@ -357,4 +403,4 @@ const Code: FC<CodeProps> = memo(({ label, ...rest }) => {
   </Container>
 });
 
-export default { BaseText, Text, Chips, Range, Color, Select: NewSelect, Checkbox, File, Event, Code, TextSource, Container, DoubleCountainer, NetworkStatus };
+export default { BaseText, Text, Chips, Range, Color, Select: NewSelect, MappedGroupSelect, Checkbox, File, Event, Code, TextSource, Container, DoubleCountainer, NetworkStatus };

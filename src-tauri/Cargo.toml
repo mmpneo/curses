@@ -29,6 +29,7 @@ windows = { version = "0.43.0", features = [
   "Win32_System_WindowsProgramming",
 ] }
 clap = { version = "4.0.29", features = ["derive"] }
+local-ip-address = "0.4.9"
 
 [features]
 default = ["custom-protocol"]

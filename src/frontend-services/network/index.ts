@@ -13,15 +13,11 @@ class Service_Network implements IServiceInterface {
   });
 
   async init() {
-    if (window.mode === "client") {
-      // try connect
-      this.#initializePeer();
+    this.#initializePeer();
+    if (window.mode === "client")
       await this.#provider?.connectClient("local");
-    } else {
-      // idle
-      this.#initializePeer();
+    else
       this.#provider?.connectHost("local");
-    }
   }
 
   #initializePeer() {

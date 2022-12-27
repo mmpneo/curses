@@ -61,7 +61,7 @@ const Description: FC<PropsWithChildren> = ({ children }) => {
 }
 
 const Content: FC<PropsWithChildren> = ({ children }) => {
-  return <div style={{ width: '19rem' }} className="flex flex-col p-4 space-y-2 overflow-hidden">{children}</div>
+  return <div style={{ width: '19rem' }} className="flex flex-col p-4 space-y-2">{children}</div>
 }
 
 const Switchable: FC<PropsWithChildren<{ visible: boolean }>> = ({ visible, children }) => {
@@ -76,6 +76,12 @@ const Switchable: FC<PropsWithChildren<{ visible: boolean }>> = ({ visible, chil
       {children}
   </motion.div>}
   </AnimatePresence>
+}
+
+const Deactivatable: FC<PropsWithChildren<{ active: boolean }>> = ({active, children}) => {
+  return <div className={classNames("flex flex-col w-full space-y-2 transition-opacity", !active ? "opacity-50 pointer-events-none" : "")}>
+    {children}
+  </div>
 }
 
 const variants = {
@@ -118,7 +124,7 @@ const TabsContent: FC<PropsWithChildren<{ tabKey: number | string, direction: nu
 });
 
 const Tabs: FC<PropsWithChildren> = ({ children }) => {
-  return <div className="-mx-1 bg-base-100 px-1 sticky top-0 pt-3 pb-2 z-10 grid grid-cols-6 gap-2">
+  return <div className="-mx-1 bg-base-100 px-1 sticky top-0 pt-3 pb-2 z-10 grid grid-cols-6 gap-2 overflow-hidden">
     {children}
   </div>
 }
@@ -130,4 +136,4 @@ const Tab: FC<PropsWithChildren<ButtonHTMLAttributes<HTMLButtonElement> & { tool
   </Tooltip>
 })
 
-export default { Base, Body, Header, SubHeader, Description, Content, TabsContent, Tabs, Tab, Switchable };
+export default { Base, Body, Header, SubHeader, Description, Content, Deactivatable, TabsContent, Tabs, Tab, Switchable };

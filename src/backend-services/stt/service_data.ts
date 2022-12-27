@@ -1,12 +1,13 @@
+import { MappedGroupDictionary } from "../../types";
+
 export type ServiceLanguageLibrary = (string | string[])[][];
 
-export const azureLanguages: ServiceLanguageLibrary = [
-  ["Afrikaans", ["af-ZA"]],
-  ["Albanian", ["sq-AL"]],
-  ["Amharic", ["am-ET"]],
+export const azureLanguages: MappedGroupDictionary = {
+  "Afrikaans": [["af-ZA"]],
+  "Albanian": [["sq-AL"]],
+  "Amharic": [["am-ET"]],
 
-  [
-    "Arabic",
+  "Arabic": [
     ["ar-DZ", "Algeria"],
     ["ar-BH", "Bahrain), modern standar"],
     ["ar-EG", "Egypt"],
@@ -27,17 +28,16 @@ export const azureLanguages: ServiceLanguageLibrary = [
     ["ar-YE", "Yemen"],
   ],
 
-  ["Armenian", ["hy-AM"]],
-  ["Azerbaijani", ["az-AZ"]],
-  ["Basque", ["eu-ES"]],
-  ["Bengali", ["bn-IN"]],
-  ["Bosnian", ["bs-BA"]],
-  ["Bulgarian", ["bg-BG"]],
-  ["Burmese", ["my-MM"]],
-  ["Catalan", ["ca-ES"]],
+  "Armenian": [["hy-AM"]],
+  "Azerbaijani": [["az-AZ"]],
+  "Basque": [["eu-ES"]],
+  "Bengali": [["bn-IN"]],
+  "Bosnian": [["bs-BA"]],
+  "Bulgarian": [["bg-BG"]],
+  "Burmese": [["my-MM"]],
+  "Catalan": [["ca-ES"]],
 
-  [
-    "Chinese",
+  "Chinese": [
     ["yue-CN", "Cantonese, Simplified"],
     ["zh-HK", "Cantonese, Traditional"],
     ["zh-CN", "Mandarin, Simplified"],
@@ -46,14 +46,16 @@ export const azureLanguages: ServiceLanguageLibrary = [
     ["wuu-CN", "Wu, Simplified"],
   ],
 
-  ["Croatian", ["hr-HR"]],
-  ["Czech", ["cs-CZ"]],
-  ["Danish", ["da-DK"]],
+  "Croatian": [["hr-HR"]],
+  "Czech": [["cs-CZ"]],
+  "Danish": [["da-DK"]],
 
-  ["Dutch", ["nl-BE", "Belgium"], ["nl-NL", "Netherlands"]],
+  "Dutch": [
+    ["nl-BE", "Belgium"],
+    ["nl-NL", "Netherlands"]
+  ],
 
-  [
-    "English",
+  "English": [
     ["en-AU", "Australia"],
     ["en-CA", "Canada"],
     ["en-GH", "Ghana"],
@@ -71,70 +73,69 @@ export const azureLanguages: ServiceLanguageLibrary = [
     ["en-US", "United States"],
   ],
 
-  ["Estonian", ["et-EE"]],
-  ["Filipino", ["fil-PH"]],
-  ["Finnish", ["fi-FI"]],
+  "Estonian": [["et-EE"]],
+  "Filipino": [["fil-PH"]],
+  "Finnish": [["fi-FI"]],
 
-  [
-    "French",
+  "French": [
     ["fr-BE", "Belgium"],
     ["fr-CA", "Canada"],
     ["fr-FR", "France"],
     ["fr-CH", "Switzerland"],
   ],
 
-  ["Galician", ["gl-ES"]],
-  ["Georgian", ["ka-GE"]],
+  "Galician": [["gl-ES"]],
+  "Georgian": [["ka-GE"]],
 
-  [
-    "German",
+  "German": [
     ["de-AT", "Austria"],
     ["de-DE", "Germany"],
     ["de-CH", "Switzerland"],
   ],
 
-  ["Greek", ["el-GR"]],
-  ["Gujarati", ["gu-IN"]],
-  ["Hebrew", ["he-IL"]],
-  ["Hindi", ["hi-IN"]],
-  ["Hungarian", ["hu-HU"]],
-  ["Icelandic", ["is-IS"]],
-  ["Indonesian", ["id-ID"]],
-  ["Irish", ["ga-IE"]],
+  "Greek": [["el-GR"]],
+  "Gujarati": [["gu-IN"]],
+  "Hebrew": [["he-IL"]],
+  "Hindi": [["hi-IN"]],
+  "Hungarian": [["hu-HU"]],
+  "Icelandic": [["is-IS"]],
+  "Indonesian": [["id-ID"]],
+  "Irish": [["ga-IE"]],
 
-  ["Italian", ["it-IT", "Italy"], ["it-CH", "Switzerland"]],
+  "Italian": [
+    ["it-IT", "Italy"],
+    ["it-CH", "Switzerland"]
+  ],
 
-  ["Japanese", ["ja-JP"]],
-  ["Javanese", ["jv-ID"]],
-  ["Kannada", ["kn-IN"]],
-  ["Kazakh", ["kk-KZ"]],
-  ["Khmer", ["km-KH"]],
-  ["Korean", ["ko-KR"]],
-  ["Lao", ["lo-LA"]],
-  ["Latvian", ["lv-LV"]],
-  ["Lithuanian", ["lt-LT"]],
-  ["Macedonian", ["mk-MK"]],
-  ["Malay", ["ms-MY"]],
-  ["Maltese", ["mt-MT"]],
-  ["Marathi", ["mr-IN"]],
-  ["Mongolian", ["mn-MN"]],
-  ["Nepali", ["ne-NP"]],
-  ["Norwegian", ["nb-NO"]],
-  ["Pashto", ["ps-AF"]],
-  ["Persian", ["fa-IR"]],
-  ["Polish", ["pl-PL"]],
-  ["Portuguese", ["pt-BR"]],
-  ["Portuguese", ["pt-PT"]],
-  ["Romanian", ["ro-RO"]],
-  ["Russian", ["ru-RU"]],
-  ["Serbian", ["sr-RS"]],
-  ["Sinhala", ["si-LK"]],
-  ["Slovak", ["sk-SK"]],
-  ["Slovenian", ["sl-SI"]],
-  ["Somali", ["so-SO"]],
+  "Japanese": [["ja-JP"]],
+  "Javanese": [["jv-ID"]],
+  "Kannada": [["kn-IN"]],
+  "Kazakh": [["kk-KZ"]],
+  "Khmer": [["km-KH"]],
+  "Korean": [["ko-KR"]],
+  "Lao": [["lo-LA"]],
+  "Latvian": [["lv-LV"]],
+  "Lithuanian": [["lt-LT"]],
+  "Macedonian": [["mk-MK"]],
+  "Malay": [["ms-MY"]],
+  "Maltese": [["mt-MT"]],
+  "Marathi": [["mr-IN"]],
+  "Mongolian": [["mn-MN"]],
+  "Nepali": [["ne-NP"]],
+  "Norwegian": [["nb-NO"]],
+  "Pashto": [["ps-AF"]],
+  "Persian": [["fa-IR"]],
+  "Polish": [["pl-PL"]],
+  "Portuguese": [["pt-BR"], ["pt-PT"]],
+  "Romanian": [["ro-RO"]],
+  "Russian": [["ru-RU"]],
+  "Serbian": [["sr-RS"]],
+  "Sinhala": [["si-LK"]],
+  "Slovak": [["sk-SK"]],
+  "Slovenian": [["sl-SI"]],
+  "Somali": [["so-SO"]],
 
-  [
-    "Spanish",
+  "Spanish": [
     ["es-AR", "Argentina"],
     ["es-BO", "Bolivia"],
     ["es-CL", "Chile"],
@@ -159,19 +160,22 @@ export const azureLanguages: ServiceLanguageLibrary = [
     ["es-VE", "Venezuela"],
   ],
 
-  ["Swahili", ["sw-KE", "Kenya"], ["sw-TZ", "Tanzania"]],
+  "Swahili": [
+    ["sw-KE", "Kenya"],
+    ["sw-TZ", "Tanzania"]
+  ],
 
-  ["Swedish", ["sv-SE"]],
-  ["Tamil", ["ta-IN"]],
-  ["Telugu", ["te-IN"]],
-  ["Thai", ["th-TH"]],
-  ["Turkish", ["tr-TR"]],
-  ["Ukrainian", ["uk-UA"]],
-  ["Uzbek", ["uz-UZ"]],
-  ["Vietnamese", ["vi-VN"]],
-  ["Welsh", ["cy-GB"]],
-  ["Zulu", ["zu-ZA"]],
-];
+  "Swedish": [["sv-SE"]],
+  "Tamil": [["ta-IN"]],
+  "Telugu": [["te-IN"]],
+  "Thai": [["th-TH"]],
+  "Turkish": [["tr-TR"]],
+  "Ukrainian": [["uk-UA"]],
+  "Uzbek": [["uz-UZ"]],
+  "Vietnamese": [["vi-VN"]],
+  "Welsh": [["cy-GB"]],
+  "Zulu": [["zu-ZA"]],
+};
 
 export const chromeLangs: ServiceLanguageLibrary = [
   ["Afrikaans", ["af-ZA"]],
@@ -284,36 +288,33 @@ export const chromeLangs: ServiceLanguageLibrary = [
   ["ภาษาไทย", ["th-TH"]],
 ];
 
-export const deepGramLangs: ServiceLanguageLibrary = [
-  [
-    "English",
+export const deepGramLangs: MappedGroupDictionary = {
+  "English": [
     ["en-AU", "Australia"],
     ["en-GB", "United Kingdom"],
     ["en-IN", "India"],
     ["en-NZ", "New Zealand"],
     ["en-US", "United States"],
   ],
-  ["Chinese", ["zn-CN", "China"], ["zn-TW", "Taiwan"]],
-  ["Dutch", ["nl"]],
-  ["Flemish", ["nl"]],
-  ["French", ["fr", "France"], ["fr-CA", "Canada"]],
-  ["German", ["de"]],
-  ["Hindi", ["hi"]],
-  ["Indonesian", ["id"]],
-  ["Italian", ["it"]],
-  ["Japanese", ["ja"]],
-  ["Korean", ["ko"]],
-  ["Norwegian", ["no"]],
-  ["Polish", ["pl"]],
-  ["Polish", ["pl"]],
-  [
-    "Portuguese",
+  "Chinese": [["zn-CN", "China"], ["zn-TW", "Taiwan"]],
+  "Dutch": [["nl"]],
+  "Flemish": [["nl"]],
+  "French": [["fr", "France"], ["fr-CA", "Canada"]],
+  "German": [["de"]],
+  "Hindi": [["hi"]],
+  "Indonesian": [["id"]],
+  "Italian": [["it"]],
+  "Japanese": [["ja"]],
+  "Korean": [["ko"]],
+  "Norwegian": [["no"]],
+  "Polish": [["pl"]],
+  "Portuguese": [
     ["pt-BR", "Brazil"],
     ["pt-PT", "Portugal"],
   ],
-  ["Russian", ["ru"]],
-  ["Spanish", ["es"]],
-  ["Swedish", ["sv"]],
-  ["Turkish", ["tr"]],
-  ["Ukrainian", ["uk"]],
-];
+  "Russian": [["ru"]],
+  "Spanish": [["es"]],
+  "Swedish": [["sv"]],
+  "Turkish": [["tr"]],
+  "Ukrainian": [["uk"]],
+};

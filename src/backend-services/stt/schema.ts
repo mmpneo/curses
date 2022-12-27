@@ -5,6 +5,7 @@ export enum STT_Backends {
   browser_remote = "browser-remote",
   azure = "azure",
   deepgram = "deepgram",
+  speechly = "speechly",
 }
 
 export type STT_State = {
@@ -18,6 +19,9 @@ export type STT_State = {
     profanity: string;
     interim: boolean;
   };
+  speechly: {
+    key: string;
+  }
   deepgram: {
     language_group: string;
     language: string;
@@ -63,9 +67,19 @@ const Schema_STT: JSONSchemaType<STT_State> = {
       default: {} as any,
       additionalProperties: false,
     },
+    speechly: {
+      type: "object",
+      properties: {
+        key: { type: "string", default: "" },
+      },
+      required: ["key"],
+      default: {} as any,
+      additionalProperties: false,
+    },
   },
   required: [
     "backend",
+    "speechly",
     "azure",
     "deepgram",
   ],

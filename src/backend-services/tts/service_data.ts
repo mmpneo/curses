@@ -1,86 +1,308 @@
+import { MappedGroupDictionary } from "../../types";
+
 export type ServiceVoiceLibrary = [string, string, [string, string][]][];
 
-
-
-export const azureVoices: ServiceVoiceLibrary = [
-  ["Arabic (Egypt)", "ar-EG", [["SalmaNeural", "ar-EG-SalmaNeural"], ["ShakirNeural", "ar-EG-ShakirNeural"]]],
-  ["Arabic (Saudi Arabia)", "ar-SA", [["ZariyahNeural", "ar-SA-ZariyahNeural"], ["HamedNeural", "ar-SA-HamedNeural"]]],
-  ["Bulgarian (Bulgaria)", "bg-BG", [["KalinaNeural", "bg-BG-KalinaNeural"], ["BorislavNeural", "bg-BG-BorislavNeural"]]],
-  ["Catalan (Spain)", "ca-ES", [["AlbaNeural", "ca-ES-AlbaNeural"], ["JoanaNeural", "ca-ES-JoanaNeural"], ["EnricNeural", "ca-ES-EnricNeural"]]],
-  ["Chinese (Cantonese, Traditional)", "zh-HK", [["HiuGaaiNeural", "zh-HK-HiuGaaiNeural"], ["HiuMaanNeural", "zh-HK-HiuMaanNeural"], ["WanLungNeural", "zh-HK-WanLungNeural"]]],
-  ["Chinese (Mandarin, Simplified)", "zh-CN", [
-    ["XiaoxiaoNeural", "zh-CN-XiaoxiaoNeural"],
-    ["XiaoyouNeural", "zh-CN-XiaoyouNeural"],
-    ["XiaomoNeural", "zh-CN-XiaomoNeural"],
-    ["XiaoxuanNeural", "zh-CN-XiaoxuanNeural"],
-    ["XiaohanNeural", "zh-CN-XiaohanNeural"],
-    ["XiaoruiNeural", "zh-CN-XiaoruiNeural"],
-    ["YunyangNeural", "zh-CN-YunyangNeural"],
-    ["YunyeNeural", "zh-CN-YunyeNeural"],
-    ["YunxiNeural", "zh-CN-YunxiNeural"],
-  ]],
-  ["Chinese (Taiwanese Mandarin)", "zh-TW", [["HsiaoChenNeural", "zh-TW-HsiaoChenNeural"], ["HsiaoYuNeural", "zh-TW-HsiaoYuNeural"], ["YunJheNeural", "zh-TW-YunJheNeural"],]],
-  ["Croatian (Croatia)", "hr-HR", [["GabrijelaNeural", "hr-HR-GabrijelaNeural"], ["SreckoNeural", "hr-HR-SreckoNeural"]]],
-  ["Czech (Czech)", "cs-CZ", [["VlastaNeural", "cs-CZ-VlastaNeural"], ["AntoninNeural", "cs-CZ-AntoninNeural"]]],
-  ["Danish (Denmark)", "da-DK", [["ChristelNeural", "da-DK-ChristelNeural"], ["JeppeNeural", "da-DK-JeppeNeural"]]],
-  ["Dutch (Belgium)", "nl-BE", [["DenaNeural", "nl-BE-DenaNeural"], ["ArnaudNeural", "nl-BE-ArnaudNeural"]]],
-  ["Dutch (Netherlands)", "nl-NL", [["ColetteNeural", "nl-NL-ColetteNeural"], ["FennaNeural", "nl-NL-FennaNeural"], ["MaartenNeural", "nl-NL-MaartenNeural"]]],
-  ["English (Australia)", "en-AU", [["NatashaNeural", "en-AU-NatashaNeural"], ["WilliamNeural", "en-AU-WilliamNeural"]]],
-  ["English (Canada)", "en-CA", [["ClaraNeural", "en-CA-ClaraNeural"], ["LiamNeural", "en-CA-LiamNeural"]]],
-  ["English (Hongkong)", "en-HK", [["YanNeural", "en-HK-YanNeural"], ["SamNeural", "en-HK-SamNeural"]]],
-  ["English (India)", "en-IN", [["NeerjaNeural", "en-IN-NeerjaNeural"], ["PrabhatNeural", "en-IN-PrabhatNeural"]]],
-  ["English (Ireland)", "en-IE", [["EmilyNeural", "en-IE-EmilyNeural"], ["ConnorNeural", "en-IE-ConnorNeural"]]],
-  ["English (New Zealand)", "en-NZ", [["MollyNeural", "en-NZ-MollyNeural"], ["MitchellNeural", "en-NZ-MitchellNeural"]]],
-  ["English (Philippines)", "en-PH", [["RosaNeural", "en-PH-RosaNeural"], ["JamesNeural", "en-PH-JamesNeural"]]],
-  ["English (Singapore)", "en-SG", [["LunaNeural", "en-SG-LunaNeural"], ["WayneNeural", "en-SG-WayneNeural"]]],
-  ["English (South Africa)", "en-ZA", [["LeahNeural", "en-ZA-LeahNeural"], ["LukeNeural", "en-ZA-LukeNeural"]]],
-  ["English (United Kingdom)", "en-GB", [["LibbyNeural", "en-GB-LibbyNeural"], ["MiaNeural", "en-GB-MiaNeural"], ["RyanNeural", "en-GB-RyanNeural"]]],
-  ["English (United States)", "en-US", [["AriaNeural", "en-US-AriaNeural"], ["JennyNeural", "en-US-JennyNeural"], ["GuyNeural", "en-US-GuyNeural"]]],
-  ["Estonian (Estonia)", "et-EE", [["AnuNeural", "et-EE-AnuNeural"], ["KertNeural", "et-EE-KertNeural"]]],
-  ["Finnish (Finland)", "fi-FI", [["NooraNeural", "fi-FI-NooraNeural"], ["SelmaNeural", "fi-FI-SelmaNeural"], ["HarriNeural", "fi-FI-HarriNeural"]]],
-  ["French (Belgium)", "fr-BE", [["CharlineNeural", "fr-BE-CharlineNeural"], ["GerardNeural", "fr-BE-GerardNeural"]]],
-  ["French (Canada)", "fr-CA", [["SylvieNeural", "fr-CA-SylvieNeural"], ["AntoineNeural", "fr-CA-AntoineNeural"], ["JeanNeural", "fr-CA-JeanNeural"]]],
-  ["French (France)", "fr-FR", [["DeniseNeural", "fr-FR-DeniseNeural"], ["HenriNeural", "fr-FR-HenriNeural"]]],
-  ["French (Switzerland)", "fr-CH", [["ArianeNeural", "fr-CH-ArianeNeural"], ["FabriceNeural", "fr-CH-FabriceNeural"]]],
-  ["German (Austria)", "de-AT", [["IngridNeural", "de-AT-IngridNeural"], ["JonasNeural", "de-AT-JonasNeural"]]],
-  ["German (Germany)", "de-DE", [["KatjaNeural", "de-DE-KatjaNeural"], ["ConradNeural", "de-DE-ConradNeural"]]],
-  ["German (Switzerland)", "de-CH", [["LeniNeural", "de-CH-LeniNeural"], ["JanNeural", "de-CH-JanNeural"]]],
-  ["Greek (Greece)", "el-GR", [["AthinaNeural", "el-GR-AthinaNeural"], ["NestorasNeural", "el-GR-NestorasNeural"]]],
-  ["Gujarati (India)", "gu-IN", [["DhwaniNeural", "gu-IN-DhwaniNeural"], ["NiranjanNeural", "gu-IN-NiranjanNeural"]]],
-  ["Hebrew (Israel)", "he-IL", [["HilaNeural", "he-IL-HilaNeural"], ["AvriNeural", "he-IL-AvriNeural"]]],
-  ["Hindi (India)", "hi-IN", [["SwaraNeural", "hi-IN-SwaraNeural"], ["MadhurNeural", "hi-IN-MadhurNeural"]]],
-  ["Hungarian (Hungary)", "hu-HU", [["NoemiNeural", "hu-HU-NoemiNeural"], ["TamasNeural", "hu-HU-TamasNeural"]]],
-  ["Indonesian (Indonesia)", "id-ID", [["GadisNeural", "id-ID-GadisNeural"], ["ArdiNeural", "id-ID-ArdiNeural"]]],
-  ["Irish (Ireland)", "ga-IE", [["OrlaNeural", "ga-IE-OrlaNeural"], ["ColmNeural", "ga-IE-ColmNeural"]]],
-  ["Italian (Italy)", "it-IT", [["ElsaNeural", "it-IT-ElsaNeural"], ["IsabellaNeural", "it-IT-IsabellaNeural"], ["DiegoNeural", "it-IT-DiegoNeural"]]],
-  ["Japanese (Japan)", "ja-JP", [["NanamiNeural", "ja-JP-NanamiNeural"], ["KeitaNeural", "ja-JP-KeitaNeural"]]],
-  ["Korean (Korea)", "ko-KR", [["SunHiNeural", "ko-KR-SunHiNeural"], ["InJoonNeural", "ko-KR-InJoonNeural"]]],
-  ["Latvian (Latvia)", "lv-LV", [["EveritaNeural", "lv-LV-EveritaNeural"], ["NilsNeural", "lv-LV-NilsNeural"]]],
-  ["Lithuanian (Lithuania)", "lt-LT", [["OnaNeural", "lt-LT-OnaNeural"], ["LeonasNeural", "lt-LT-LeonasNeural"]]],
-  ["Malay (Malaysia)", "ms-MY", [["YasminNeural", "ms-MY-YasminNeural"], ["OsmanNeural", "ms-MY-OsmanNeural"]]],
-  ["Maltese (Malta)", "mt-MT", [["GraceNeural", "mt-MT-GraceNeural"], ["JosephNeural", "mt-MT-JosephNeural"]]],
-  ["Marathi (India)", "mr-IN", [["AarohiNeural", "mr-IN-AarohiNeural"], ["ManoharNeural", "mr-IN-ManoharNeural"]]],
-  ["Norwegian (Bokmål, Norway)", "nb-NO", [["IselinNeural", "nb-NO-IselinNeural"], ["PernilleNeural", "nb-NO-PernilleNeural"], ["FinnNeural", "nb-NO-FinnNeural"]]],
-  ["Polish (Poland)", "pl-PL", [["AgnieszkaNeural", "pl-PL-AgnieszkaNeural"], ["ZofiaNeural", "pl-PL-ZofiaNeural"], ["MarekNeural", "pl-PL-MarekNeural"]]],
-  ["Portuguese (Brazil)", "pt-BR", [["FranciscaNeural", "pt-BR-FranciscaNeural"], ["AntonioNeural", "pt-BR-AntonioNeural"]]],
-  ["Portuguese (Portugal)", "pt-PT", [["FernandaNeural", "pt-PT-FernandaNeural"], ["RaquelNeural", "pt-PT-RaquelNeural"], ["DuarteNeural", "pt-PT-DuarteNeural"]]],
-  ["Romanian (Romania)", "ro-RO", [["AlinaNeural", "ro-RO-AlinaNeural"], ["EmilNeural", "ro-RO-EmilNeural"]]],
-  ["Russian (Russia)", "ru-RU", [["DariyaNeural", "ru-RU-DariyaNeural"], ["SvetlanaNeural", "ru-RU-SvetlanaNeural"], ["DmitryNeural", "ru-RU-DmitryNeural"]]],
-  ["Slovak (Slovakia)", "sk-SK", [["ViktoriaNeural", "sk-SK-ViktoriaNeural"], ["LukasNeural", "sk-SK-LukasNeural"]]],
-  ["Slovenian (Slovenia)", "sl-SI", [["PetraNeural", "sl-SI-PetraNeural"], ["RokNeural", "sl-SI-RokNeural"]]],
-  ["Spanish (Argentina)", "es-AR", [["ElenaNeural", "es-AR-ElenaNeural"], ["TomasNeural", "es-AR-TomasNeural"]]],
-  ["Spanish (Colombia)", "es-CO", [["SalomeNeural", "es-CO-SalomeNeural"], ["GonzaloNeural", "es-CO-GonzaloNeural"]]],
-  ["Spanish (Mexico)", "es-MX", [["DaliaNeural", "es-MX-DaliaNeural"], ["JorgeNeural", "es-MX-JorgeNeural"]]],
-  ["Spanish (Spain)", "es-ES", [["ElviraNeural", "es-ES-ElviraNeural"], ["AlvaroNeural", "es-ES-AlvaroNeural"]]],
-  ["Spanish (US)", "es-US", [["PalomaNeural", "es-US-PalomaNeural"], ["AlonsoNeural", "es-US-AlonsoNeural"]]],
-  ["Swahili (Kenya)", "sw-KE", [["ZuriNeural", "sw-KE-ZuriNeural"], ["RafikiNeural", "sw-KE-RafikiNeural"]]],
-  ["Swedish (Sweden)", "sv-SE", [["HilleviNeural", "sv-SE-HilleviNeural"], ["SofieNeural", "sv-SE-SofieNeural"], ["MattiasNeural", "sv-SE-MattiasNeural"]]],
-  ["Tamil (India)", "ta-IN", [["PallaviNeural", "ta-IN-PallaviNeural"], ["ValluvarNeural", "ta-IN-ValluvarNeural"]]],
-  ["Telugu (India)", "te-IN", [["ShrutiNeural", "te-IN-ShrutiNeural"], ["MohanNeural", "te-IN-MohanNeural"]]],
-  ["Thai (Thailand)", "th-TH", [["AcharaNeural", "th-TH-AcharaNeural"], ["PremwadeeNeural", "th-TH-PremwadeeNeural"], ["NiwatNeural", "th-TH-NiwatNeural"]]],
-  ["Turkish (Turkey)", "tr-TR", [["EmelNeural", "tr-TR-EmelNeural"], ["AhmetNeural", "tr-TR-AhmetNeural"]]],
-  ["Ukrainian (Ukraine)", "uk-UA", [["PolinaNeural", "uk-UA-PolinaNeural"], ["OstapNeural", "uk-UA-OstapNeural"]]],
-  ["Urdu (Pakistan)", "ur-PK", [["UzmaNeural", "ur-PK-UzmaNeural"], ["AsadNeural", "ur-PK-AsadNeural"]]],
-  ["Vietnamese (Vietnam)", "vi-VN", [["HoaiMyNeural", "vi-VN-HoaiMyNeural"], ["NamMinhNeural", "vi-VN-NamMinhNeural"]]],
-  ["Welsh (United Kingdom)", "cy-GB", [["NiaNeural", "cy-GB-NiaNeural"], ["AledNeural", "cy-GB-AledNeural"]]],
-];
+export const azureVoices: MappedGroupDictionary = {
+  "Arabic (Egypt)": [
+    ["ar-EG-SalmaNeural", "SalmaNeural"],
+    ["ar-EG-ShakirNeural", "ShakirNeural"]
+  ],
+  "Arabic (Saudi Arabia)": [
+    ["ar-SA-ZariyahNeural", "ZariyahNeural"],
+    ["ar-SA-HamedNeural", "HamedNeural"]
+  ],
+  "Bulgarian (Bulgaria)": [
+    ["bg-BG-KalinaNeural", "KalinaNeural"],
+    ["bg-BG-BorislavNeural", "BorislavNeural"]
+  ],
+  "Catalan (Spain)": [
+    ["ca-ES-AlbaNeural", "AlbaNeural"],
+    ["ca-ES-JoanaNeural", "JoanaNeural"],
+    ["ca-ES-EnricNeural", "EnricNeural"]
+  ],
+  "Chinese (Cantonese, Traditional)": [
+    ["zh-HK-HiuGaaiNeural", "HiuGaaiNeural"],
+    ["zh-HK-HiuMaanNeural", "HiuMaanNeural"],
+    ["zh-HK-WanLungNeural", "WanLungNeural"]
+  ],
+  "Chinese (Mandarin, Simplified)": [
+    ["zh-CN-XiaoxiaoNeural", "XiaoxiaoNeural"],
+    ["zh-CN-XiaoyouNeural", "XiaoyouNeural"],
+    ["zh-CN-XiaomoNeural", "XiaomoNeural"],
+    ["zh-CN-XiaoxuanNeural", "XiaoxuanNeural"],
+    ["zh-CN-XiaohanNeural", "XiaohanNeural"],
+    ["zh-CN-XiaoruiNeural", "XiaoruiNeural"],
+    ["zh-CN-YunyangNeural", "YunyangNeural"],
+    ["zh-CN-YunyeNeural", "YunyeNeural"],
+    ["zh-CN-YunxiNeural", "YunxiNeural"],
+  ],
+  "Chinese (Taiwanese Mandarin)": [
+    ["zh-TW-HsiaoChenNeural", "HsiaoChenNeural"],
+    ["zh-TW-HsiaoYuNeural", "HsiaoYuNeural"],
+    ["zh-TW-YunJheNeural", "YunJheNeural"]
+  ],
+  "Croatian (Croatia)": [
+    ["hr-HR-GabrijelaNeural", "GabrijelaNeural"],
+    ["hr-HR-SreckoNeural", "SreckoNeural"]
+  ],
+  "Czech (Czech)": [
+    ["cs-CZ-VlastaNeural", "VlastaNeural"],
+    ["cs-CZ-AntoninNeural", "AntoninNeural"]
+  ],
+  "Danish (Denmark)": [
+    ["da-DK-ChristelNeural", "ChristelNeural"],
+    ["da-DK-JeppeNeural", "JeppeNeural"]
+  ],
+  "Dutch (Belgium)": [
+    ["nl-BE-DenaNeural", "DenaNeural"],
+    ["nl-BE-ArnaudNeural", "ArnaudNeural"]
+  ],
+  "Dutch (Netherlands)": [
+    ["nl-NL-ColetteNeural", "ColetteNeural"],
+    ["nl-NL-FennaNeural", "FennaNeural"],
+    ["nl-NL-MaartenNeural", "MaartenNeural"]
+  ],
+  "English (Australia)": [
+    ["en-AU-NatashaNeural", "NatashaNeural"],
+    ["en-AU-WilliamNeural", "WilliamNeural"]
+  ],
+  "English (Canada)": [
+    ["en-CA-ClaraNeural", "ClaraNeural"],
+    ["en-CA-LiamNeural", "LiamNeural"]
+  ],
+  "English (Hongkong)": [
+    ["en-HK-YanNeural", "YanNeural"],
+    ["en-HK-SamNeural", "SamNeural"]
+  ],
+  "English (India)": [
+    ["en-IN-NeerjaNeural", "NeerjaNeural"],
+    ["en-IN-PrabhatNeural", "PrabhatNeural"]
+  ],
+  "English (Ireland)": [
+    ["en-IE-EmilyNeural", "EmilyNeural"],
+    ["en-IE-ConnorNeural", "ConnorNeural"]
+  ],
+  "English (New Zealand)": [
+    ["en-NZ-MollyNeural", "MollyNeural"],
+    ["en-NZ-MitchellNeural", "MitchellNeural"]
+  ],
+  "English (Philippines)": [
+    ["en-PH-RosaNeural", "RosaNeural"],
+    ["en-PH-JamesNeural", "JamesNeural"]
+  ],
+  "English (Singapore)": [
+    ["en-SG-LunaNeural", "LunaNeural"],
+    ["en-SG-WayneNeural", "WayneNeural"]
+  ],
+  "English (South Africa)": [
+    ["en-ZA-LeahNeural", "LeahNeural"],
+    ["en-ZA-LukeNeural", "LukeNeural"]
+  ],
+  "English (United Kingdom)": [
+    ["en-GB-LibbyNeural", "LibbyNeural"],
+    ["en-GB-MiaNeural", "MiaNeural"],
+    ["en-GB-RyanNeural", "RyanNeural"]
+  ],
+  "English (United States)": [
+    ["en-US-AriaNeural", "AriaNeural"],
+    ["en-US-JennyNeural", "JennyNeural"],
+    ["en-US-GuyNeural", "GuyNeural"]
+  ],
+  "Estonian (Estonia)": [
+    ["et-EE-AnuNeural", "AnuNeural"],
+    ["et-EE-KertNeural", "KertNeural"]
+  ],
+  "Finnish (Finland)": [
+    ["fi-FI-NooraNeural", "NooraNeural"],
+    ["fi-FI-SelmaNeural", "SelmaNeural"],
+    ["fi-FI-HarriNeural", "HarriNeural"]
+  ],
+  "French (Belgium)": [
+    ["fr-BE-CharlineNeural", "CharlineNeural"],
+    ["fr-BE-GerardNeural", "GerardNeural"]
+  ],
+  "French (Canada)": [
+    ["fr-CA-SylvieNeural", "SylvieNeural"],
+    ["fr-CA-AntoineNeural", "AntoineNeural"],
+    ["fr-CA-JeanNeural", "JeanNeural"]
+  ],
+  "French (France)": [
+    ["fr-FR-DeniseNeural", "DeniseNeural"],
+    ["fr-FR-HenriNeural", "HenriNeural"]
+  ],
+  "French (Switzerland)": [
+    ["fr-CH-ArianeNeural", "ArianeNeural"],
+    ["fr-CH-FabriceNeural", "FabriceNeural"]
+  ],
+  "German (Austria)": [
+    ["de-AT-IngridNeural", "IngridNeural"],
+    ["de-AT-JonasNeural", "JonasNeural"]
+  ],
+  "German (Germany)": [
+    ["de-DE-KatjaNeural", "KatjaNeural"],
+    ["de-DE-ConradNeural", "ConradNeural"]
+  ],
+  "German (Switzerland)": [
+    ["de-CH-LeniNeural", "LeniNeural"],
+    ["de-CH-JanNeural", "JanNeural"]
+  ],
+  "Greek (Greece)": [
+    ["el-GR-AthinaNeural", "AthinaNeural"],
+    ["el-GR-NestorasNeural", "NestorasNeural"]
+  ],
+  "Gujarati (India)": [
+    ["gu-IN-DhwaniNeural", "DhwaniNeural"],
+    ["gu-IN-NiranjanNeural", "NiranjanNeural"]
+  ],
+  "Hebrew (Israel)": [
+    ["he-IL-HilaNeural", "HilaNeural"],
+    ["he-IL-AvriNeural", "AvriNeural"]
+  ],
+  "Hindi (India)": [
+    ["hi-IN-SwaraNeural", "SwaraNeural"],
+    ["hi-IN-MadhurNeural", "MadhurNeural"]
+  ],
+  "Hungarian (Hungary)": [
+    ["hu-HU-NoemiNeural", "NoemiNeural"],
+    ["hu-HU-TamasNeural", "TamasNeural"]
+  ],
+  "Indonesian (Indonesia)": [
+    ["id-ID-GadisNeural", "GadisNeural"],
+    ["id-ID-ArdiNeural", "ArdiNeural"]
+  ],
+  "Irish (Ireland)": [
+    ["ga-IE-OrlaNeural", "OrlaNeural"],
+    ["ga-IE-ColmNeural", "ColmNeural"]
+  ],
+  "Italian (Italy)": [
+    ["it-IT-ElsaNeural", "ElsaNeural"],
+    ["it-IT-IsabellaNeural", "IsabellaNeural"],
+    ["it-IT-DiegoNeural", "DiegoNeural"]
+  ],
+  "Japanese (Japan)": [
+    ["ja-JP-NanamiNeural", "NanamiNeural"],
+    ["ja-JP-KeitaNeural", "KeitaNeural"]
+  ],
+  "Korean (Korea)": [
+    ["ko-KR-SunHiNeural", "SunHiNeural"],
+    ["ko-KR-InJoonNeural", "InJoonNeural"]
+  ],
+  "Latvian (Latvia)": [
+    ["lv-LV-EveritaNeural", "EveritaNeural"],
+    ["lv-LV-NilsNeural", "NilsNeural"]
+  ],
+  "Lithuanian (Lithuania)": [
+    ["lt-LT-OnaNeural", "OnaNeural"],
+    ["lt-LT-LeonasNeural", "LeonasNeural"]
+  ],
+  "Malay (Malaysia)": [
+    ["ms-MY-YasminNeural", "YasminNeural"],
+    ["ms-MY-OsmanNeural", "OsmanNeural"]
+  ],
+  "Maltese (Malta)": [
+    ["mt-MT-GraceNeural", "GraceNeural"],
+    ["mt-MT-JosephNeural", "JosephNeural"]
+  ],
+  "Marathi (India)": [
+    ["mr-IN-AarohiNeural", "AarohiNeural"],
+    ["mr-IN-ManoharNeural", "ManoharNeural"]
+  ],
+  "Norwegian (Bokmål, Norway)": [
+    ["nb-NO-IselinNeural", "IselinNeural"],
+    ["nb-NO-PernilleNeural", "PernilleNeural"],
+    ["nb-NO-FinnNeural", "FinnNeural"]
+  ],
+  "Polish (Poland)": [
+    ["pl-PL-AgnieszkaNeural", "AgnieszkaNeural"],
+    ["pl-PL-ZofiaNeural", "ZofiaNeural"],
+    ["pl-PL-MarekNeural", "MarekNeural"]
+  ],
+  "Portuguese (Brazil)": [
+    ["pt-BR-FranciscaNeural", "FranciscaNeural"],
+    ["pt-BR-AntonioNeural", "AntonioNeural"]
+  ],
+  "Portuguese (Portugal)": [
+    ["pt-PT-FernandaNeural", "FernandaNeural"],
+    ["pt-PT-RaquelNeural", "RaquelNeural"],
+    ["pt-PT-DuarteNeural", "DuarteNeural"]
+  ],
+  "Romanian (Romania)": [
+    ["ro-RO-AlinaNeural", "AlinaNeural"],
+    ["ro-RO-EmilNeural", "EmilNeural"]
+  ],
+  "Russian (Russia)": [
+    ["ru-RU-DariyaNeural", "DariyaNeural"],
+    ["ru-RU-SvetlanaNeural", "SvetlanaNeural"],
+    ["ru-RU-DmitryNeural", "DmitryNeural"]
+  ],
+  "Slovak (Slovakia)": [
+    ["sk-SK-ViktoriaNeural", "ViktoriaNeural"],
+    ["sk-SK-LukasNeural", "LukasNeural"]
+  ],
+  "Slovenian (Slovenia)": [
+    ["sl-SI-PetraNeural", "PetraNeural"],
+    ["sl-SI-RokNeural", "RokNeural"]
+  ],
+  "Spanish (Argentina)": [
+    ["es-AR-ElenaNeural", "ElenaNeural"],
+    ["es-AR-TomasNeural", "TomasNeural"]
+  ],
+  "Spanish (Colombia)": [
+    ["es-CO-SalomeNeural", "SalomeNeural"],
+    ["es-CO-GonzaloNeural", "GonzaloNeural"]
+  ],
+  "Spanish (Mexico)": [
+    ["es-MX-DaliaNeural", "DaliaNeural"],
+    ["es-MX-JorgeNeural", "JorgeNeural"]
+  ],
+  "Spanish (Spain)": [
+    ["es-ES-ElviraNeural", "ElviraNeural"],
+    ["es-ES-AlvaroNeural", "AlvaroNeural"]
+  ],
+  "Spanish (US)": [
+    ["es-US-PalomaNeural", "PalomaNeural"],
+    ["es-US-AlonsoNeural", "AlonsoNeural"]
+  ],
+  "Swahili (Kenya)": [
+    ["sw-KE-ZuriNeural", "ZuriNeural"],
+    ["sw-KE-RafikiNeural", "RafikiNeural"]
+  ],
+  "Swedish (Sweden)": [
+    ["sv-SE-HilleviNeural", "HilleviNeural"],
+    ["sv-SE-SofieNeural", "SofieNeural"],
+    ["sv-SE-MattiasNeural", "MattiasNeural"]
+  ],
+  "Tamil (India)": [
+    ["ta-IN-PallaviNeural", "PallaviNeural"],
+    ["ta-IN-ValluvarNeural", "ValluvarNeural"]
+  ],
+  "Telugu (India)": [
+    ["te-IN-ShrutiNeural", "ShrutiNeural"],
+    ["te-IN-MohanNeural", "MohanNeural"]
+  ],
+  "Thai (Thailand)": [
+    ["th-TH-AcharaNeural", "AcharaNeural"],
+    ["th-TH-PremwadeeNeural", "PremwadeeNeural"],
+    ["th-TH-NiwatNeural", "NiwatNeural"]
+  ],
+  "Turkish (Turkey)": [
+    ["tr-TR-EmelNeural", "EmelNeural"],
+    ["tr-TR-AhmetNeural", "AhmetNeural"]
+  ],
+  "Ukrainian (Ukraine)": [
+    ["uk-UA-PolinaNeural", "PolinaNeural"],
+    ["uk-UA-OstapNeural", "OstapNeural"]
+  ],
+  "Urdu (Pakistan)": [
+    ["ur-PK-UzmaNeural", "UzmaNeural"],
+    ["ur-PK-AsadNeural", "AsadNeural"]
+  ],
+  "Vietnamese (Vietnam)": [
+    ["vi-VN-HoaiMyNeural", "HoaiMyNeural"],
+    ["vi-VN-NamMinhNeural", "NamMinhNeural"]
+  ],
+  "Welsh (United Kingdom)": [
+    ["cy-GB-NiaNeural", "NiaNeural"],
+    ["cy-GB-AledNeural", "AledNeural"]
+  ],
+};

@@ -1,16 +1,16 @@
 import NiceModal from "@ebay/nice-modal-react";
 import { FC, FormEvent, useState } from "react";
-import { ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, Zoom } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.min.css';
 import { TextEventSource, TextEventType } from "../types";
 import Canvas from "./canvas";
 import Sidebar from "./sidebar";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useSnapshot } from "valtio";
+import ActionBar from "./actionbar";
 import "./file-modal";
 import OverlayInput from "./overlay-input";
-import ActionBar from "./actionbar";
 
 const EditorView: FC = () => {
   const { fullscreenInput } = useSnapshot(window.API.ui);
@@ -21,7 +21,7 @@ const EditorView: FC = () => {
       <AnimatePresence>
         {fullscreenInput && <OverlayInput onClose={() => window.API.ui.fullscreenInput = false} />}
       </AnimatePresence>
-      <ToastContainer />
+      <ToastContainer theme="dark" transition={Zoom} />
     </NiceModal.Provider>
   </div>
 }
