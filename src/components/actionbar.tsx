@@ -45,8 +45,8 @@ const handleSwitchTTS = () => {
 }
 
 const ActionBar: FC = () => {
-  return <div data-tauri-drag-region className="relative w-full py-1 flex items-center space-x-4 z-50 px-2">
-    <div className="w-full"></div>
+  return <div data-tauri-drag-region className="relative w-full py-1 flex items-center space-x-4 z-50">
+    <div className="w-full pointer-events-none font-black text-2xl align-middle leading-tight">Curses</div>
     <AppActions />
     <div className="pointer-events-none w-full flex justify-end">
       <WindowActions />

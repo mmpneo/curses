@@ -97,7 +97,7 @@ class Backend {
       });
       return "";
     } catch (error: any) {
-      return error.message
+      return error.message || "Something went wrong"
     } finally {
       obs.disconnect();
     }
