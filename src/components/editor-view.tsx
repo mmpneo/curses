@@ -14,10 +14,16 @@ import OverlayInput from "./overlay-input";
 
 const EditorView: FC = () => {
   const { fullscreenInput } = useSnapshot(window.API.ui);
-  return <div className="relative rounded-lg bg-base-200 w-screen h-screen flex overflow-hidden">
+  return <div className="relative bg-base-200 w-screen h-screen flex overflow-hidden">
     <NiceModal.Provider>
       <Sidebar />
-      <EditorViewport />
+      <div className="relative flex flex-col w-full h-full">
+        <ActionBar />
+        <EditorViewport />
+        <AnimatePresence initial={false}>
+          {!fullscreenInput && <div className="absolute self-center bottom-4"><STTInput /></div>}
+        </AnimatePresence>
+      </div>
       <AnimatePresence>
         {fullscreenInput && <OverlayInput onClose={() => window.API.ui.fullscreenInput = false} />}
       </AnimatePresence>
@@ -40,19 +46,11 @@ export const EditorViewport: FC = () => {
     document.addEventListener("mousemove", onMove);
   }
 
-  return <div className="flex flex-col w-full overflow-hidden">
-    <ActionBar/>
-    <div onMouseDown={event => event.button === 1 && handleStartPan(event)} className="w-full relative bg-base-300 rounded-tl-box flex flex-grow items-center justify-center overflow-hidden">
-      <div className="absolute top-0 left-0">
-      </div>
-      <div className="rounded-lg border border-dashed border-primary/50" style={{
-        transform: `translate3d(${x}px, ${y}px, 0px)`,
-      }}>
-        <Canvas />
-      </div>
-      <AnimatePresence initial={false}>
-        {!fullscreenInput && <div className="absolute bottom-4"><STTInput /></div>}
-      </AnimatePresence>
+  return <div onMouseDown={event => event.button === 1 && handleStartPan(event)} className="w-full relative bg-base-300 rounded-tl-box flex flex-grow items-center justify-center overflow-hidden">
+    <div className="rounded-lg border border-dashed border-primary/50" style={{
+      transform: `translate3d(${x}px, ${y}px, 0px)`,
+    }}>
+      <Canvas />
     </div>
   </div>
 }
@@ -74,9 +72,9 @@ const STTInput: FC = () => {
 
   return <motion.div
     key="overlay-input"
-    initial={{opacity: 0, y: 10}}
-    exit={{opacity: 0, y: 10}}
-    animate={{opacity: 1, y: 0}}
+    initial={{ opacity: 0, y: 10 }}
+    exit={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
     transition={{ ease: "anticipate", duration: 0.5 }}
     className="flex items-center space-x-2 w-96">
     {/* <button className="btn btn-circle btn-ghost"><RiChatDeleteFill/></button> */}

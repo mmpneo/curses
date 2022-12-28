@@ -93,7 +93,7 @@ const Inspector_TTS: FC = () => {
   return <Inspector.Body>
     <Inspector.Header><RiChatVoiceFill /> Text to Speech</Inspector.Header>
     <Inspector.Content>
-      <Input.Checkbox label="Start from action bar" value={data.showActionButton} onChange={handleStart} />
+      <Input.Checkbox label="Add to action bar" value={data.showActionButton} onChange={handleStart} />
 
       <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
         <Input.Select value={serviceOptions.find(o => o.value === data.data.backend)} options={serviceOptions} label="Service" onChange={(e: any) => up("backend", e.value as TTS_Backends)} />

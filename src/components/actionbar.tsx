@@ -30,7 +30,6 @@ const ButtonService: FC<PropsWithChildren<HtmlHTMLAttributes<HTMLButtonElement> 
 const handleSwitchFullscreenInput = () => window.API.ui.fullscreenInput = !window.API.ui.fullscreenInput;
 const handleSwitchMuteSTT = () => window.API.stt.serviceState.muted = !window.API.stt.serviceState.muted;
 const handleSwitchSound = () => window.APIFrontend.sound.serviceState.muted = !window.APIFrontend.sound.serviceState.muted;
-const handleSwitchInputWindow = () => window.API.switchInputWindow();
 const handleSwitchSTT = () => {
   if (window.API.stt.serviceState.status === ServiceNetworkState.disconnected)
     window.API.stt.start();
@@ -45,8 +44,8 @@ const handleSwitchTTS = () => {
 }
 
 const ActionBar: FC = () => {
-  return <div data-tauri-drag-region className="relative w-full py-1 flex items-center space-x-4 z-50">
-    <div className="w-full pointer-events-none font-black text-2xl align-middle leading-tight">Curses</div>
+  return <div data-tauri-drag-region className="relative w-full py-1 flex items-center space-x-4 px-2">
+    <div className="w-full pointer-events-none font-black text-2xl align-middle leading-tight font-header">curses</div>
     <AppActions />
     <div className="pointer-events-none w-full flex justify-end">
       <WindowActions />
@@ -76,9 +75,10 @@ const AppActions: FC = () => {
 
 const WindowActions: FC = () => {
   return <div className="flex z-0 pointer-events-auto items-center space-x-2">
-    <Button tooltip="Minimize window"><VscChromeMinimize /></Button>
-    <Button tooltip="Maximize window"><VscChromeMaximize /></Button>
-    <Button tooltip="Close application"><VscChromeClose /></Button>
+    {/* <button className="btn btn-sm"></button> */}
+    <button className="btn btn-ghost btn-sm btn-square"><VscChromeMinimize /></button>
+    <button className="btn btn-ghost btn-sm btn-square"><VscChromeMaximize /></button>
+    <button className="btn btn-ghost btn-sm btn-square"><VscChromeClose /></button>
   </div>
 }
 

@@ -1,9 +1,8 @@
 #![cfg_attr(all(not(debug_assertions), target_os = "windows"), windows_subsystem = "windows")]
 
-use std::env;
-
 use clap::Parser;
-use tauri::{command, State};
+use tauri::{command, State, Manager};
+use window_shadows::set_shadow;
 
 use crate::services::AppConfiguration;
 
@@ -23,6 +22,11 @@ fn get_port(state: State<'_, InitArguments>) -> u16 {
 fn main() {
     let args = InitArguments::parse();
     tauri::Builder::default()
+        .setup(|app| {
+            let window = app.get_window("main").unwrap();
+            set_shadow(&window, true).expect("Unsupported platform!");
+            Ok(())
+        })
         .manage(AppConfiguration { port: args.port })
         .invoke_handler(tauri::generate_handler![get_port])
         .plugin(services::osc::init())

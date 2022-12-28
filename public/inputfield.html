@@ -191,7 +191,7 @@
 <body>
   <div class="container">
     <div data-tauri-drag-region class="titlebar">
-      <div class="titlebar-logo" l>SimpleSTT</div>
+      <div class="titlebar-logo" l>Curses input</div>
       <input id="opacity" class="titlebar-opacity" type="range" min="0.1" max="1" step="0.05">
       <div id="btn-close" class="titlebar-button" id="titlebar-close">
         <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 24 24" height="2rem" width="2rem"
@@ -243,10 +243,10 @@
       inputOpacity.value = value;
       let root = document.documentElement;
       root.style.setProperty('--opacity', value);
-      localStorage.setItem("simple-stt-inputfield-opacity", value);
+      localStorage.setItem("curses-app-inputfield-opacity", value);
     }
 
-    const opacity = localStorage.getItem("simple-stt-inputfield-opacity")
+    const opacity = localStorage.getItem("curses-app-inputfield-opacity")
     opacity && applyOpacity(opacity)
 
     inputOpacity.oninput = e => {

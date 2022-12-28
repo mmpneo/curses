@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/tauri";
+import { QRCodeCanvas } from "qrcode.react";
 import { FC } from "react";
 import { RiUserVoiceFill } from "react-icons/ri";
 import { useSnapshot } from "valtio";
@@ -21,6 +22,11 @@ const Browser: FC = () => {
   return <>
     <Inspector.SubHeader>Browser options</Inspector.SubHeader>
     <button className="btn btn-sm btn-primary" onClick={handleOpen}>Open chrome</button>
+
+    <QRCodeCanvas
+          size={256}
+          style={{ height: "100%", maxHeight: "100%", width: "4.5rem" }}
+          value={`${window.networkConfiguration.localIp}:${window.networkConfiguration.port}/client`} />
   </>
 }
 
@@ -113,7 +119,7 @@ const Inspector_STT: FC = () => {
   return <Inspector.Body>
     <Inspector.Header><RiUserVoiceFill /> Speech to Text</Inspector.Header>
     <Inspector.Content>
-      <Input.Checkbox label="Start from action bar" onChange={handleStart} value={data.showActionButton} />
+      <Input.Checkbox label="Add to action bar" onChange={handleStart} value={data.showActionButton} />
       <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
         <Input.Select options={[
           { label: "Browser", value: STT_Backends.browser },
@@ -129,7 +135,7 @@ const Inspector_STT: FC = () => {
       </Inspector.Deactivatable>
 
 
-      <ServiceButton status={state.status} onStart={() => window.API.stt.start()} onStop={() => window.API.stt.stop()} />
+      {data.data.backend !== STT_Backends.browser && <ServiceButton status={state.status} onStart={() => window.API.stt.start()} onStop={() => window.API.stt.stop()} />}
     </Inspector.Content>
   </Inspector.Body>
 }

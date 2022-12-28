@@ -40,7 +40,7 @@ const SideBarButton: FC<PropsWithChildren<ButtonProps>> = memo(({ tab, ...props 
 });
 
 const Divider: FC = () => {
-  return <div className="my-2 flex-none bg-base-100/50 h-1 w-8 mx-2 self-center rounded-full"></div>
+  return <div className="my-2 flex-none bg-neutral h-1 w-4 self-center rounded-full"></div>
 }
 
 const AddElementsMenu: FC = () => {
@@ -104,7 +104,7 @@ const Sidebar: FC = memo(() => {
   const sttState = useSnapshot(window.API.stt.serviceState);
   const ttsState = useSnapshot(window.API.tts.serviceState);
 
-  return <div className="flex h-full z-10">
+  return <div className="flex h-full z-20">
     <div className="bg-base-200 flex-none overflow-y-scroll scrollbar-hide">
       <motion.div transition={{ ease: "anticipate", duration: 0.2 }} initial={{ width: "3.5rem" }} animate={{ width: expand ? "13rem" : "3.5rem" }} className="flex flex-col space-y-2 py-2 px-2">
         <button className="w-full btn btn-ghost border-none justify-start min-h-fit h-auto flex-nowrap whitespace-nowrap px-0 gap-1 overflow-hidden" onClick={switchExpand}>

@@ -1,6 +1,6 @@
 {
   "package": {
-    "productName": "simple-stt",
+    "productName": "curses",
     "version": "0.0.0"
   },
   "build": {
@@ -33,7 +33,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.simple-stt.dev",
+      "identifier": "com.cursescaptions.dev",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -63,7 +63,7 @@
         "transparent": true,
         "height": 600,
         "resizable": true,
-        "title": "simple-stt",
+        "title": "Curses",
         "decorations": false,
         "width": 800
       }

@@ -45,12 +45,12 @@ const Body: FC<PropsWithChildren<{ scrollable?: boolean }>> = ({ scrollable, chi
 }
 
 const Header: FC<PropsWithChildren> = memo(({ children }) => {
-  return <div className="flex items-center gap-2 px-4 pt-5 text-xl font-bold">{children}</div>
+  return <div className="flex font-header items-center gap-2 px-4 pt-4 text-xl font-extrabold">{children}</div>
 })
 
 const SubHeader: FC<PropsWithChildren> = ({ children }) => {
   return <span className="pt-4">
-    <span className="font-bold text-primary flex justify-between items-center gap-2 whitespace-nowrap">{children}</span>
+    <span className="flex font-header font-bold text-primary justify-between items-center gap-2 whitespace-nowrap">{children}</span>
   </span>
 }
 

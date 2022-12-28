@@ -147,7 +147,7 @@ const Inspector_Settings: FC = () => {
       </Inspector.Switchable> */}
 
       <Inspector.SubHeader>Link apps</Inspector.SubHeader>
-      <Inspector.Description>Sync text events with remote SimpleSTT instance</Inspector.Description>
+      <Inspector.Description>Sync text events with remote Curses instance</Inspector.Description>
       <Input.Text label="Address" placeholder="127.0.0.1:3030" />
       <Input.NetworkStatus value={ServiceNetworkState.connected} label="Connection" />
       <button className="btn btn-sm btn-neutral">Connect</button>

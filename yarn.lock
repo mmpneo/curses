@@ -2184,6 +2184,69 @@ __metadata:
   languageName: node
   linkType: hard
 
+"curses@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "curses@workspace:."
+  dependencies:
+    "@ebay/nice-modal-react": ^1.2.8
+    "@floating-ui/react-dom": ^1.1.0
+    "@floating-ui/react-dom-interactions": ^0.13.3
+    "@speechly/browser-client": ^2.6.2
+    "@tauri-apps/api": ^1.1.0
+    "@tauri-apps/cli": ^1.1.0
+    "@twurple/api": ^5.2.7
+    "@twurple/auth": ^5.2.7
+    "@twurple/chat": ^5.2.7
+    "@types/lodash": ^4.14.189
+    "@types/node": ^18.7.10
+    "@types/pubsub-js": ^1.8.3
+    "@types/react": ^18.0.15
+    "@types/react-dom": ^18.0.6
+    "@types/use-sync-external-store": ^0.0.3
+    "@vitejs/plugin-react": ^3.0.0
+    "@vitejs/plugin-react-swc": ^3.0.1
+    "@welldone-software/why-did-you-render": ^7.0.1
+    ace-builds: ^1.14.0
+    ajv: ^8.11.2
+    autoprefixer: ^10.4.13
+    browser-fs-access: ^0.31.1
+    classnames: ^2.3.2
+    daisyui: ^2.40.1
+    framer-motion: ^8.0.2
+    immer: ^9.0.16
+    immer-yjs: ^1.1.0
+    lodash: ^4.17.21
+    microsoft-cognitiveservices-speech-sdk: ^1.24.1
+    nanoid: ^4.0.0
+    obs-websocket-js: ^5.0.2
+    peerjs: ^1.4.7
+    postcss: ^8.4.19
+    prettier: ^2.7.1
+    pubsub-js: ^1.9.4
+    qrcode.react: ^3.1.0
+    react: ^18.2.0
+    react-ace: ^10.1.0
+    react-colorful: ^5.6.1
+    react-dom: ^18.2.0
+    react-icons: ^4.7.1
+    react-reverse-portal: ^2.1.1
+    react-rnd: ^10.3.7
+    react-select: ^5.6.1
+    react-shadow: ^19.0.3
+    react-toastify: ^9.1.1
+    react-use: ^17.4.0
+    simplebar-react: ^2.4.3
+    tailwindcss: ^3.2.4
+    typescript: ^4.6.4
+    use-sync-external-store: ^1.2.0
+    valtio: ^1.8.0
+    vite: ^4.0.3
+    y-protocols: ^1.0.5
+    y-utility: ^0.1.2
+    yjs: ^13.5.42
+  languageName: unknown
+  linkType: soft
+
 "daisyui@npm:^2.40.1":
   version: 2.40.1
   resolution: "daisyui@npm:2.40.1"
@@ -4694,69 +4757,6 @@ __metadata:
   checksum: 75bc9b788be4dad48b96ff2225604fe9c62d2e69327491ecb4d034b482cb88e5cd810e7b84f6ded3c4a87f1ecd407f1f2fafd5da09cf07dec3b9ce100cc13a44
   languageName: node
   linkType: hard
-
-"simple-stt@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "simple-stt@workspace:."
-  dependencies:
-    "@ebay/nice-modal-react": ^1.2.8
-    "@floating-ui/react-dom": ^1.1.0
-    "@floating-ui/react-dom-interactions": ^0.13.3
-    "@speechly/browser-client": ^2.6.2
-    "@tauri-apps/api": ^1.1.0
-    "@tauri-apps/cli": ^1.1.0
-    "@twurple/api": ^5.2.7
-    "@twurple/auth": ^5.2.7
-    "@twurple/chat": ^5.2.7
-    "@types/lodash": ^4.14.189
-    "@types/node": ^18.7.10
-    "@types/pubsub-js": ^1.8.3
-    "@types/react": ^18.0.15
-    "@types/react-dom": ^18.0.6
-    "@types/use-sync-external-store": ^0.0.3
-    "@vitejs/plugin-react": ^3.0.0
-    "@vitejs/plugin-react-swc": ^3.0.1
-    "@welldone-software/why-did-you-render": ^7.0.1
-    ace-builds: ^1.14.0
-    ajv: ^8.11.2
-    autoprefixer: ^10.4.13
-    browser-fs-access: ^0.31.1
-    classnames: ^2.3.2
-    daisyui: ^2.40.1
-    framer-motion: ^8.0.2
-    immer: ^9.0.16
-    immer-yjs: ^1.1.0
-    lodash: ^4.17.21
-    microsoft-cognitiveservices-speech-sdk: ^1.24.1
-    nanoid: ^4.0.0
-    obs-websocket-js: ^5.0.2
-    peerjs: ^1.4.7
-    postcss: ^8.4.19
-    prettier: ^2.7.1
-    pubsub-js: ^1.9.4
-    qrcode.react: ^3.1.0
-    react: ^18.2.0
-    react-ace: ^10.1.0
-    react-colorful: ^5.6.1
-    react-dom: ^18.2.0
-    react-icons: ^4.7.1
-    react-reverse-portal: ^2.1.1
-    react-rnd: ^10.3.7
-    react-select: ^5.6.1
-    react-shadow: ^19.0.3
-    react-toastify: ^9.1.1
-    react-use: ^17.4.0
-    simplebar-react: ^2.4.3
-    tailwindcss: ^3.2.4
-    typescript: ^4.6.4
-    use-sync-external-store: ^1.2.0
-    valtio: ^1.8.0
-    vite: ^4.0.3
-    y-protocols: ^1.0.5
-    y-utility: ^0.1.2
-    yjs: ^13.5.42
-  languageName: unknown
-  linkType: soft
 
 "simple-swizzle@npm:^0.2.2":
   version: 0.2.2
