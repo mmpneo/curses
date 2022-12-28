@@ -22,19 +22,17 @@ const ChatInspector: FC = () => {
   const chatState = useSnapshot(window.API.twitch.chatState);
 
   return <>
-    <Inspector.SubHeader>Post in chat</Inspector.SubHeader>
-    <Inspector.Description>Post speech-to-text or translation results in chat</Inspector.Description>
+    <Inspector.SubHeader>Chat options</Inspector.SubHeader>
     <Input.NetworkStatus label="Chat connection" value={chatState.status} />
-    <Input.Checkbox label="Enabled" value={pr.chatPostEnable} onChange={e => up("chatPostEnable", e)} />
-    <Input.Checkbox label="Only when live" value={pr.chatPostLive} onChange={e => up("chatPostLive", e)} />
-    <Input.TextSource label="Source" value={pr.chatPostSource} onChange={e => up("chatPostSource", e)} />
-
-    <Input.Checkbox label="Input field" value={pr.chatPostInput} onChange={e => up("chatPostInput", e)} />
-
-
-    <Inspector.SubHeader>Post from chat</Inspector.SubHeader>
+    <Input.Checkbox label="Post in chat" value={pr.chatPostEnable} onChange={e => up("chatPostEnable", e)} />
+    <Inspector.Description>Post speech to text or translation results in chat</Inspector.Description>
+    <Inspector.Switchable visible={pr.chatPostEnable}>
+      <Input.Checkbox label="Post only when live" value={pr.chatPostLive} onChange={e => up("chatPostLive", e)} />
+      <Input.TextSource label="Post from" value={pr.chatPostSource} onChange={e => up("chatPostSource", e)} />
+      <Input.Checkbox label="Post from input field" value={pr.chatPostInput} onChange={e => up("chatPostInput", e)} />
+    </Inspector.Switchable>
+    <Input.Checkbox label="Post from chat" value={pr.chatReceiveEnable} onChange={e => up("chatReceiveEnable", e)} />
     <Inspector.Description>Use your chat as an input field</Inspector.Description>
-    <Input.Checkbox label="Enabled" value={pr.chatReceiveEnable} onChange={e => up("chatReceiveEnable", e)} />
   </>
 }
 

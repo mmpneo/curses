@@ -333,10 +333,10 @@ const NetworkStatus: FC<NetworkStatusProps> = ({ label, value }) => {
         <span className="text-xs font-semibold text-success leading-none">Connected</span>
         <div className="rounded-full ring-2 bg-success ring-success ring-offset-base-100 ring-offset-2 w-2 h-2 " />
       </>}
-      {value === ServiceNetworkState.error && <>
+      {/* {value === ServiceNetworkState.error && <>
         <span className="text-xs font-semibold text-red-500 leading-none">Error</span>
         <div className="rounded-full ring-2 bg-red-500 ring-red-500 ring-offset-base-100 ring-offset-2 w-2 h-2 " />
-      </>}
+      </>} */}
     </div>
   </Container>
 }

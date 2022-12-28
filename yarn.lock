@@ -973,6 +973,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@msgpack/msgpack@npm:^2.7.1":
+  version: 2.8.0
+  resolution: "@msgpack/msgpack@npm:2.8.0"
+  checksum: bead9393f57239007a2fe455df5277cbc03b125f14f310162a652b81471dcf3ab6780eaa24b36e20aa742998910a6840147d08b7267063b8e2de5d40c624360e
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -2124,6 +2131,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"crypto-js@npm:^4.1.1":
+  version: 4.1.1
+  resolution: "crypto-js@npm:4.1.1"
+  checksum: b3747c12ee3a7632fab3b3e171ea50f78b182545f0714f6d3e7e2858385f0f4101a15f2517e033802ce9d12ba50a391575ff4638c9de3dd9b2c4bc47768d5425
+  languageName: node
+  linkType: hard
+
 "css-in-js-utils@npm:^2.0.0":
   version: 2.0.1
   resolution: "css-in-js-utils@npm:2.0.1"
@@ -2185,7 +2199,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:4, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.3":
+"debug@npm:4, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.2, debug@npm:^4.3.3":
   version: 4.3.4
   resolution: "debug@npm:4.3.4"
   dependencies:
@@ -3288,6 +3302,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"isomorphic-ws@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "isomorphic-ws@npm:4.0.1"
+  peerDependencies:
+    ws: "*"
+  checksum: d7190eadefdc28bdb93d67b5f0c603385aaf87724fa2974abb382ac1ec9756ed2cfb27065cbe76122879c2d452e2982bc4314317f3d6c737ddda6c047328771a
+  languageName: node
+  linkType: hard
+
 "isomorphic.js@npm:^0.2.4":
   version: 0.2.5
   resolution: "isomorphic.js@npm:0.2.5"
@@ -3863,6 +3886,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"obs-websocket-js@npm:^5.0.2":
+  version: 5.0.2
+  resolution: "obs-websocket-js@npm:5.0.2"
+  dependencies:
+    "@msgpack/msgpack": ^2.7.1
+    crypto-js: ^4.1.1
+    debug: ^4.3.2
+    eventemitter3: ^4.0.7
+    isomorphic-ws: ^4.0.1
+    type-fest: ^2.3.2
+    ws: ^8.2.2
+  checksum: 9501cc3abda2e34fc51d6ca730c47a581fb212cc9ea37422cb34675700207af291567ac777d89241129598972dccbe27773782ccfe7cf97fb8502c9b94f82f29
+  languageName: node
+  linkType: hard
+
 "once@npm:^1.3.0":
   version: 1.4.0
   resolution: "once@npm:1.4.0"
@@ -4110,6 +4148,15 @@ __metadata:
   version: 2.1.1
   resolution: "punycode@npm:2.1.1"
   checksum: 823bf443c6dd14f669984dea25757b37993f67e8d94698996064035edd43bed8a5a17a9f12e439c2b35df1078c6bec05a6c86e336209eb1061e8025c481168e8
+  languageName: node
+  linkType: hard
+
+"qrcode.react@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "qrcode.react@npm:3.1.0"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+  checksum: 94a2942ecf83f461d869adb20305ae663c6d1abe93ef2c72442b07d756ce70cf6deb6fd588dc5b382b48c6991cfde1dfd5ac9b814c1461e71d5edb2d945e67fc
   languageName: node
   linkType: hard
 
@@ -4682,10 +4729,12 @@ __metadata:
     lodash: ^4.17.21
     microsoft-cognitiveservices-speech-sdk: ^1.24.1
     nanoid: ^4.0.0
+    obs-websocket-js: ^5.0.2
     peerjs: ^1.4.7
     postcss: ^8.4.19
     prettier: ^2.7.1
     pubsub-js: ^1.9.4
+    qrcode.react: ^3.1.0
     react: ^18.2.0
     react-ace: ^10.1.0
     react-colorful: ^5.6.1
@@ -5064,6 +5113,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"type-fest@npm:^2.3.2":
+  version: 2.19.0
+  resolution: "type-fest@npm:2.19.0"
+  checksum: a4ef07ece297c9fba78fc1bd6d85dff4472fe043ede98bd4710d2615d15776902b595abf62bd78339ed6278f021235fb28a96361f8be86ed754f778973a0d278
+  languageName: node
+  linkType: hard
+
 "typescript@npm:^4.6.4":
   version: 4.9.3
   resolution: "typescript@npm:4.9.3"
@@ -5331,7 +5387,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:^8.11.0":
+"ws@npm:^8.11.0, ws@npm:^8.2.2":
   version: 8.11.0
   resolution: "ws@npm:8.11.0"
   peerDependencies:

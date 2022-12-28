@@ -9,6 +9,8 @@ import Service_Translation from "./translation";
 import Service_VRC from "./vrc";
 import Service_Twitch from "./twitch";
 import { proxy } from "valtio";
+import { InspectorTabPath } from "../types";
+import OBSWebSocket from "obs-websocket-js";
 
 export enum Services {
   vrc = "vrc",
@@ -34,9 +36,30 @@ class Backend {
     return this._state.state;
   }
 
-  ui = proxy({
-    fullscreenInput: false
+  ui = proxy<{
+    fullscreenInput: boolean;
+    sidebarState: {
+      tab: InspectorTabPath | undefined;
+      show: boolean;
+      expand: boolean;
+    };
+  }>({
+    fullscreenInput: false,
+    sidebarState: {
+      tab: undefined,
+      show: false,
+      expand: false
+    },
   });
+  changeTab(v: InspectorTabPath) {
+    const sidebar = window.API.ui.sidebarState;
+    if (sidebar.tab?.tab === v.tab && sidebar.tab.value === v.value && sidebar.show) {
+      sidebar.show = false; // close tab
+      return;
+    }
+    sidebar.tab = v; // close tab
+    sidebar.show = true; // close tab
+  }
 
   patchService<Key extends keyof BackendState["services"]>(
     service: Key,
@@ -54,6 +77,30 @@ class Backend {
   public changeScale(value: number) {
     this.state.uiScale = value;
     document.documentElement.style.setProperty("--uiscale", value.toString());
+  }
+
+  async setupObsScene({name, port, password}: {name: string, port: string, password: string}) {
+    const obs = new OBSWebSocket();
+    try {
+      await obs.connect(`ws://127.0.0.1:${4455}`, password);
+      const activeScene = await obs.call("GetCurrentProgramScene")
+      const canvas = window.APIFrontend.document.fileBinder.get().canvas
+      await obs.call("CreateInput", {
+        sceneName: activeScene.currentProgramSceneName,
+        inputName: name,
+        inputKind: "browser_source",
+        inputSettings: {
+          url: "http://localhost:1420/client?port=3030",
+          width: canvas.w,
+          height: canvas.h,
+        }
+      });
+      return "";
+    } catch (error: any) {
+      return error.message
+    } finally {
+      obs.disconnect();
+    }
   }
 
   private inputWindow?: WebviewWindow;
@@ -77,7 +124,8 @@ class Backend {
   }
 
   public async init() {
-    this.initInputWIndow();
+    // todo later
+    // this.initInputWIndow();
     await this._state.init();
     await this.pubsub.init();
     await this.twitch.init();

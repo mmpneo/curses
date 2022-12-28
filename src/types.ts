@@ -8,11 +8,11 @@ export interface IServiceInterface {
   init(): void;
 }
 
-export enum ServiceNetworkState {
-  disconnected,
-  connecting,
-  connected,
-  error
+export const enum ServiceNetworkState {
+  disconnected = "disconnected",
+  connecting = "connecting",
+  connected = "connected",
+  error = "error"
 }
 
 export enum TextEventType {

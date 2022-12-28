@@ -1,52 +1,42 @@
 import classNames from "classnames";
 import { AnimatePresence, motion } from "framer-motion";
-import { ButtonHTMLAttributes, createContext, FC, memo, PropsWithChildren, useCallback, useContext, useEffect, useState } from "react";
-import { RiAddFill, RiChatVoiceFill, RiFolderMusicFill, RiFontSize, RiImageFill, RiMessage2Fill, RiMicFill, RiSettings2Fill, RiStackFill, RiTranslate2, RiTwitchFill } from "react-icons/ri";
+import { ButtonHTMLAttributes, FC, memo, PropsWithChildren, useEffect } from "react";
+import { RiAddFill, RiChatVoiceFill, RiFolderMusicFill, RiFontSize, RiImageFill, RiMessage2Fill, RiSettings2Fill, RiStackFill, RiTranslate2, RiTwitchFill, RiUserVoiceFill } from "react-icons/ri";
 import { TbArrowBarToLeft, TbArrowBarToRight, TbTextResize } from "react-icons/tb";
 import { useSnapshot } from "valtio";
 import { Services } from "../backend-services";
 import { useGetState } from "../frontend-services";
 import { ElementType } from "../frontend-services/schema/element";
-import { InspectorTabPath } from "../types";
+import { InspectorTabPath, ServiceNetworkState } from "../types";
 import Dropdown from "./dropdown/Dropdown";
 import Tooltip from "./dropdown/Tooltip";
 import Inspector from "./inspector";
 
-const sidebarContext = createContext<{
-  tab: InspectorTabPath | undefined;
-  show: boolean;
-  expand: boolean;
-  changeTab: (tab: InspectorTabPath) => void;
-}>({
-  show: false,
-  expand: false,
-  tab: undefined,
-  changeTab: (tab: InspectorTabPath) => { }
-});
-
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   tooltip: string;
   tab: InspectorTabPath;
+  status?: ServiceNetworkState
 }
 
 
-const SideBarButtonBase: FC<PropsWithChildren<Omit<ButtonProps, "tab"> & { active?: boolean }>> = memo(({ active, tooltip, children, ...props }) => {
-  const { expand } = useContext(sidebarContext);
+const SideBarButtonBase: FC<PropsWithChildren<Omit<ButtonProps, "tab"> & { active?: boolean }>> = memo(({ status, active, tooltip, children, ...props }) => {
+  const { expand } = useSnapshot(window.API.ui.sidebarState);
   const activeStyles = active ? "btn-secondary" : "btn-ghost";
-  return <Tooltip enable={!expand} placement="right" content={tooltip}>
-    <button {...props} className={classNames("w-full btn border-none justify-start min-h-fit h-auto flex-nowrap whitespace-nowrap px-0 gap-1 overflow-hidden", activeStyles)}>
+  return <Tooltip body={status === ServiceNetworkState.connected ? "Connected" : ""} enable={!expand} placement="right" className="relative" content={tooltip}>
+    <button {...props} className={classNames("w-full btn border-none justify-start min-h-fit h-auto flex-nowrap whitespace-nowrap px-0 gap-1", activeStyles)}>
       <div className="flex flex-none w-10 h-10 items-center justify-center text-xl">
         {children}
       </div>
-      <div className="font-medium leading-none">{tooltip}</div>
+      <div className={classNames("font-medium leading-none transition-opacity", expand ? "opacity-100" : "opacity-0")}>{tooltip}</div>
     </button>
   </Tooltip>
 });
 
 const SideBarButton: FC<PropsWithChildren<ButtonProps>> = memo(({ tab, ...props }) => {
-  const { show, expand, ...ctx } = useContext(sidebarContext);
+  const { show, expand, ...ctx } = useSnapshot(window.API.ui.sidebarState);
   const active = show && ctx.tab?.tab === tab.tab && ctx.tab?.value === tab.value;
-  return <SideBarButtonBase {...props} active={active} onClick={() => ctx.changeTab(tab)} />
+
+  return <SideBarButtonBase {...props} active={active} onClick={() => window.API.changeTab(tab)} />
 });
 
 const Divider: FC = () => {
@@ -101,61 +91,54 @@ const ElementList: FC = () => {
 }
 
 const Sidebar: FC = memo(() => {
-  const [show, setShow] = useState(false);
-  const [expand, setExpand] = useState(false);
-  const [tab, setTab] = useState<InspectorTabPath | undefined>();
-  const { fullscreenInput } = useSnapshot(window.API.ui);
+  const { fullscreenInput, sidebarState: { tab, show, expand } } = useSnapshot(window.API.ui);
+  useEffect(() => {
+    if (fullscreenInput && show)
+      window.API.ui.sidebarState.show = false;
+  }, [fullscreenInput]);
 
-  const changeTab = useCallback((v: InspectorTabPath) => {
-    if (tab?.tab === v.tab && tab?.value === v.value && show) {
-      setShow(false);
-      return;
-    }
-    setShow(true);
-    setTab(v);
-  }, [tab, show]);
+  const switchExpand = () => {
+    window.API.ui.sidebarState.expand = !window.API.ui.sidebarState.expand;
+  }
 
-  useEffect(() => { fullscreenInput && show && setShow(false) }, [fullscreenInput]);
+  const sttState = useSnapshot(window.API.stt.serviceState);
+  const ttsState = useSnapshot(window.API.tts.serviceState);
 
   return <div className="flex h-full z-10">
-    <sidebarContext.Provider value={{ show, expand, tab, changeTab }}>
-      <div className="bg-base-200 flex-none overflow-y-scroll scrollbar-hide">
-        <motion.div transition={{ ease: "anticipate", duration: 0.2 }} initial={{ width: "3.5rem" }} animate={{ width: expand ? "13rem" : "3.5rem" }} className="flex flex-col space-y-2 py-2 px-2">
-          <button className="w-full btn btn-ghost border-none justify-start min-h-fit h-auto flex-nowrap whitespace-nowrap px-0 gap-1 overflow-hidden" onClick={() => setExpand(e => !e)}>
-            <span className={classNames("flex-none w-10 h-8 items-center justify-center text-lg text-base-content/50 swap swap-flip", { "swap-active": expand })}>
-              <TbArrowBarToLeft className="swap-on" />
-              <TbArrowBarToRight className="swap-off" />
-            </span>
-            <div className="font-medium text-xs text-base-content/50 leading-none">Collapse menu</div>
-          </button>
-          <SideBarButton tab={{ tab: Services.stt }} tooltip="Speech to Text"><RiMicFill /></SideBarButton>
-          <SideBarButton tab={{ tab: Services.tts }} tooltip="Text to Speech"><RiChatVoiceFill /></SideBarButton>
-          <SideBarButton tab={{ tab: Services.translation }} tooltip="Translation"><RiTranslate2 /></SideBarButton>
-          <SideBarButton tab={{ tab: Services.vrc }} tooltip="VRChat chatbox"><RiMessage2Fill /></SideBarButton>
-          <SideBarButton tab={{ tab: Services.twitch }} tooltip="Twitch Integration"><RiTwitchFill /></SideBarButton>
-          <SideBarButton tab={{ tab: "settings" }} tooltip="Settings & About"><RiSettings2Fill /></SideBarButton>
-          <Divider />
-          <SideBarButton tab={{ tab: "scenes" }} tooltip="Canvas & Scenes"><RiStackFill /></SideBarButton>
-          <ElementList />
-          <Dropdown placement="right" content={<AddElementsMenu />}>
-            <SideBarButtonBase tooltip="Add element"><RiAddFill /></SideBarButtonBase>
-          </Dropdown>
-          <Divider />
-          <SideBarButton tab={{ tab: "files" }} tooltip="Files"><RiFolderMusicFill /></SideBarButton>
-          <SideBarButtonBase tooltip="Fonts"><RiFontSize /></SideBarButtonBase>
-        </motion.div>
-      </div>
-    </sidebarContext.Provider>
+    <div className="bg-base-200 flex-none overflow-y-scroll scrollbar-hide">
+      <motion.div transition={{ ease: "anticipate", duration: 0.2 }} initial={{ width: "3.5rem" }} animate={{ width: expand ? "13rem" : "3.5rem" }} className="flex flex-col space-y-2 py-2 px-2">
+        <button className="w-full btn btn-ghost border-none justify-start min-h-fit h-auto flex-nowrap whitespace-nowrap px-0 gap-1 overflow-hidden" onClick={switchExpand}>
+          <span className={classNames("flex-none w-10 h-8 items-center justify-center text-lg text-base-content/50 swap swap-flip", { "swap-active": expand })}>
+            <TbArrowBarToLeft className="swap-on" />
+            <TbArrowBarToRight className="swap-off" />
+          </span>
+          <div className="font-medium text-xs text-base-content/50 leading-none">Collapse menu</div>
+        </button>
+        <SideBarButton status={sttState.status} tab={{ tab: Services.stt }} tooltip="Speech to Text"><RiUserVoiceFill /></SideBarButton>
+        <SideBarButton status={ttsState.status} tab={{ tab: Services.tts }} tooltip="Text to Speech"><RiChatVoiceFill /></SideBarButton>
+        <SideBarButton disabled tab={{ tab: Services.translation }} tooltip="Translation"><RiTranslate2 /></SideBarButton>
+        <SideBarButton tab={{ tab: Services.vrc }} tooltip="VRChat chatbox"><RiMessage2Fill /></SideBarButton>
+        <SideBarButton tab={{ tab: Services.twitch }} tooltip="Twitch Integration"><RiTwitchFill /></SideBarButton>
+        <SideBarButton tab={{ tab: "settings" }} tooltip="Settings & About"><RiSettings2Fill /></SideBarButton>
+        <Divider />
+        <SideBarButton tab={{ tab: "scenes" }} tooltip="Canvas & Scenes"><RiStackFill /></SideBarButton>
+        <ElementList />
+        <Dropdown placement="right" content={<AddElementsMenu />}>
+          <SideBarButtonBase tooltip="Add element"><RiAddFill /></SideBarButtonBase>
+        </Dropdown>
+        <Divider />
+        <SideBarButton tab={{ tab: "files" }} tooltip="Files"><RiFolderMusicFill /></SideBarButton>
+        <SideBarButtonBase tooltip="Fonts"><RiFontSize /></SideBarButtonBase>
+      </motion.div>
+    </div>
     <AnimatePresence initial={false}>
       {show && <motion.div
         key="inspector-opacity"
         variants={inspectorOpacityVariants}
         initial="hidden"
-        // transition={{ ease: "anticipate", duration: 1 }}
         exit="hidden"
         animate="visible"
         className="relative h-full pt-4">
-        {/* <button className="top-3 absolute text-base-content -right-10 btn btn-sm bg-base-100 border-none btn-circle text-lg" onClick={() => setShow(false)}><RiCloseFill /></button> */}
         <motion.div
           key="inspector-size"
           variants={inspectorSizeVariants}

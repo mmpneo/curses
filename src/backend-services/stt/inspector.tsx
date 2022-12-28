@@ -1,13 +1,13 @@
-import { FC } from "react";
-import { useSnapshot } from "valtio";
-import { STT_Backends, STT_State } from "./schema";
-import { deepGramLangs, azureLanguages } from "./service_data";
-import Inspector from "../../components/inspector";
-import Input from "../../components/input";
-import { RiMicFill } from "react-icons/ri";
-import ServiceButton from "../components/service-button";
-import { ServiceNetworkState } from "../../types";
 import { invoke } from "@tauri-apps/api/tauri";
+import { FC } from "react";
+import { RiUserVoiceFill } from "react-icons/ri";
+import { useSnapshot } from "valtio";
+import Input from "../../components/input";
+import Inspector from "../../components/inspector";
+import { ServiceNetworkState } from "../../types";
+import ServiceButton from "../components/service-button";
+import { STT_Backends, STT_State } from "./schema";
+import { azureLanguages, deepGramLangs } from "./service_data";
 
 const Browser: FC = () => {
   const handleOpen = () => {
@@ -107,13 +107,13 @@ const Inspector_STT: FC = () => {
   const data = useSnapshot(window.API.state.services.stt);
   const state = useSnapshot(window.API.stt.serviceState);
 
-  const handleStart = (v: boolean) => window.API.state.services.stt.autoStart = v;
+  const handleStart = (v: boolean) => window.API.state.services.stt.showActionButton = v;
   const handleBackend = (v: STT_Backends) => window.API.state.services.stt.data.backend = v;
 
   return <Inspector.Body>
-    <Inspector.Header><RiMicFill /> Speech to text</Inspector.Header>
+    <Inspector.Header><RiUserVoiceFill /> Speech to Text</Inspector.Header>
     <Inspector.Content>
-      <Input.Checkbox label="Start with play button" onChange={handleStart} value={data.autoStart} />
+      <Input.Checkbox label="Start from action bar" onChange={handleStart} value={data.showActionButton} />
       <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
         <Input.Select options={[
           { label: "Browser", value: STT_Backends.browser },

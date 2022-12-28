@@ -10,6 +10,7 @@ import { BrowserClient, BrowserMicrophone, Segment } from "@speechly/browser-cli
 export class STT_SpeechlyService implements ISpeechRecognitionService {
   constructor(private bindings: SpeechServiceEventBindings) {}
   
+  #microphone?: BrowserMicrophone;
   #instance?: BrowserClient;
   #initialized?: boolean;
   
@@ -32,11 +33,11 @@ export class STT_SpeechlyService implements ISpeechRecognitionService {
       this.#initialized = true;
     });
 
-    const microphone = new BrowserMicrophone();
-    await microphone.initialize();
-    if (!microphone.mediaStream)
+    this.#microphone = new BrowserMicrophone();
+    await this.#microphone.initialize();
+    if (!this.#microphone.mediaStream)
       return this.bindings.onStop("Error initialising");
-    await this.#instance.attach(microphone.mediaStream);
+    await this.#instance.attach(this.#microphone.mediaStream);
 
     this.#instance.onSegmentChange((segment: Segment) => {
       let transcript = segment.words
@@ -55,6 +56,7 @@ export class STT_SpeechlyService implements ISpeechRecognitionService {
   }
 
   stop(): void {
+    this.#microphone?.close();
     this.#instance?.close();
     this.bindings.onStop()
   }

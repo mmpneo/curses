@@ -22,18 +22,18 @@ export interface BackendState {
 
 
 type ServiceState<Data = any> = {
-  autoStart: boolean
+  showActionButton: boolean
   data: Data
 }
 
 const genServiceSchema = <T>(schema: JSONSchemaType<T>): JSONSchemaType<ServiceState<T>> => ({
   type:       "object",
   properties: {
-    autoStart: {type: "boolean", default: false},
+    showActionButton: {type: "boolean", default: false},
     data:      schema
   },
   default:    {},
-  required:   ["autoStart", "data"]
+  required:   ["showActionButton", "data"]
 } as JSONSchemaType<ServiceState<T>>)
 
 export const backendSchema: JSONSchemaType<BackendState> = {

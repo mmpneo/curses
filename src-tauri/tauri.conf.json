@@ -4,9 +4,9 @@
     "version": "0.0.0"
   },
   "build": {
-    "beforeDevCommand": "yarn dev --host",
+    "beforeDevCommand": "yarn dev",
     "beforeBuildCommand": "yarn build",
-    "devPath": "../dist",
+    "devPath": "http://localhost:1420",
     "distDir": "../dist",
     "withGlobalTauri": true
   },

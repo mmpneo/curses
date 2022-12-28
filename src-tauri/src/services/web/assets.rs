@@ -32,6 +32,7 @@ async fn file_response<R: Runtime>(path: FullPath, resolver: Arc<AssetResolver<R
         .status(StatusCode::OK)
         .header(ACCEPT_RANGES, HeaderValue::from_static("bytes"))
         .header(ACCESS_CONTROL_ALLOW_ORIGIN, HeaderValue::from_static("*"))
+        .header(CONTENT_TYPE, asset.mime_type)
         .header(CONTENT_SECURITY_POLICY, HeaderValue::from_static("frame-ancestors *"))
         .header(X_FRAME_OPTIONS, HeaderValue::from_static("ALLOW-FROM *"))
         .body(asset.bytes))

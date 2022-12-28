@@ -1,9 +1,13 @@
 import { FC, useState } from "react";
 import { RiFileCopyLine, RiSettings2Fill } from "react-icons/ri";
+import { SiObsstudio } from "react-icons/si";
 import { useCopyToClipboard } from "react-use";
 import { useSnapshot } from "valtio";
 import Inspector from ".";
+import { useGetState } from "../../frontend-services";
 import { ServiceNetworkState } from "../../types";
+import Dropdown from "../dropdown/Dropdown";
+import Tooltip from "../dropdown/Tooltip";
 import Input from "../input";
 
 const themesLight = [
@@ -50,22 +54,51 @@ const options = [
 const UI_SCALE_MIN = 0.8;
 const UI_SCALE_MAX = 1.5;
 
+const ObsSetup: FC = () => {
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
+  const [name, setName] = useState("Curse captions");
+  const [port, setPort] = useState("4455");
+  const [password, setPassword] = useState("");
+
+  const handleSetup = async () => {
+    setError("");
+    if (!port || !name)
+      return;
+    const resp = await window.API.setupObsScene({port, password, name});
+    resp ? setError(resp) : setSuccess(true);
+  }
+
+  return <div className="menu bg-base-100 p-4 w-72 rounded-box flex flex-col space-y-2">
+    <Input.Text value={name} onChange={e => setName(e.target.value)} label="Source name" />
+    <Input.Text value={port} onChange={e => setPort(e.target.value)} label="Port" />
+    <Input.Text type="password" autoComplete="false" value={password} onChange={e => setPassword(e.target.value)} label="Password" />
+    <span className="text-xs opacity-50">New source will be created in the currently active scene</span>
+    {error && <span className="text-xs text-error">{error}</span>}
+    {success ?
+      <button className="btn btn-sm btn-success">Success</button> : 
+      <button onClick={handleSetup} className="btn btn-sm btn-primary">Confirm</button>
+    }
+  </div>
+}
+
 const Inspector_Settings: FC = () => {
   const { clientTheme, uiScale } = useSnapshot(window.API.state);
+  const canvasState = useGetState(state => state.canvas);
   const handleChangeTheme = (v: string) => window.API.changeTheme(v);
   const handleChangeScale = (v: string | number) => {
     const _v = typeof v === "string" ? parseFloat(v) : v;
     window.API.changeScale(Math.max(UI_SCALE_MIN, Math.min(UI_SCALE_MAX, _v)));
   }
 
-  const [,copy] = useCopyToClipboard();
+  const [, copy] = useCopyToClipboard();
 
   const handleCopyLocalClient = () => {
-    const {host, port} = window.networkConfiguration;
+    const { host, port } = window.networkConfiguration;
     copy(`${host}:${port}/client`);
   }
   const handleCopyPubsub = () => {
-    const {localIp, port} = window.networkConfiguration;
+    const { localIp, port } = window.networkConfiguration;
     copy(`${localIp}:${port}`);
   }
 
@@ -74,6 +107,22 @@ const Inspector_Settings: FC = () => {
   return <Inspector.Body>
     <Inspector.Header><RiSettings2Fill /> Settings</Inspector.Header>
     <Inspector.Content>
+      <Inspector.SubHeader>Setup client</Inspector.SubHeader>
+
+      <Dropdown targetOffset={24} placement="right" content={<ObsSetup />}>
+        <Tooltip placement="top" className="w-full flex flex-col" content="Setup browser source" body={<span><span className="font-medium">Active "obs-websocket"</span> plugin required. <br /> OBS 28.x should have it by default, just enable it!</span>}>
+          <button className="btn btn-sm btn-primary gap-2"><SiObsstudio /> Setup OBS for me</button>
+        </Tooltip>
+      </Dropdown>
+      <div className="divider text-xs font-semibold">or</div>
+      <button className="btn btn-outline border-2 btn-sm btn-primary gap-2"><RiFileCopyLine /> Copy link</button>
+      <div className="text-xs text-center">Create new browser source, paste the link and set window size to {canvasState.w}x{canvasState.h} pixels</div>
+
+      {/* <QRCodeCanvas
+          size={256}
+          style={{ height: "100%", maxHeight: "100%", width: "4.5rem" }}
+          value={`${window.networkConfiguration.localIp}:${window.networkConfiguration.port}/client`} /> */}
+
       <Inspector.SubHeader>UI</Inspector.SubHeader>
       <Input.Select label="Theme" options={options} value={{ value: clientTheme, label: clientTheme }} onChange={(e: any) => handleChangeTheme(e.value)} />
       <Input.Chips label="UI scale" value={uiScale} onChange={e => handleChangeScale(e)} options={[
@@ -82,15 +131,9 @@ const Inspector_Settings: FC = () => {
         { label: "L", value: 1.2 },
         { label: "X", value: 1.4 },
       ]} />
-      <Inspector.SubHeader>Client</Inspector.SubHeader>
 
-      <Input.Container label="Client url">
-        <div className="field-width input-group">
-          <input disabled value="copy link" className="w-full cursor-text font-medium input input-sm input-bordered" />
-          <button className="btn btn-sm text-lg" onClick={handleCopyLocalClient}><RiFileCopyLine/></button>
-        </div>
-      </Input.Container>
-      <Input.Checkbox value={testSwitch} onChange={v => setSwitch(v)} label="Remote share" />
+
+      {/* <Input.Checkbox value={testSwitch} onChange={v => setSwitch(v)} label="Remote share" />
       <Inspector.Switchable visible={testSwitch}>
         <Input.NetworkStatus value={ServiceNetworkState.connected} label="Remote connection" />
         <Input.Container label="Remote url">
@@ -101,7 +144,7 @@ const Inspector_Settings: FC = () => {
             </button>
           </div>
         </Input.Container>
-      </Inspector.Switchable>
+      </Inspector.Switchable> */}
 
       <Inspector.SubHeader>Link apps</Inspector.SubHeader>
       <Inspector.Description>Sync text events with remote SimpleSTT instance</Inspector.Description>

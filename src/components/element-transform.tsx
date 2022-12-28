@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import { FC, memo } from "react";
 import { DraggableData, Position, ResizableDelta, Rnd } from "react-rnd";
+import { useSnapshot } from "valtio";
 import { useGetState, useUpdateState } from "../frontend-services";
 import { ElementInstance } from "./element-instance";
 
@@ -20,12 +21,19 @@ export const ElementSimpleTransform: FC<{ id: string }> = memo(({ id }) => {
 });
 
 const Knob: FC<{ className: string }> = ({ className }) => {
-  return <div className={classNames("absolute rounded-full bg-secondary w-2 h-2", className)}></div>
+  return <div className={classNames("absolute rounded-full bg-primary w-2 h-2", className)}></div>
 }
 
 export const ElementEditorTransform: FC<{ id: string }> = memo(({ id }) => {
   const rect = useGetState(state => state.elements[id].scenes["main"].rect);
+  const {tab, show} = useSnapshot(window.API.ui.sidebarState);
   const update = useUpdateState();
+
+  const selectElement = () => {
+    const state = window.APIFrontend.document.fileBinder.get();
+    const element = state.elements[id]
+    window.API.changeTab({ tab: element.type, value: id });
+  }
 
   const handleDrag = (_e: any, data: DraggableData) => {
     update(state => {
@@ -41,23 +49,31 @@ export const ElementEditorTransform: FC<{ id: string }> = memo(({ id }) => {
       state.elements[id].scenes["main"].rect.h = Math.round(elementRef.offsetHeight);
     });
   }
-  return <Rnd className="group"
+
+  const selected = show && tab?.value === id;
+
+  return <Rnd className={classNames("group", {"z-50": selected})}
     size={{
       width: rect?.w || 100,
       height: rect?.h || 100
     }}
     position={{
-      x: rect?.x || 100,
-      y: rect?.y || 100,
+      x: rect?.x ?? 0,
+      y: rect?.y ?? 0,
     }}
     onDragStop={handleDrag}
     onResizeStop={handleResize}
   >
     <ElementInstance id={id} />
-    <div className="absolute inset-0 border-2 border-dashed border-transparent group-hover:border-secondary/50 transition-colors"></div>
-    <Knob className="group-hover:opacity-100 opacity-0 transition-opacity -bottom-1 -left-1" />
-    <Knob className="group-hover:opacity-100 opacity-0 transition-opacity -bottom-1 -right-1" />
-    <Knob className="group-hover:opacity-100 opacity-0 transition-opacity -top-1 -right-1" />
-    <Knob className="group-hover:opacity-100 opacity-0 transition-opacity -top-1 -left-1" />
+    <div 
+      onDoubleClick={e => {e.preventDefault(); e.stopPropagation(); selectElement()}}
+      className={classNames("absolute inset-0 border-2 border-dashed opacity-0 border-secondary/50 transition-opacity",
+      selected ? "opacity-100 border-primary" : "group-hover:opacity-30"
+      )}>
+        <Knob className="-bottom-1 -left-1" />
+        <Knob className="-bottom-1 -right-1" />
+        <Knob className="-top-1 -right-1" />
+        <Knob className="-top-1 -left-1" />
+      </div>
   </Rnd>
 });

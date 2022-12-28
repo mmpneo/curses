@@ -21,7 +21,6 @@ declare global {
     APIFrontend: Frontend;
     mode: "host" | "client";
     platform: "app" | "web";
-    remoteHost?: string // use this 
     networkConfiguration: NetworkConfiguration
     // "__TAURI_METADATA__": any
   }
@@ -37,18 +36,13 @@ window.platform = window.__TAURI_METADATA__ ? "app" : "web";
 
 window.mode = window.location.pathname.startsWith('/client') ? "client" : "host";
 
-if (window.mode === "client") {
-  const q = new URLSearchParams(window.location.search.substring(1));
-  if (q.has("host")) {
-    window.remoteHost = q.get("host") as string;
-  }
-}
 window.addEventListener('contextmenu', e => e.preventDefault(), false);
 
 window.API = new Backend();
 window.APIFrontend = new Frontend();
 
 async function buildNetworkConfiguration() {
+  
   if (window.platform === "app") {
     const appConfig = await invoke<any>("plugin:web|config");
     console.log(appConfig);
@@ -59,11 +53,13 @@ async function buildNetworkConfiguration() {
     }
   }
   else {
-    // if client from app
+    const q = new URLSearchParams(window.location.search.substring(1));
+    const qHost = q.has("host") ? q.get("host") : null;
+    const qPort = q.has("port") ? q.get("port") : null;
     window.networkConfiguration = {
       localIp: "",
-      host: location.hostname,
-      port: location.port
+      host: qHost ?? location.hostname,
+      port: qPort ?? location.port
     }
   }
 }
