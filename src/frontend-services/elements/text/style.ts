@@ -21,16 +21,6 @@ export const elementStyle = `
           width: 100%;
           position: relative;
         }
-       
-        .animate.word{
-          white-space: pre;
-        }
-        
-        .animate .char{white-space: pre;}
-        
-        .char-internal {
-          display: inline-flex;
-        }
 
         .box {
           opacity: 0;
@@ -40,22 +30,23 @@ export const elementStyle = `
           opacity: 1;
         }
         
-        .animate.word:not(.animated) .char-internal{
-          opacity: 0;
-          width: 0;
-          height: 0;
-          animation: letterAppear .1s ease-in-out var(--time);
+        .char.animate {
+          animation: charAppear 0.3s ease-in-out;
           animation-fill-mode: both;
           animation-iteration-count: 1;
         }
-        .word.animated .char-internal{
-          opacity: 1; 
-          width: auto;
-          height: auto;
+
+        @keyframes charAppear {
+          0%{
+            opacity: 0;
+          }
+          100%{
+            opacity: 1;
+          }
         }
         
         .text br {
           content: " ";
           width: 100%;
         }
-      `
+      `;

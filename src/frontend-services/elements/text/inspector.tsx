@@ -130,15 +130,18 @@ const BehaviourInspector: FC<{ id: string }> = ({ id }) => {
   return <>
     <Inspector.SubHeader>Animation</Inspector.SubHeader>
     <Input.Checkbox label="Enable animation" value={data.animateEnable} onChange={e => up("animateEnable", e)} />
+    <Inspector.Switchable visible={data.animateEnable}>
+      <Inspector.Description>Animation interval</Inspector.Description>
+      <Input.Text label="Characters" type="number" value={data.animateDelayChar} onChange={e => up("animateDelayChar", parseFloat(e.target.value))} />
+      <Input.Text label="Words" type="number" value={data.animateDelayWord} onChange={e => up("animateDelayWord", parseFloat(e.target.value))} />
+      <Input.Text label="Sentences" type="number" value={data.animateDelaySentence} onChange={e => up("animateDelaySentence", parseFloat(e.target.value))} />
+    </Inspector.Switchable>
     <Input.Checkbox label="Emit event" value={data.animateEvent} onChange={e => up("animateEvent", e)} />
     {data.animateEvent && <Input.Container label="Copy event css">
       <button onClick={handleCopyCss} className="btn btn-neutral btn-sm gap-1">Copy <RiFileCopyLine/></button>
     </Input.Container>}
-    <Input.Text label="Characters delay" type="number" value={data.animateDelayChar} onChange={e => up("animateDelayChar", parseFloat(e.target.value))} />
-    <Input.Text label="Words delay" type="number" value={data.animateDelayWord} onChange={e => up("animateDelayWord", parseFloat(e.target.value))} />
-    <Input.Text label="Sentence delay" type="number" value={data.animateDelaySentence} onChange={e => up("animateDelaySentence", parseFloat(e.target.value))} />
 
-    <Input.Checkbox label="Animate scroll" value={data.animateScroll} onChange={e => up("animateScroll", e)} />
+    {/* <Input.Checkbox label="Animate scroll" value={data.animateScroll} onChange={e => up("animateScroll", e)} /> */}
 
     <Inspector.SubHeader>Clean up</Inspector.SubHeader>
     <Input.Text label="Clear text after" type="number" value={data.behaviorClearTimer} onChange={e => up("behaviorClearTimer", parseFloat(e.target.value))} />

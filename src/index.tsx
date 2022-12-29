@@ -73,9 +73,9 @@ buildNetworkConfiguration()
         ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(<ClientView />);
       else
         ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-          <React.StrictMode>
+          // <React.StrictMode>
             <EditorView />
-          </React.StrictMode>
+          // </React.StrictMode>
         );
     });
   })

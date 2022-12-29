@@ -69,10 +69,19 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
       }
     }
     else {
+      
       const lookForInterim = sentencesRef.current.findIndex(s => s.interim); // todo cache index
       // ignore interim results if has sentence animating and no active interim
       if (lookForInterim < 0 && isRunning.current && isInterim) {
         return;
+      }
+      if (!event.value && lookForInterim >= 0) {
+        sentenceQueue.current.splice(lookForInterim);
+        isRunning.current = false;
+        setSentences(l => l.filter(l => !l.interim));
+        onComplete();
+        return;
+        // cancel last interim
       }
 
       if (lookForInterim >= 0) { // update last interim sentence
@@ -114,8 +123,8 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
     const sub = window.API.pubsub.subscribeText(TextEventSource.textfield, event => {
       if (!stateRef.current.sourceInterim && event?.type === TextEventType.interim)
         return;
-      event?.value && enqueueSentence(event);
-    });
+      event && enqueueSentence(event);
+    }, true);
     return () => window.API.pubsub.unsubscribe(sub);
   }, [state.sourceInputField, state.behaviorClearTimer]);
 
@@ -243,6 +252,5 @@ const BoxElement: FC<PropsWithChildren<any>> = memo(({ children, ...boxProps }) 
     </span>
   </div>
 })
-
 export { Inspector_ElementText, Element_TextStateSchema }
 export default Element_Text;

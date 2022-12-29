@@ -35,7 +35,6 @@ class Service_PubSub implements IServiceInterface {
   }
   
   #ajv: Ajv;
-  #pubsub = PubSub;
 
   public registeredEvents = proxyMap<string, RegisteredEvent>([]);
 
@@ -67,7 +66,7 @@ class Service_PubSub implements IServiceInterface {
     this.#publishLocally(msg);
   }
   #publishLocally({topic, data}: BaseEvent) {
-    this.#pubsub.publishSync(topic, data);
+    PubSub.publishSync(topic, data);
   }
   #publishPubSub(msg: BaseEvent) {
     invoke("plugin:web|pubsub_broadcast", {value: JSON.stringify(msg)});
@@ -77,8 +76,8 @@ class Service_PubSub implements IServiceInterface {
   }
 
   publishText(topic: TextEventSource, textData: PartialWithRequired<TextEvent, "type" | "value">) {
-    if (!textData.value)
-      return;
+    // if (!textData.value)
+    //   return;
     let data = this.applyEmotes(textData)
     this.#publishLocally({topic, data});
     this.#publishToClients({topic, data});
@@ -93,10 +92,14 @@ class Service_PubSub implements IServiceInterface {
     return PubSub.subscribe(eventname, (_, data) => fn(data));
   }
 
-  public subscribeText(source: TextEventSource, fn: (value?: TextEvent) => void) {
-    return PubSub.subscribe(source, (_, data: TextEvent) => fn(data));
+  public subscribeText(source: TextEventSource, fn: (value?: TextEvent) => void, allowEmpty = false) {
+    return PubSub.subscribe(source, (a, data: TextEvent) => {
+      if (allowEmpty)
+        fn(data);
+      else if (data.value)
+        fn(data);
+    })
   }
-
 
   getLocalNetworkLink() {}
 

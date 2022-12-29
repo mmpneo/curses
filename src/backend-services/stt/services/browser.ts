@@ -42,6 +42,7 @@ export class STT_BrowserService implements ISpeechRecognitionService{
   }
 
   start(params: STT_State): void {
+    return this.bindings.onStop();
     this.#instance.lang           = "en-US";
     this.#instance.continuous     = true;
     this.#instance.interimResults = true;

@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { createContext, FC, memo, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, FC, memo, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { TextEvent } from "../../../types";
 import { Element_TextState } from "./schema";
 
@@ -61,60 +61,61 @@ export const TextSentenceTest: FC<{state: Element_TextState}> = ({state}) => {
   </>
 }
 
-const TextSentenceRenderSimple: FC = memo(() => {
-  const { data, onComplete, onActivity } = useContext(sentenceCtx);
-  const [words, setWords] = useState<WordDataSegment[]>([])
-  useEffect(() => {
-    let wordsList = data.value.split(' ');
-
-    const words: WordDataSegment[] = wordsList.map((word, wordIndex) => {
+function nativeRender(container: HTMLSpanElement, data: TextSentenceData, onActivity: (r: DOMRect) => void, onComplete: () => void) {
+  if (!container) // skip when destroying sentence ele
+    return;
+  container.replaceChildren();
+  let wordsList = data.value.split(' ');
+    // convert words to data blocks
+    const words: WordDataSegment[] = wordsList.map((_word, wordIndex) => {
+      let word = _word + " ";
       // check for profanity
-      if (checkProfanity(word, data.state.textProfanityMask)) {
+      if (checkProfanity(word, data.state.textProfanityMask))
         return { classes: "profanity", type: TextWordType.profanity, value: data.state.textProfanityMask };
-      }
       // check is img
-      if (wordIndex in data.emotes) {
+      if (wordIndex in data.emotes)
         return { classes: '', type: TextWordType.img, value: data.emotes[wordIndex] }
-      }
       return { classes: '', type: TextWordType.char, value: word }
     });
 
-    // merge segments
-    const arr: WordDataSegment[] = [];
+    // merge words into segments
+    const segments: WordDataSegment[] = [];
     let step = 0;
     for (let index = 0; index < words.length; index++) {
       const word = words[index];
-      if (word.type === TextWordType.char && arr[step - 1]?.type === TextWordType.char) {
-        // merge
-        arr[step - 1].value = arr[step - 1].value.concat(' ', word.value);
+      if (word.type !== TextWordType.img && (word.type === segments[step - 1]?.type))
+        segments[step - 1].value = segments[step - 1].value.concat(' ', word.value);
+      else {
+        segments.push(word);
+        step++;
+      }
+    }
+
+    for (let i = 0; i < segments.length; i++) {
+      const segment = segments[i];
+      let newNode: Element;
+      if (segment.type === TextWordType.char || segment.type === TextWordType.profanity) {
+        newNode = document.createElement("span");
+        newNode.innerHTML = segment.value;
       }
       else {
-        arr.push(word);
-        step++;
-        // push
+        newNode = document.createElement("img");
+        (newNode as HTMLImageElement).src = segment.value;
       }
+      newNode.className = segment.classes + (data.interim ? " interim" : "");
+      container.appendChild(newNode);
     }
-    setWords(arr);
-    onActivity?.();
-  }, [data.value]);
+    !data.interim && onComplete();
+}
 
+const TextSentenceRenderSimple: FC = memo(() => {
+  const { data, onComplete, onActivity } = useContext(sentenceCtx);
   useEffect(() => {!data.interim && onComplete?.()}, [data.interim])
-
-  const renderWord = (word: WordDataSegment) => {
-    switch (word.type) {
-      case TextWordType.profanity:
-      case TextWordType.char:
-        return <span className="char">{word.value} </span>
-      case TextWordType.img:
-        return <span className="char"><img src={word.value} /> </span>
-    }
-  }
-
-  return <>
-    {words.map((word, i) => <span className={classNames("word", { interim: data.interim }, word.classes)} key={i}>
-      {renderWord(word)}
-    </span>)}
-  </>
+  const containerRef = useRef<HTMLSpanElement>(null);
+  useLayoutEffect(() => {
+    containerRef.current && nativeRender(containerRef.current, data, onActivity, onComplete);
+  }, [data.value, data.interim])
+  return <span ref={containerRef}></span>
 });
 
 
@@ -135,7 +136,7 @@ function nativeLoop(chars: CharData[], index: number, container: HTMLSpanElement
       newNode = document.createElement("img");
       (newNode as HTMLImageElement).src = char[1];
     }
-    newNode.className = "char animate";
+    newNode.className = `char animate ${char[0] === 2 ? "profanity" : ''}`;
     container.appendChild(newNode);
     char[3] && onActivity(newNode.getBoundingClientRect());
     if (index + 2 <= chars.length)
@@ -156,6 +157,10 @@ const TextSentenceRenderAnimated: FC = memo(() => {
   
      wordsList.forEach((word, wordIndex) => {
       let _word = word;
+
+      let isProfanity = checkProfanity(word, data.state.textProfanityMask);
+      if (isProfanity)
+        _word = data.state.textProfanityMask;
   
       if (wordIndex in (data.emotes || {})) {
         '_ '.split('').forEach((char, charIndex) => {
@@ -180,7 +185,7 @@ const TextSentenceRenderAnimated: FC = memo(() => {
           return;
         }
         const delay = char === ' ' ? data.state.animateDelayWord : data.state.animateDelayChar;
-        flatChars.push([TextSymbolType.char, char, delay, char !== ' ']);
+        flatChars.push([isProfanity ? TextSymbolType.profanity : TextSymbolType.char, char, delay, char !== ' ']);
       });
     });
     nativeLoop(flatChars, 0, ref, rect => onActivity(rect), () => onComplete());

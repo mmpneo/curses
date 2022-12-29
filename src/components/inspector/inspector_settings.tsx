@@ -109,19 +109,19 @@ const Inspector_Settings: FC = () => {
     <Inspector.Content>
       <Inspector.SubHeader>Setup client</Inspector.SubHeader>
 
+      {/* <div className="btn-group w-full">
+        <button className="flex-grow btn btn-outline border-2 btn-sm btn-primary gap-2"><SiObsstudio /> Setup OBS</button>
+        <button className="flex-grow btn btn-sm btn-primary gap-2"><RiFileCopyLine /> Copy url</button>
+      </div> */}
+
       <Dropdown targetOffset={24} placement="right" content={<ObsSetup />}>
         <Tooltip placement="top" className="w-full flex flex-col" content="Setup browser source" body={<span><span className="font-medium">Active "obs-websocket"</span> plugin required. <br /> OBS 28.x should have it by default, just enable it!</span>}>
-          <button className="btn btn-sm btn-primary gap-2"><SiObsstudio /> Setup OBS for me</button>
+          <button className="btn btn-sm btn-primary gap-2"><SiObsstudio /> Setup OBS</button>
         </Tooltip>
       </Dropdown>
       <div className="divider text-xs font-semibold">or</div>
       <button className="btn btn-outline border-2 btn-sm btn-primary gap-2"><RiFileCopyLine /> Copy link</button>
       <div className="text-xs text-center">Create new browser source, paste the link and set window size to {canvasState.w}x{canvasState.h} pixels</div>
-
-      {/* <QRCodeCanvas
-          size={256}
-          style={{ height: "100%", maxHeight: "100%", width: "4.5rem" }}
-          value={`${window.networkConfiguration.localIp}:${window.networkConfiguration.port}/client`} /> */}
 
       <Inspector.SubHeader>UI</Inspector.SubHeader>
       <Input.Select label="Theme" options={options} value={{ value: clientTheme, label: clientTheme }} onChange={(e: any) => handleChangeTheme(e.value)} />
@@ -147,7 +147,7 @@ const Inspector_Settings: FC = () => {
       </Inspector.Switchable> */}
 
       <Inspector.SubHeader>Link apps</Inspector.SubHeader>
-      <Inspector.Description>Sync text events with remote Curses instance</Inspector.Description>
+      <Inspector.Description>Sync text events with remote app instance</Inspector.Description>
       <Input.Text label="Address" placeholder="127.0.0.1:3030" />
       <Input.NetworkStatus value={ServiceNetworkState.connected} label="Connection" />
       <button className="btn btn-sm btn-neutral">Connect</button>
