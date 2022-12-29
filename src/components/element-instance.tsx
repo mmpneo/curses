@@ -1,7 +1,8 @@
 import { FC, memo } from "react";
 import root from 'react-shadow';
 import { useGetState } from "../frontend-services";
-import { Element_Image, Element_Text } from "../frontend-services/elements";
+import Element_Image from "../frontend-services/elements/image";
+import Element_Text from "../frontend-services/elements/text";
 import { ElementType } from "../frontend-services/schema/element";
 
 export const ElementInstance: FC<{ id: string; }> = memo(({ id }) => {

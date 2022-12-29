@@ -3,8 +3,10 @@ import Schema_STT, {STT_State}       from "./stt/schema";
 import Schema_Twitch, {Twitch_State} from "./twitch/schema";
 import Schema_VRC, {VRC_State}       from "./vrc/schema";
 import Schema_TTS, {TTS_State}       from "./tts/schema";
+import { nanoid } from "nanoid";
 
 export interface BackendState {
+  id: string;
   clientTheme: string;
   uiScale: number;
   shortcuts: {
@@ -39,6 +41,7 @@ const genServiceSchema = <T>(schema: JSONSchemaType<T>): JSONSchemaType<ServiceS
 export const backendSchema: JSONSchemaType<BackendState> = {
   type:       "object",
   properties: {
+    id: {type: "string", default: nanoid(42)},
     clientTheme: {type: "string", default: "night"},
     uiScale: {type: "number", default: 1},
     shortcuts:    {
@@ -64,5 +67,5 @@ export const backendSchema: JSONSchemaType<BackendState> = {
     }
   },
   additionalProperties: false,
-  required:   ["clientTheme", "services"]
+  required:   ["id", "uiScale", "clientTheme", "services"]
 }

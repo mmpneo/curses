@@ -1,23 +1,24 @@
+import NiceModal from "@ebay/nice-modal-react";
 import { useId } from "@floating-ui/react-dom-interactions";
 import classNames from "classnames/bind";
 import { FC, InputHTMLAttributes, memo, PropsWithChildren, ReactNode, useCallback, useEffect, useRef, useState } from "react";
-import Select, { MenuListProps, MenuProps, OptionProps, Props as SelectProps } from 'react-select';
-import { RgbaColorPicker, RgbaColor } from "react-colorful";
-import Dropdown from "../dropdown/Dropdown";
-import { FileState, FileType } from "../../frontend-services/files/schema";
-import FileElement from "../../frontend-services/components/file-element";
-import NiceModal from "@ebay/nice-modal-react";
+import { RgbaColor, RgbaColorPicker } from "react-colorful";
 import { RiUpload2Fill } from "react-icons/ri";
+import Select, { MenuListProps, MenuProps, OptionProps, Props as SelectProps } from 'react-select';
 import SimpleBar from "simplebar-react";
+import FileElement from "../../frontend-services/components/file-element";
+import { FileState, FileType } from "../../frontend-services/files/schema";
+import Dropdown from "../dropdown/Dropdown";
 
 // import "ace-builds/src-noconflict/mod";
 import AceEditor from "react-ace";
-import "ace-builds/src-noconflict/mode-css";
 import "ace-builds/src-noconflict/ext-language_tools";
+import "ace-builds/src-noconflict/mode-css";
 import "ace-builds/src-noconflict/theme-twilight";
 import { MappedGroupDictionary, ServiceNetworkState, TextEventSource } from "../../types";
 
-import styles from "./style.module.css"
+import { useSnapshot } from "valtio";
+import styles from "./style.module.css";
 const cx = classNames.bind(styles);
 
 interface InputBaseProps {
@@ -32,7 +33,7 @@ const Container: FC<PropsWithChildren<{ id?: string, vertical?: boolean, label: 
   </div>
 });
 
-const BaseText: FC<InputHTMLAttributes<HTMLInputElement>> = memo((props: any) => <input {...props} className={cx(styles.clearAppearance, "field-width input input-bordered overflow-hidden input-sm font-semibold leading-none appearance-none")} />);
+const BaseText: FC<InputHTMLAttributes<HTMLInputElement>> = memo((props: any) => <input {...props} className={cx(styles.clearAppearance, "field-width input input-bordered overflow-hidden input-sm font-semibold leading-none")} />);
 
 interface InputTextProps extends InputBaseProps, InputHTMLAttributes<HTMLInputElement> { }
 
@@ -403,4 +404,41 @@ const Code: FC<CodeProps> = memo(({ label, ...rest }) => {
   </Container>
 });
 
-export default { BaseText, Text, Chips, Range, Color, Select: NewSelect, MappedGroupSelect, Checkbox, File, Event, Code, TextSource, Container, DoubleCountainer, NetworkStatus };
+interface FontProps extends InputBaseProps {
+  value: string,
+  onChange: (value: string) => void
+}
+const FontSelectDropdown: FC<any> = memo(({ onChange, value }) => {
+  const [name, setName] = useState("");
+  const fonts = useSnapshot(window.APIFrontend.files.ui.fontFamilies)
+
+  const handleInstall = () => {
+    name && window.APIFrontend.files.installFont(name);
+  }
+
+  return <div className="flex flex-col space-y-2 bg-base-100 rounded-box p-4 w-64">
+    <span className="text-xs text-primary font-bold font-header">Installed</span>
+    <label className="flex justify-between items-center cursor-pointer">
+      <span className="label-text font-semibold" style={{fontFamily: "Outfit"}}>Outfit</span> 
+      <input type="radio" name="font" value={value} checked={value === "Outfit"} onChange={e => onChange("Outfit")} className="radio radio-primary" />
+    </label>
+    {fonts.map(font => <label key={font} className="flex justify-between items-center cursor-pointer">
+      <span className="label-text font-semibold" style={{fontFamily: font}}>{font}</span> 
+      <input type="radio" name="font" value={value} checked={value === font} onChange={e => onChange(font)} className="radio radio-primary" />
+    </label>)}
+    <div className="input-group w-full">
+      <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Font name" className="w-full input input-sm input-bordered" />
+      <button className="btn btn-sm btn-square" onClick={handleInstall}>+</button>
+    </div>
+    <span className="text-xs text-base-content/50">Find font at <a className="link link-primary link-hover font-medium" target="_blank" href="https://fonts.google.com/">Google Fonts</a> and copypaste it's name here</span>
+  </div>
+})
+const Font: FC<FontProps> = memo(({ label, ...rest }) => {
+  return <Dropdown targetOffset={24} placement="right" content={<FontSelectDropdown {...rest} />}>
+    <Container label={label}>
+      <button style={{fontFamily: rest.value || "inherit"}} className="btn btn-sm btn-primary btn-outline border-2 field-width">{rest.value || "Select font"}</button>
+    </Container>
+  </Dropdown>
+})
+
+export default { BaseText, Text, Chips, Range, Color, Font, Select: NewSelect, MappedGroupSelect, Checkbox, File, Event, Code, TextSource, Container, DoubleCountainer, NetworkStatus };

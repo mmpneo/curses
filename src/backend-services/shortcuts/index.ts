@@ -1,7 +1,7 @@
 import { IServiceInterface } from "../../types";
 import { register, unregisterAll } from "@tauri-apps/api/globalShortcut";
 import { subscribe } from "valtio";
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 class Service_Shortcuts implements IServiceInterface {
   async init() {
     if (window.platform === "web" || window.mode === "client") {

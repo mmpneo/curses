@@ -1,4 +1,3 @@
-import { values } from "lodash";
 import {
   SpeechConfig,
   SpeechSynthesisOutputFormat,
@@ -18,7 +17,7 @@ export class TTS_AzureService implements ITTSService {
   #isPlaying = false;
 
   start(state: TTS_State): void {
-    if (values(state.azure).some(isEmptyValue)) return this.bindings.onStop("Options missing");
+    if (Object.values(state.azure).some(isEmptyValue)) return this.bindings.onStop("Options missing");
 
     try {
       // const audioConfig                     = AudioConfig.fromSpeakerOutput(p);

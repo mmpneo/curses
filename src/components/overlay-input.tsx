@@ -54,7 +54,7 @@ const OverlayInput: FC<{ onClose: () => void }> = forwardRef(({ onClose }, ref: 
         onKeyDown={handleKey}
         autoComplete="false"
         spellCheck="false"
-        className="absolute inset-0 bg-transparent resize-none text-5xl pt-4 px-6 outline-none font-medium"
+        className="absolute font-header inset-0 bg-transparent resize-none text-5xl pt-4 px-6 outline-none font-medium focus:placeholder-base-content/10 placeholder-base-content/30"
         value={inputValue}
         onChange={e => handleChange(e.target.value)}></textarea>
       {/* <button className="absolute top-2 right-4 btn btn-xl btn-circle btn-primary text-2xl" onClick={onClose}><RiCloseFill /></button> */}

@@ -1,5 +1,4 @@
 import { invoke } from "@tauri-apps/api/tauri";
-import { values } from "lodash";
 import { isEmptyValue } from "../../../utils";
 import { TTS_State } from "../schema";
 import { ITTSService, TTSServiceEventBindings } from "../types";
@@ -15,7 +14,7 @@ export class TTS_WindowsService implements ITTSService {
   };
 
   start(state: TTS_State): void {
-    if (values(state.windows).some(isEmptyValue)) return this.bindings.onStop("Options missing");
+    if (Object.values(state.windows).some(isEmptyValue)) return this.bindings.onStop("Options missing");
     this.config = {
       device: state.windows.device,
       voice: state.windows.voice,

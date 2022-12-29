@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { AnimatePresence, motion } from "framer-motion";
 import { ButtonHTMLAttributes, FC, memo, PropsWithChildren, useEffect } from "react";
-import { RiAddFill, RiChatVoiceFill, RiFolderMusicFill, RiFontSize, RiImageFill, RiMessage2Fill, RiSettings2Fill, RiStackFill, RiTranslate2, RiTwitchFill, RiUserVoiceFill } from "react-icons/ri";
+import { RiAddFill, RiChatVoiceFill, RiFolderMusicFill, RiImageFill, RiMessage2Fill, RiSettings2Fill, RiTranslate2, RiTwitchFill, RiUserVoiceFill } from "react-icons/ri";
 import { TbArrowBarToLeft, TbArrowBarToRight, TbTextResize } from "react-icons/tb";
 import { useSnapshot } from "valtio";
 import { Services } from "../backend-services";
@@ -116,19 +116,18 @@ const Sidebar: FC = memo(() => {
         </button>
         <SideBarButton status={sttState.status} tab={{ tab: Services.stt }} tooltip="Speech to Text"><RiUserVoiceFill /></SideBarButton>
         <SideBarButton status={ttsState.status} tab={{ tab: Services.tts }} tooltip="Text to Speech"><RiChatVoiceFill /></SideBarButton>
-        <SideBarButton disabled tab={{ tab: Services.translation }} tooltip="Translation"><RiTranslate2 /></SideBarButton>
+        <SideBarButton disabled tab={{ tab: Services.translation }} tooltip="Translation\WIP"><RiTranslate2 /></SideBarButton>
         <SideBarButton tab={{ tab: Services.vrc }} tooltip="VRChat chatbox"><RiMessage2Fill /></SideBarButton>
         <SideBarButton tab={{ tab: Services.twitch }} tooltip="Twitch Integration"><RiTwitchFill /></SideBarButton>
         <SideBarButton tab={{ tab: "settings" }} tooltip="Settings & About"><RiSettings2Fill /></SideBarButton>
         <Divider />
-        <SideBarButton tab={{ tab: "scenes" }} tooltip="Canvas & Scenes"><RiStackFill /></SideBarButton>
+        {/* <SideBarButton tab={{ tab: "scenes" }} tooltip="Canvas & Scenes"><RiStackFill /></SideBarButton> */}
         <ElementList />
         <Dropdown placement="right" content={<AddElementsMenu />}>
           <SideBarButtonBase tooltip="Add element"><RiAddFill /></SideBarButtonBase>
         </Dropdown>
         <Divider />
         <SideBarButton tab={{ tab: "files" }} tooltip="Files"><RiFolderMusicFill /></SideBarButton>
-        <SideBarButtonBase tooltip="Fonts"><RiFontSize /></SideBarButtonBase>
       </motion.div>
     </div>
     <AnimatePresence initial={false}>

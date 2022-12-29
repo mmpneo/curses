@@ -42,9 +42,10 @@ export class PeerjsProvider {
     this.#peer?.destroy();
     this.#peer = undefined;
     setTimeout(() => {
-      console.log("[Client] Reset")
-      this.connectClient(netId);
-    }, 1000);
+      console.log("[Client] Reset");
+      location.reload();
+      // this.connectClient(netId);
+    }, 2000);
   }
 
   async internalConnectClient(netId: string, resolve: (v: any) => void, reject: (v: any) => void) {
@@ -74,11 +75,9 @@ export class PeerjsProvider {
   }
 
   async connectClient(netId: string) {
-    let resolve = (v: unknown) => {};
-    let reject = (v?: any) => {};
-    const p = new Promise((res, rej) => {resolve = res; reject = rej;})
-    this.internalConnectClient(netId, resolve, reject);
-    await p;
+    await new Promise((res, rej) => {
+      this.internalConnectClient(netId, res, rej);
+    })
   }
 
   dispose() {

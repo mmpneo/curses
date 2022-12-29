@@ -5,14 +5,81 @@ import { GetArrayDiff } from "../../utils";
 import { createDocumentFile, FileState, FileType } from "./schema";
 import { fileOpen } from "browser-fs-access";
 import { nanoid } from "nanoid";
+import groupBy from "lodash/groupBy";
+import { toast } from "react-toastify";
+
+export interface GoogleFont {
+  category: string
+  family: string
+  files: {
+    [fontType: string]: string // file url
+  }
+  kind: string[]
+  lastModified: string
+  subsets: string[]
+  variants: string[]
+  version: string
+}
+type FontMeta = {
+  family: string,
+  weight: string,
+  style: string
+}
 
 type SaveFile = Omit<FileState, "id" | "size">;
 
 class Service_Files implements IServiceInterface {
+  private fontsList: GoogleFont[] = [];
   public readonly fileUrls = proxy<{ [id: string]: string }>({});
   public readonly ui = proxy<{ fontFamilies: string[] }>({
     fontFamilies: [],
   });
+
+  async init() {
+    if (window.mode === "host")
+      this.loadFonts();
+    this.#yFilesMeta.observe(() => this.#updateTrackedBlobs());
+    this.#updateTrackedBlobs();
+  }
+
+  async loadFonts() {
+    try {
+      const resp = await fetch('https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyAMzuma_Br9ULWKG2O8c2OolXt9R5Z0NJc');
+      const data = await resp.json() as {items: GoogleFont[]};
+      this.fontsList = data.items;
+    } catch (error) {}
+  }
+
+  public async installFont(fontName: string) {
+    const font = this.fontsList.find(f => f.family === fontName);
+    if (!font)
+      return;
+    const variantList = font.variants.filter(variant => !variant.includes("italic"))
+    const buffersPromise = Promise.all(variantList.map(fileKey => fetch(font.files[fileKey].replace("http://", "https://"))))
+      .then(resp => Promise.all(resp.map(r => r.arrayBuffer())))
+      .then(buffers => {
+        const variants = variantList.map(variant => ({
+          family: font.family,
+          weight: (variant === "regular" || variant === "italic") ? "400" : variant.replace("italic", ""),
+          style: variant.includes("italic") ? "italic" : "normal",
+        }));
+        this.installFonts(variants, buffers.map(b => new Uint8Array(b)));
+      });
+    toast.promise(buffersPromise, {
+      pending: "Installing font",
+      success: `Installed ${fontName}`,
+      error: `Error installing ${fontName}`
+    });
+  }
+
+  installFonts(fonts: FontMeta[], files: Uint8Array[]) {
+    const meta: SaveFile[] = fonts.map(f => ({
+      type: "font/ttf",
+      name: f.family,
+      meta: f
+    }));
+    this.#saveFiles(meta, files);
+  }
 
   getFileUrl(fileId: string): string | undefined {
     return this.fileUrls[fileId];
@@ -36,11 +103,6 @@ class Service_Files implements IServiceInterface {
     return this.#yFilesBinary.get(i);
   }
 
-  async init() {
-    this.#yFilesMeta.observe(() => this.#updateTrackedBlobs());
-    this.#updateTrackedBlobs();
-  }
-
   #updateTrackedBlobs() {
     const filesMeta = this.#filesMeta;
 
@@ -55,6 +117,19 @@ class Service_Files implements IServiceInterface {
       const rawFile = window.APIFrontend.document.fileArray.get(metaIndex);
       const blob = new Blob([rawFile], { type: meta.type });
       this.fileUrls[id] = URL.createObjectURL(blob);
+
+      if (meta.type.startsWith("font/")) {
+        if (!meta.meta)
+          continue;
+        const fontMeta: FontMeta = meta.meta as FontMeta;
+
+        if (!this.ui.fontFamilies.includes(fontMeta.family))
+          this.ui.fontFamilies.push(fontMeta.family);
+
+        new FontFace(fontMeta.family, rawFile, fontMeta).load().then(font => {
+          document.fonts.add(font);
+        });
+      }
     }
 
     for (let id of remove) {

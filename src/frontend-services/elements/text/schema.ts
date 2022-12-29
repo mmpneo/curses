@@ -16,18 +16,18 @@ export enum FlexAlign {
 export type Element_TextState = {
   previewMode: boolean;
   // text
-  textFontSize: number;
+  textFontSize: string;
   textFontFamily: string;
-  textFontWeight: number;
+  textFontWeight: string;
   textCase: FontCase;
-  textLineHeight: number;
+  textLineHeight: string;
   textColor: string;
   textColorInterim: string;
-  textShadowX: number;
-  textShadowY: number;
-  textShadowZ: number;
+  textShadowX: string;
+  textShadowY: string;
+  textShadowZ: string;
   textShadowColor: string;
-  textStroke: number;
+  textStroke: string;
   textStrokeColor: string;
   textAlignH: FlexAlign;
   textAlignV: FlexAlign;
@@ -42,8 +42,8 @@ export type Element_TextState = {
   boxAutoHeight: boolean;
   boxAlignH: FlexAlign;
   boxAlignV: FlexAlign;
-  boxBorderRadius: number;
-  boxBorderWidth: number;
+  boxBorderRadius: string;
+  boxBorderWidth: string;
   boxBorderColor: string;
 
   //animation
@@ -83,33 +83,33 @@ export const Element_TextStateSchema: JSONSchemaType<Element_TextState> = {
   type: "object",
   properties: {
     previewMode: { type: "boolean", default: false },
-    textFontSize: { type: "number", default: 18 },
+    textFontSize: { type: "string", default: "22" },
     textFontFamily: { type: "string", default: "Inter" },
-    textFontWeight: { type: "number", default: 500 },
+    textFontWeight: { type: "string", default: "500" },
     textCase: { type: "string", default: FontCase.inherit },
-    textLineHeight: { type: "number", default: 1 },
-    textColor: { type: "string", default: "rgb(255,255,255)" },
-    textColorInterim: { type: "string", default: "rgb(255,255,255)" },
-    textShadowX: {type: "number", default: 0},
-    textShadowY: {type: "number", default: 0},
-    textShadowZ: {type: "number", default: 0},
-    textShadowColor: {type: "string", default: "rgb(0,0,0,0.5)"},
-    textStroke: { type: "number", default: 0 },
-    textStrokeColor: { type: "string", default: "rgb(255,255,255)" },
+    textLineHeight: { type: "string", default: "1.2" },
+    textColor: { type: "string", default: "rgba(255,255,255,1)" },
+    textColorInterim: { type: "string", default: "rgba(255,255,255,1)" },
+    textShadowX: {type: "string", default: "0"},
+    textShadowY: {type: "string", default: "0"},
+    textShadowZ: {type: "string", default: "0"},
+    textShadowColor: {type: "string", default: "rgba(0,0,0,0.5)"},
+    textStroke: { type: "string", default: "0" },
+    textStrokeColor: { type: "string", default: "rgba(255,255,255,0)" },
     textAlignH: { type: "string", default: FlexAlign.start },
     textAlignV: { type: "string", default: FlexAlign.start },
     textProfanityMask: { type: "string", default: "[redacted ]" },
-    textProfanityColor: { type: "string", default: "rgb(255,255,255)" },
-    textProfanityInterimColor: { type: "string", default: "rgb(255,255,255)" },
-    boxColor: { type: "string", default: "rgb(0,0,0,0.5)" },
+    textProfanityColor: { type: "string", default: "rgba(255,255,255,1)" },
+    textProfanityInterimColor: { type: "string", default: "rgba(255,255,255,1)" },
+    boxColor: { type: "string", default: "rgba(0,0,0,0.5)" },
     boxPadding: { type: "number", default: 10 },
     boxAutoWidth: { type: "boolean", default: false },
     boxAutoHeight: { type: "boolean", default: true },
     boxAlignH: { type: "string", default: FlexAlign.center },
     boxAlignV: { type: "string", default: FlexAlign.end },
-    boxBorderRadius: { type: "number", default: 5 },
-    boxBorderWidth: { type: "number", default: 0 },
-    boxBorderColor: { type: "string", default: "rgb(0,0,0)" },
+    boxBorderRadius: { type: "string", default: "5" },
+    boxBorderWidth: { type: "string", default: "0" },
+    boxBorderColor: { type: "string", default: "rgba(0,0,0,0)" },
     animateEnable: { type: "boolean", default: false },
     animateDelayChar: { type: "number", default: 100 },
     animateDelayWord: { type: "number", default: 100 },

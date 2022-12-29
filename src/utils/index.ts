@@ -1,4 +1,4 @@
-import { difference } from "lodash";
+import difference from "lodash/difference";
 import { subscribeKey } from "valtio/utils";
 import { TextEvent, TextEventSource, TextEventType } from "../types";
 

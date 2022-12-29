@@ -9,6 +9,7 @@ import React from "react";
 import { invoke } from "@tauri-apps/api/tauri";
 
 type NetworkConfiguration = {
+  id?: string
   localIp: string,
   host: string,
   port: string
@@ -42,7 +43,7 @@ window.API = new Backend();
 window.APIFrontend = new Frontend();
 
 async function buildNetworkConfiguration() {
-  
+  // only host
   if (window.platform === "app") {
     const appConfig = await invoke<any>("plugin:web|config");
     console.log(appConfig);
@@ -54,29 +55,29 @@ async function buildNetworkConfiguration() {
   }
   else {
     const q = new URLSearchParams(window.location.search.substring(1));
+    const qHostId = q.has("id") ? q.get("id") : null;
     const qHost = q.has("host") ? q.get("host") : null;
     const qPort = q.has("port") ? q.get("port") : null;
     window.networkConfiguration = {
       localIp: "",
+      id: qHostId ?? "",
       host: qHost ?? location.hostname,
       port: qPort ?? location.port
     }
+    console.log(window.networkConfiguration)
   }
 }
+
+const LazyEditor = React.lazy(() => import("./components/editor-view"));
+
 buildNetworkConfiguration()
-  .then(() => {
-    Promise.all([
-      window.API.init(),
-      window.APIFrontend.init()
-    ]).then(() => {
-      if (window.mode === "client")
-        ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(<ClientView />);
-      else
-        ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-          // <React.StrictMode>
-            <EditorView />
-          // </React.StrictMode>
-        );
-    });
+  .then(async () => {
+    await window.API.init(),
+    await window.APIFrontend.init()
+  }).then(() => {
+    if (window.mode === "client")
+      ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(<ClientView/>);
+    else
+      ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(<LazyEditor/>);
   })
 

@@ -1,4 +1,4 @@
-import { createContext, FC, memo, PropsWithChildren, useContext, useRef, useState } from "react";
+import { createContext, FC, memo, PropsWithChildren, ReactNode, useContext, useRef, useState } from "react";
 import { useSnapshot } from "valtio";
 import { RiFontSize, RiMusic2Fill, RiPauseMiniFill, RiPlayFill } from "react-icons/ri";
 import { FileState } from "../files/schema";
@@ -25,22 +25,28 @@ export const FilePicker: FC = () => {
   </div>
 }
 
+const FileTemplate: FC<PropsWithChildren<{name?: string, desc?: ReactNode, actions?: ReactNode}>> = ({children, name, desc, actions}) => {
+  return <div className="flex space-x-2">
+  <div className="text-base-content p-2 flex-none relative border-2 border-primary/10 border-dashed bg-base-100 rounded-lg w-14 h-14 flex items-center justify-center overflow-hidden">
+    {children}
+  </div>
+  <div className="flex flex-col overflow-hidden text-sm">
+    <span className="font-bold text-ellipsis whitespace-nowrap overflow-hidden">{name}</span>
+    <span className="text-xs opacity-50">{desc}</span>
+    <span className="flex space-x-2 font-semibold">
+      {actions}
+    </span>
+  </div>
+</div>
+}
+
 const FileContainer: FC<PropsWithChildren> = memo(({ children }) => {
   const file = useContext(fileCtx);
-  return <div className="flex space-x-2">
-    <div className="text-base-content p-2 flex-none relative border-2 border-primary/10 border-dashed bg-base-100 rounded-lg w-14 h-14 flex items-center justify-center overflow-hidden">
-      {children}
-    </div>
-    <div className="flex flex-col overflow-hidden text-sm">
-      <span className="font-bold text-ellipsis whitespace-nowrap overflow-hidden">{file?.data.name}</span>
-      <span className="text-xs opacity-50">{file?.data.type} • {formatBytes(file!.data.size)}</span>
-      {/* <span className="font-medium opacity-50 text-xs">{formatBytes(file!.data.size)}</span> */}
-
-      <span className="flex space-x-2 font-semibold">
-        {file?.actions?.map((action, i) => <span key={i} className="link link-hover link-primary" onClick={() => action.fn(file?.data.id)}>{action.label}</span>)}
-      </span>
-    </div>
-  </div>
+  return <FileTemplate 
+    name={file?.data.name}
+    desc={<>{file?.data.type} • {formatBytes(file!.data.size)}</>}
+    actions={file?.actions?.map((action, i) => <span key={i} className="link link-hover link-primary" onClick={() => action.fn(file?.data.id)}>{action.label}</span>)}
+    >{children}</FileTemplate>
 });
 
 
@@ -113,6 +119,20 @@ const FileImage: FC = () => {
 const FileFont: FC = () => {
   return <RiFontSize size={48} />
 }
+
+
+export type FontGroupProps = {
+  name: string;
+  count: number;
+  size: number;
+}
+export const FontGroup: FC<{data: FontGroupProps}> = memo(({data}) => {
+  return <FileTemplate 
+  name={data.name}
+  desc={formatBytes(data.size)}
+  actions={<span className="link link-hover link-primary" onClick={() => {}}>Uninstall font</span>}
+  ><FileFont /></FileTemplate>
+})
 
 const FileElement: FC<FileProps> = (props) => {
   return <fileCtx.Provider value={props}>

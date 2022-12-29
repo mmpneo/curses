@@ -5,8 +5,7 @@ import { FC, memo, PropsWithChildren, useCallback, useEffect, useRef, useState }
 import { useMeasure, useTimeoutFn } from "react-use";
 import { useGetState } from "../..";
 import { TextEvent, TextEventSource, TextEventType } from "../../../types";
-import Inspector_ElementText from "./inspector";
-import { Element_TextState, Element_TextStateSchema } from "./schema";
+import { Element_TextState } from "./schema";
 import TextSentence, { sentenceCtx, TextSentenceData, TextSentenceTest } from "./sentence";
 import { elementStyle } from "./style";
 
@@ -252,5 +251,4 @@ const BoxElement: FC<PropsWithChildren<any>> = memo(({ children, ...boxProps }) 
     </span>
   </div>
 })
-export { Inspector_ElementText, Element_TextStateSchema }
 export default Element_Text;

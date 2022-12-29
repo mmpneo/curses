@@ -51,10 +51,11 @@ class Backend {
       expand: false
     },
   });
-  changeTab(v: InspectorTabPath) {
+  changeTab(v?: InspectorTabPath) {
     const sidebar = window.API.ui.sidebarState;
-    if (sidebar.tab?.tab === v.tab && sidebar.tab.value === v.value && sidebar.show) {
+    if (sidebar.tab?.tab === v?.tab && sidebar.tab?.value === v?.value && sidebar.show) {
       sidebar.show = false; // close tab
+      sidebar.tab = undefined;
       return;
     }
     sidebar.tab = v; // close tab
@@ -82,15 +83,16 @@ class Backend {
   async setupObsScene({name, port, password}: {name: string, port: string, password: string}) {
     const obs = new OBSWebSocket();
     try {
-      await obs.connect(`ws://127.0.0.1:${4455}`, password);
+      const { host: nHost, port: nPort } = window.networkConfiguration;
+      await obs.connect(`ws://127.0.0.1:${port}`, password);
       const activeScene = await obs.call("GetCurrentProgramScene")
-      const canvas = window.APIFrontend.document.fileBinder.get().canvas
+      const canvas = window.APIFrontend.document.fileBinder.get().canvas;
       await obs.call("CreateInput", {
         sceneName: activeScene.currentProgramSceneName,
         inputName: name,
         inputKind: "browser_source",
         inputSettings: {
-          url: "http://localhost:1420/client?port=3030",
+          url: window.APIFrontend.network.getClientLink(),
           width: canvas.w,
           height: canvas.h,
         }

@@ -3,8 +3,7 @@ import { FC, memo, useCallback, useEffect, useRef, useState } from "react";
 import { useEffectOnce } from "react-use";
 import { useGetState } from "../..";
 import { StyleToEventController } from "../utils";
-import Inspector_ElementImage from "./inspector";
-import { Element_ImageState, Element_ImageStateSchema } from "./schema";
+import { Element_ImageState } from "./schema";
 
 const Element_Image: FC<{ id: string }> = memo(({ id }) => {
   const state: Element_ImageState = useGetState(state => state.elements[id].scenes["main"].data);
@@ -68,5 +67,4 @@ const Element_Image: FC<{ id: string }> = memo(({ id }) => {
   </>
 });
 
-export { Inspector_ElementImage, Element_ImageStateSchema };
 export default Element_Image;

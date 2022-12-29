@@ -8,8 +8,8 @@ import Inspector_Translation from "../../backend-services/translation/inspector"
 import Inspector_TTS from "../../backend-services/tts/inspector";
 import Inspector_Twitch from "../../backend-services/twitch/inspector";
 import Inspector_VRC from "../../backend-services/vrc/inspector";
-import { Inspector_ElementImage } from "../../frontend-services/elements/image";
-import { Inspector_ElementText } from "../../frontend-services/elements/text";
+import Inspector_ElementImage from "../../frontend-services/elements/image/inspector";
+import Inspector_ElementText from "../../frontend-services/elements/text/inspector";
 import Inspector_Files from "../../frontend-services/files/inspector";
 import { ElementType } from "../../frontend-services/schema/element";
 import { InspectorTabPath } from "../../types";
@@ -49,14 +49,14 @@ const Header: FC<PropsWithChildren> = memo(({ children }) => {
 })
 
 const SubHeader: FC<PropsWithChildren> = ({ children }) => {
-  return <span className="pt-4">
+  return <span className="first:pt-0 pt-4">
     <span className="flex font-header font-bold text-primary justify-between items-center gap-2 whitespace-nowrap">{children}</span>
   </span>
 }
 
 const Description: FC<PropsWithChildren> = ({ children }) => {
   return <span>
-    <span className="-mt-2 text-xs text-base-content/60 flex justify-between items-center gap-2">{children}</span>
+    <span className="-mt-2 text-xs text-base-content/70 flex justify-between items-center gap-2">{children}</span>
   </span>
 }
 

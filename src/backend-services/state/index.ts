@@ -1,6 +1,7 @@
 import { BaseDirectory, createDir, exists, readBinaryFile, writeBinaryFile } from "@tauri-apps/api/fs";
 import Ajv from "ajv";
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
+import { nanoid } from "nanoid";
 import { proxy, subscribe } from "valtio";
 import { IServiceInterface } from "../../types";
 import { backendSchema, BackendState } from "../schema";
@@ -20,15 +21,13 @@ class Service_State implements IServiceInterface {
 
     let data = await this.#load_state();
     const hasData = !!data;
+    // creat new state
     if (!hasData) {
       data = {};
     }
     validate(data);
     this.state = proxy<BackendState>(data as BackendState);
-    console.log("loaded state", data);
-
     !hasData && this.#save_state();
-
     subscribe(this.state, () => this.#save_state());
   }
 
@@ -42,7 +41,7 @@ class Service_State implements IServiceInterface {
     }
   }
 
-  async #load_state(): Promise<object | undefined> {
+  async #load_state(): Promise<Record<string, any> | undefined> {
     if (window.platform === "app") {
       var decoder = new TextDecoder();
       const fileExists = await exists("user/settings", {dir: BaseDirectory.AppData});
@@ -56,7 +55,7 @@ class Service_State implements IServiceInterface {
       }
     }
 
-    // web localstorage
+    // todo better web state
     let str = localStorage.getItem("backendState");
     return this.tryParseState(str);
   }

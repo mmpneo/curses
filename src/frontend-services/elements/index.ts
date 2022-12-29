@@ -2,9 +2,10 @@ import { IServiceInterface } from "../../types";
 import { nanoid } from "nanoid";
 import { ElementState, ElementType } from "../schema/element";
 import Element_Image from "./image";
-import Element_Text, { Element_TextStateSchema } from "./text";
+import Element_Text from "./text";
 import Ajv from "ajv";
 import { Element_ImageStateSchema } from "./image/schema";
+import { Element_TextStateSchema } from "./text/schema";
 
 class Service_Elements implements IServiceInterface {
   #ajv!: Ajv;
@@ -43,7 +44,6 @@ class Service_Elements implements IServiceInterface {
     if (type === ElementType.text) {
       const validator = this.#ajv.compile(Element_TextStateSchema);
       validator(data);
-      console.log(data);
     }
 
     window.APIFrontend.document.patch((state) => {
@@ -64,6 +64,8 @@ class Service_Elements implements IServiceInterface {
   }
 
   removeElement(id: string) {
+    if (window.API.ui.sidebarState.tab?.value === id)
+      window.API.changeTab()
     window.APIFrontend.document.patch((state) => {
       if (!state.elements[id]) return;
       const index = state.elementsIds.indexOf(id);
@@ -73,5 +75,4 @@ class Service_Elements implements IServiceInterface {
   }
 }
 
-export { Element_Image, Element_Text };
 export default Service_Elements;

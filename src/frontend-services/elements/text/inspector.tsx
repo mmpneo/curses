@@ -44,28 +44,28 @@ const TextInspector: FC<{ id: string }> = ({ id }) => {
     <Input.Color label="Interim Color" value={data.textColorInterim} onChange={e => up("textColorInterim", e)} />
     <Input.Color label="Profanity Color" value={data.textProfanityColor} onChange={e => up("textProfanityColor", e)} />
     <Input.Color label="Profanity interim" value={data.textProfanityInterimColor} onChange={e => up("textProfanityInterimColor", e)} />
-    <Input.Text label="Size" type="number" value={data.textFontSize} onChange={e => up("textFontSize", parseFloat(e.target.value))} />
-    <Input.Text label="Family" value={data.textFontFamily} onChange={e => up("textFontFamily", e.target.value)} />
-    <Input.Range label="Weight" step="100" min="100" max="900" value={data.textFontWeight} onChange={e => up("textFontWeight", parseFloat(e.target.value))} />
+    <Input.Text label="Size" type="number" value={data.textFontSize} onChange={e => up("textFontSize", e.target.value)} />
+    <Input.Font label="Family" value={data.textFontFamily} onChange={value => up("textFontFamily", value)} />
+    <Input.Range label="Weight" step="100" min="100" max="900" value={data.textFontWeight} onChange={e => up("textFontWeight", e.target.value)} />
     <Input.Chips options={[
       { label: "aa", value: FontCase.lowercase },
       { label: "AA", value: FontCase.uppercase },
       { label: "-", value: FontCase.inherit },
     ]} label="Case" value={data.textCase} onChange={e => up("textCase", e as FontCase)} />
-    <Input.Text label="Line Height" type="number" value={data.textLineHeight} onChange={e => up("textLineHeight", parseFloat(e.target.value))} />
+    <Input.Text label="Line Height" step="0.1" type="number" value={data.textLineHeight} onChange={e => up("textLineHeight", e.target.value)} />
 
     {/* <Inspector.SubHeader>Font Color</Inspector.SubHeader> */}
 
     <Inspector.SubHeader>Shadow</Inspector.SubHeader>
     <Input.DoubleCountainer label="Position">
-      <Input.BaseText value={data.textShadowX} onChange={e => up("textShadowX", parseFloat(e.target.value))} type="number" />
-      <Input.BaseText value={data.textShadowY} onChange={e => up("textShadowY", parseFloat(e.target.value))} type="number" />
+      <Input.BaseText value={data.textShadowX} onChange={e => up("textShadowX", e.target.value)} type="number" />
+      <Input.BaseText value={data.textShadowY} onChange={e => up("textShadowY", e.target.value)} type="number" />
     </Input.DoubleCountainer>
-    <Input.Text label="Blur" type="number" value={data.textShadowZ} onChange={e => up("textShadowZ", parseFloat(e.target.value))} />
+    <Input.Text label="Blur" type="number" value={data.textShadowZ} onChange={e => up("textShadowZ", e.target.value)} />
     <Input.Color label="Color" value={data.textShadowColor} onChange={e => up("textShadowColor", e)} />
 
     <Inspector.SubHeader>Outline</Inspector.SubHeader>
-    <Input.Text label="Size" min="0" step="0.05" type="number" value={data.textStroke} onChange={e => up("textStroke", parseFloat(e.target.value))} />
+    <Input.Text label="Size" min="0" step="0.05" type="number" value={data.textStroke} onChange={e => up("textStroke", e.target.value)} />
     <Input.Color label="Color" value={data.textStrokeColor} onChange={e => up("textStrokeColor", e)} />
 
     <Inspector.SubHeader>Align</Inspector.SubHeader>
@@ -95,8 +95,8 @@ const BoxInspector: FC<{ id: string }> = ({ id }) => {
     <Input.Checkbox label="Auto width" value={data.boxAutoWidth} onChange={e => up("boxAutoWidth", e)} />
     <Input.Checkbox label="Auto height" value={data.boxAutoHeight} onChange={e => up("boxAutoHeight", e)} />
     <Inspector.SubHeader>Border</Inspector.SubHeader>
-    <Input.Text label="Radius" min="0" step="0.05" type="number" value={data.boxBorderRadius} onChange={e => up("boxBorderRadius", parseFloat(e.target.value))} />
-    <Input.Text label="Width" min="0" step="0.05" type="number" value={data.boxBorderWidth} onChange={e => up("boxBorderWidth", parseFloat(e.target.value))} />
+    <Input.Text label="Radius" min="0" step="0.05" type="number" value={data.boxBorderRadius} onChange={e => up("boxBorderRadius", e.target.value)} />
+    <Input.Text label="Width" min="0" step="0.05" type="number" value={data.boxBorderWidth} onChange={e => up("boxBorderWidth", e.target.value)} />
     <Input.Color label="Color" value={data.boxBorderColor} onChange={e => up("boxBorderColor", e)} />
 
     <Inspector.SubHeader>Align</Inspector.SubHeader>
@@ -132,9 +132,9 @@ const BehaviourInspector: FC<{ id: string }> = ({ id }) => {
     <Input.Checkbox label="Enable animation" value={data.animateEnable} onChange={e => up("animateEnable", e)} />
     <Inspector.Switchable visible={data.animateEnable}>
       <Inspector.Description>Animation interval</Inspector.Description>
-      <Input.Text label="Characters" type="number" value={data.animateDelayChar} onChange={e => up("animateDelayChar", parseFloat(e.target.value))} />
-      <Input.Text label="Words" type="number" value={data.animateDelayWord} onChange={e => up("animateDelayWord", parseFloat(e.target.value))} />
-      <Input.Text label="Sentences" type="number" value={data.animateDelaySentence} onChange={e => up("animateDelaySentence", parseFloat(e.target.value))} />
+      <Input.Text label="Characters" type="number" value={data.animateDelayChar} onChange={e => up("animateDelayChar", parseFloat(e.target.value) || 0)} />
+      <Input.Text label="Words" type="number" value={data.animateDelayWord} onChange={e => up("animateDelayWord", parseFloat(e.target.value) || 0)} />
+      <Input.Text label="Sentences" type="number" value={data.animateDelaySentence} onChange={e => up("animateDelaySentence", parseFloat(e.target.value) || 0)} />
     </Inspector.Switchable>
     <Input.Checkbox label="Emit event" value={data.animateEvent} onChange={e => up("animateEvent", e)} />
     {data.animateEvent && <Input.Container label="Copy event css">
@@ -144,8 +144,8 @@ const BehaviourInspector: FC<{ id: string }> = ({ id }) => {
     {/* <Input.Checkbox label="Animate scroll" value={data.animateScroll} onChange={e => up("animateScroll", e)} /> */}
 
     <Inspector.SubHeader>Clean up</Inspector.SubHeader>
-    <Input.Text label="Clear text after" type="number" value={data.behaviorClearTimer} onChange={e => up("behaviorClearTimer", parseFloat(e.target.value))} />
-    <Input.Text label="Clear animation delay" type="number" value={data.behaviorClearDelay} onChange={e => up("behaviorClearDelay", parseFloat(e.target.value))} />
+    <Input.Text label="Clear text after" type="number" value={data.behaviorClearTimer} onChange={e => up("behaviorClearTimer", parseFloat(e.target.value) || 0)} />
+    <Input.Text label="Clear animation delay" type="number" value={data.behaviorClearDelay} onChange={e => up("behaviorClearDelay", parseFloat(e.target.value) || 0)} />
     <Input.Checkbox label="Show only one sentence" value={data.behaviorLastSentence} onChange={e => up("behaviorLastSentence", e)} />
     <Input.Checkbox label="Break line" value={data.behaviorBreakLine} onChange={e => up("behaviorBreakLine", e)} />
   </>

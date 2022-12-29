@@ -10,7 +10,7 @@ import {
 import { bind, Binder } from "immer-yjs";
 import { toast } from "react-toastify";
 import { createDocumentState, documentSchema, DocumentState } from "../schema";
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 import Ajv from "ajv";
 
 class Service_Document implements IServiceInterface {

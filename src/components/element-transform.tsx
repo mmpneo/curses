@@ -5,21 +5,6 @@ import { useSnapshot } from "valtio";
 import { useGetState, useUpdateState } from "../frontend-services";
 import { ElementInstance } from "./element-instance";
 
-export const ElementSimpleTransform: FC<{ id: string }> = memo(({ id }) => {
-  const rect = useGetState(state => state.elements[id].scenes["main"].rect);
-  return <div
-    className="absolute"
-    style={{
-      width: rect?.w || 100,
-      height: rect?.h || 100,
-      left: rect?.x || 100,
-      top: rect?.y || 100,
-    }}
-  >
-    <ElementInstance id={id} />
-  </div>
-});
-
 const Knob: FC<{ className: string }> = ({ className }) => {
   return <div className={classNames("absolute rounded-full bg-primary w-2 h-2", className)}></div>
 }

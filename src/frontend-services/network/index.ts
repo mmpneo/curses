@@ -12,12 +12,24 @@ class Service_Network implements IServiceInterface {
     active: false,
   });
 
+  getClientLink(): string {
+    const n = window.networkConfiguration;
+    return `${n.host}:${n.port}/client?id=${window.API.state.id}`;
+  }
+  copyClientLink() {
+    navigator.clipboard.writeText(window.APIFrontend.network.getClientLink());
+  }
+
   async init() {
     this.#initializePeer();
+    const tHost = window.networkConfiguration.id;
     if (window.mode === "client")
-      await this.#provider?.connectClient("local");
+      if (tHost)
+        await this.#provider?.connectClient(tHost);
+      else 
+        throw Error("Invalid host id");
     else
-      this.#provider?.connectHost("local");
+      this.#provider?.connectHost(window.API.state.id);
   }
 
   #initializePeer() {

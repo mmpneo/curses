@@ -1,5 +1,4 @@
-import classNames from "classnames";
-import { createContext, FC, memo, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createContext, FC, memo, useCallback, useContext, useEffect, useLayoutEffect, useRef } from "react";
 import { TextEvent } from "../../../types";
 import { Element_TextState } from "./schema";
 

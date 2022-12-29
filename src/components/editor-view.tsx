@@ -27,14 +27,13 @@ const EditorView: FC = () => {
       <AnimatePresence>
         {fullscreenInput && <OverlayInput onClose={() => window.API.ui.fullscreenInput = false} />}
       </AnimatePresence>
-      <ToastContainer theme="dark" transition={Zoom} />
+      <ToastContainer hideProgressBar theme="dark" transition={Zoom} />
     </NiceModal.Provider>
   </div>
 }
 
 export const EditorViewport: FC = () => {
   const [[x, y], setTranslate] = useState([0, 0]);
-  const { fullscreenInput } = useSnapshot(window.API.ui);
 
   const handleStartPan = (e: any) => {
     const onUp = () => {
