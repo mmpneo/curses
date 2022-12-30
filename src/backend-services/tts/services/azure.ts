@@ -30,8 +30,6 @@ export class TTS_AzureService implements ITTSService {
       speechConfig.speechSynthesisOutputFormat = SpeechSynthesisOutputFormat.Audio48Khz192KBitRateMonoMp3;
       this.#instance = new SpeechSynthesizer(speechConfig, null as any);
 
-      this.#instance.synthesisCompleted = (v,a) => console.log(v,a);
-
       this.bindings.onStart();
     } catch (error: any) {
       console.log(error);

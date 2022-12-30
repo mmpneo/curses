@@ -1,7 +1,6 @@
 import { BaseDirectory, createDir, exists, readBinaryFile, writeBinaryFile } from "@tauri-apps/api/fs";
 import Ajv from "ajv";
 import debounce from "lodash/debounce";
-import { nanoid } from "nanoid";
 import { proxy, subscribe } from "valtio";
 import { IServiceInterface } from "../../types";
 import { backendSchema, BackendState } from "../schema";
@@ -67,7 +66,6 @@ class Service_State implements IServiceInterface {
       if (!bExists)
         await createDir("user", { dir: BaseDirectory.AppData, recursive: true });
       const value = JSON.stringify(this.state);
-      console.log("save", value)
       await writeBinaryFile("user/settings", encoder.encode(value), {dir: BaseDirectory.AppData});
     }
     else {

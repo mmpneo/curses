@@ -36,7 +36,6 @@ class Service_PubSub implements IServiceInterface {
   });
 
   private consumePubSubMessage(stringEvent: string) {
-    console.log(stringEvent)
     if (typeof stringEvent === "string") try {
       const {topic, data}: BaseEvent = JSON.parse(stringEvent);
       if (typeof data !== "object")
@@ -135,8 +134,9 @@ class Service_PubSub implements IServiceInterface {
     toast.success("Copied!");
   }
 
-  linkConnect(fullAddress: string) {
+  linkConnect() {
     const ipValidator = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]):[0-9]+$/;
+    const fullAddress = window.API.state.linkAddress; 
     if (!fullAddress.match(ipValidator))
       return;
     
@@ -147,13 +147,13 @@ class Service_PubSub implements IServiceInterface {
       return;
     }
 
-    this.#socket = new WebSocket(`ws://${fullAddress}/pubsub?id=${window.API.state.id}-${Date.now()}`);
+    this.serviceState.state = ServiceNetworkState.connecting;
+    this.#socket = new WebSocket(`ws://192.168.0.120:3030/pubsub?id=${window.API.state.id}-${Date.now()}`);
     this.#socket.onopen = () => {
       this.serviceState.state = ServiceNetworkState.connected;
       if (!this.#socket)
         return;
       this.#socket.onmessage = (msg) => {
-        console.log(msg);
         return this.consumePubSubMessage(msg.data);
       };
     };

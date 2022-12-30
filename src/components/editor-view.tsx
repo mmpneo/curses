@@ -1,6 +1,6 @@
 import NiceModal from "@ebay/nice-modal-react";
 import { FC, FormEvent, useState } from "react";
-import { ToastContainer, Zoom } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.min.css';
 import { TextEventSource, TextEventType } from "../types";
 import Canvas from "./canvas";
@@ -13,23 +13,29 @@ import "./file-modal";
 import OverlayInput from "./overlay-input";
 
 const EditorView: FC = () => {
-  const { fullscreenInput } = useSnapshot(window.API.ui);
-  return <div className="relative bg-base-200 w-screen h-screen flex overflow-hidden">
-    <NiceModal.Provider>
-      <Sidebar />
-      <div className="relative flex flex-col w-full h-full">
-        <ActionBar />
-        <EditorViewport />
-        <AnimatePresence initial={false}>
-          {!fullscreenInput && <div className="absolute self-center bottom-4"><STTInput /></div>}
+  const { showOverlay } = useSnapshot(window.API.state);
+  return <AnimatePresence>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.97 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ ease: "anticipate", duration: .7}}
+      className="relative bg-base-200 w-screen h-screen flex overflow-hidden">
+      <NiceModal.Provider>
+        <Sidebar />
+        <div className="relative flex flex-col w-full h-full">
+          <ActionBar />
+          <EditorViewport />
+          <AnimatePresence initial={false}>
+            {!showOverlay && <div className="absolute self-center bottom-4"><STTInput /></div>}
+          </AnimatePresence>
+        </div>
+        <AnimatePresence>
+          {showOverlay && <OverlayInput onClose={() => window.API.state.showOverlay = false} />}
         </AnimatePresence>
-      </div>
-      <AnimatePresence>
-        {fullscreenInput && <OverlayInput onClose={() => window.API.ui.fullscreenInput = false} />}
-      </AnimatePresence>
-      <ToastContainer hideProgressBar theme="dark" transition={Zoom} />
-    </NiceModal.Provider>
-  </div>
+        <ToastContainer className="toasts" draggable={false} closeOnClick limit={3} hideProgressBar theme="colored" />
+      </NiceModal.Provider>
+    </motion.div>
+  </AnimatePresence>
 }
 
 export const EditorViewport: FC = () => {

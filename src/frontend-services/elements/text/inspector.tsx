@@ -141,13 +141,11 @@ const BehaviourInspector: FC<{ id: string }> = ({ id }) => {
       <button onClick={handleCopyCss} className="btn btn-neutral btn-sm gap-1">Copy <RiFileCopyLine/></button>
     </Input.Container>}
 
-    {/* <Input.Checkbox label="Animate scroll" value={data.animateScroll} onChange={e => up("animateScroll", e)} /> */}
-
-    <Inspector.SubHeader>Clean up</Inspector.SubHeader>
+    <Inspector.SubHeader>Cleanup</Inspector.SubHeader>
     <Input.Text label="Clear text after" type="number" value={data.behaviorClearTimer} onChange={e => up("behaviorClearTimer", parseFloat(e.target.value) || 0)} />
     <Input.Text label="Clear animation delay" type="number" value={data.behaviorClearDelay} onChange={e => up("behaviorClearDelay", parseFloat(e.target.value) || 0)} />
-    <Input.Checkbox label="Show only one sentence" value={data.behaviorLastSentence} onChange={e => up("behaviorLastSentence", e)} />
-    <Input.Checkbox label="Break line" value={data.behaviorBreakLine} onChange={e => up("behaviorBreakLine", e)} />
+    <Input.Checkbox label="Replace previous sentence" value={data.behaviorLastSentence} onChange={e => up("behaviorLastSentence", e)} />
+    {/* <Input.Checkbox label="Break line" value={data.behaviorBreakLine} onChange={e => up("behaviorBreakLine", e)} /> */}
   </>
 }
 
@@ -189,7 +187,7 @@ const CssInspector: FC<{ id: string }> = ({ id }) => {
 
 
 const Inspector_ElementText: FC<{ id: string }> = memo(({ id }) => {
-  const data: Element_TextState = useGetState(state => state.elements[id].scenes["main"].data);
+  const data: Element_TextState = useGetState(state => state.elements[id]?.scenes["main"].data);
   const update = useUpdateState();
 
   const up = <K extends keyof Element_TextState>(key: K, v: Element_TextState[K]) => update(state => {
@@ -202,6 +200,9 @@ const Inspector_ElementText: FC<{ id: string }> = memo(({ id }) => {
     setTab([v, Math.sign(v - tab)]);
   }
 
+  if (!data)
+    return <Inspector.Body>Deleted</Inspector.Body>
+
   return <Inspector.Body>
     <Inspector.Header><TbTextResize /> <NameInput id={id} /></Inspector.Header>
     <Inspector.Content>
@@ -211,7 +212,7 @@ const Inspector_ElementText: FC<{ id: string }> = memo(({ id }) => {
         <Inspector.Tab tooltip="Text source" tooltipBody="Where should we get the text from" onClick={() => handleTab(0)} active={tab === 0}><IoIosRadio /></Inspector.Tab>
         <Inspector.Tab tooltip="Text" tooltipBody="Colors, size, shadow, stroke" onClick={() => handleTab(1)} active={tab === 1}><RiFontSize /></Inspector.Tab>
         <Inspector.Tab tooltip="Box" tooltipBody="Background, border, size" onClick={() => handleTab(2)} active={tab === 2}><BsTextareaResize /></Inspector.Tab>
-        <Inspector.Tab tooltip="Behaviour" tooltipBody="Timer, typing and scroll animations, events" onClick={() => handleTab(3)} active={tab === 3}><VscSettings /></Inspector.Tab>
+        <Inspector.Tab tooltip="Behaviour" tooltipBody="Automatic cleanup and animation" onClick={() => handleTab(3)} active={tab === 3}><VscSettings /></Inspector.Tab>
         <Inspector.Tab tooltip="Sound" tooltipBody="Volume, sound vfx" onClick={() => handleTab(4)} active={tab === 4}><HiOutlineMusicNote /></Inspector.Tab>
         <Inspector.Tab tooltip="CSS editor" onClick={() => handleTab(5)} active={tab === 5}><SiCsswizardry /></Inspector.Tab>
       </Inspector.Tabs>

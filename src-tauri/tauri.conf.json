@@ -1,7 +1,7 @@
 {
   "package": {
     "productName": "curses",
-    "version": "0.0.0"
+    "version": "0.0.1"
   },
   "build": {
     "beforeDevCommand": "yarn dev --host",
@@ -33,7 +33,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.cursescaptions.dev",
+      "identifier": "com.cursescaptions.app",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -60,7 +60,7 @@
     "windows": [
       {
         "fullscreen": false,
-        "transparent": true,
+        "transparent": false,
         "height": 600,
         "resizable": true,
         "title": "Curses",

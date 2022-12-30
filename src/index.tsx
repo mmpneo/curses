@@ -37,6 +37,9 @@ window.platform = window.__TAURI_METADATA__ ? "app" : "web";
 
 window.mode = window.location.pathname.startsWith('/client') ? "client" : "host";
 
+if (window.mode === "host")
+  document.documentElement.className = "host";
+
 window.addEventListener('contextmenu', e => e.preventDefault(), false);
 
 window.API = new Backend();
@@ -46,7 +49,6 @@ async function buildNetworkConfiguration() {
   // only host
   if (window.platform === "app") {
     const appConfig = await invoke<any>("plugin:web|config");
-    console.log(appConfig);
     window.networkConfiguration = {
       localIp: appConfig.local_ip,
       host: "localhost",
@@ -64,7 +66,6 @@ async function buildNetworkConfiguration() {
       host: qHost ?? location.hostname,
       port: qPort ?? location.port
     }
-    console.log(window.networkConfiguration)
   }
 }
 

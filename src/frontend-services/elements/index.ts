@@ -65,7 +65,7 @@ class Service_Elements implements IServiceInterface {
 
   removeElement(id: string) {
     if (window.API.ui.sidebarState.tab?.value === id)
-      window.API.changeTab()
+      window.API.closeSidebar()
     window.APIFrontend.document.patch((state) => {
       if (!state.elements[id]) return;
       const index = state.elementsIds.indexOf(id);

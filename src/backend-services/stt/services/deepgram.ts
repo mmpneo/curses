@@ -20,18 +20,10 @@ export class STT_DeepgramService implements ISpeechRecognitionService {
       return this.bindings.onStop("Options missing");
 
     navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-      console.log(state.deepgram)
       this.recorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
-      const token = "d99a3d4b920d77190ac70ca89b9adef41ebea239";
-
-      // this.socket = new WebSocket(
-      //   `wss://api.deepgram.com/v1/listen`,
-      //   ["token", "1f1d964482856a2ba66a02a7979c20868b4c658b"]
-      // );
-
       this.socket = new WebSocket(
         `wss://api.deepgram.com/v1/listen?punctuate=${!!state.deepgram.punctuate}&interim_results=${!!state.deepgram.interim}&language=${state.deepgram.language}&tier=${state.deepgram.tier}`,
-        ["token", "1f1d964482856a2ba66a02a7979c20868b4c658b"]
+        ["token", state.deepgram.key]
       );
 
       this.socket.onopen = () => {
@@ -57,7 +49,6 @@ export class STT_DeepgramService implements ISpeechRecognitionService {
               this.bindings.onInterim(transcript);
             else
               this.bindings.onFinal(transcript);
-          // rec.speech_final &&console.log(rec.speech_final,rec.is_final, rec.channel.alternatives[0].transcript);
         } catch (error) {}
       };
       this.socket.onclose = (ev) => {

@@ -32,7 +32,6 @@ export const useUpdateState = () => {
 export function useGetState<Selection>(
   selector: (state: DocumentState) => Selection
 ) {
-  // console.log(window.APIFrontend.document.fileBinder.get(state => state))
   return useSyncExternalStoreWithSelector<DocumentState, Selection>(
     window.APIFrontend.document.fileBinder.subscribe,
     window.APIFrontend.document.fileBinder.get,

@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { useSnapshot } from "valtio";
 import Inspector from ".";
 import { useGetState, useUpdateState } from "../../frontend-services";
+import { ServiceNetworkState } from "../../types";
 import Dropdown, { useDropdown } from "../dropdown/Dropdown";
 import Tooltip from "../dropdown/Tooltip";
 import Input from "../input";
@@ -89,12 +90,10 @@ const ObsSetupDropdown: FC = () => {
 }
 
 const Inspector_Settings: FC = () => {
-  const { clientTheme, uiScale } = useSnapshot(window.API.state);
+  const { linkAddress, clientTheme, uiScale } = useSnapshot(window.API.state);
   const {state: linkStatus} = useSnapshot(window.API.pubsub.serviceState);
   const canvas = useGetState(state => state.canvas);
   const updateState = useUpdateState();
-
-  const [linkAddr, setLinkAddr] = useState("");
 
   const handleChangeTheme = (v: string) => window.API.changeTheme(v);
   const handleChangeScale = (v: string | number) => {
@@ -102,9 +101,8 @@ const Inspector_Settings: FC = () => {
     window.API.changeScale(Math.max(UI_SCALE_MIN, Math.min(UI_SCALE_MAX, _v)));
   }
 
-  const handleCopyPubsub = () => {
-    const { localIp, port } = window.networkConfiguration;
-    // copy(`${localIp}:${port}`);
+  const updateLink = (value: string) => {
+    window.API.state.linkAddress = value;
   }
 
   return <Inspector.Body>
@@ -137,37 +135,14 @@ const Inspector_Settings: FC = () => {
         </Tooltip>
       </div>
 
-      {/* <div className="divider text-xs font-semibold">or</div> */}
-      {/* <button className="btn btn-sm gap-2"><RiFileCopyLine /> Copy link</button> */}
-
-      {/* <Input.Checkbox value={testSwitch} onChange={v => setSwitch(v)} label="Remote share" />
-      <Inspector.Switchable visible={testSwitch}>
-        <Input.NetworkStatus value={ServiceNetworkState.connected} label="Remote connection" />
-        <Input.Container label="Remote url">
-          <div className="field-width input-group">
-            <input disabled value="copy link" className="w-full cursor-text font-medium input input-sm input-bordered" />
-            <button className="btn btn-sm text-lg">
-              <RiFileCopyLine/>
-            </button>
-          </div>
-        </Input.Container>
-      </Inspector.Switchable> */}
-
       <Inspector.SubHeader>Link apps</Inspector.SubHeader>
       <Inspector.Description>Sync text events with remote app instance</Inspector.Description>
-      <Input.Text value={linkAddr} onChange={e => setLinkAddr(e.target.value)} label="Address" placeholder="192.168..smth" />
-      <Input.NetworkStatus value={linkStatus} label="Status"/>
-      <ServiceButton startLabel="Connect" stopLabel="Disconnect" status={linkStatus} onStart={() => window.API.pubsub.linkConnect(linkAddr)} onStop={() => window.API.pubsub.linkDisconnect()} />
-      {/* <Input.NetworkStatus value={ServiceNetworkState.connected} label="Connection" /> */}
+      <Inspector.Deactivatable active={linkStatus === ServiceNetworkState.disconnected}>
+        <Input.Text value={linkAddress} onChange={e => updateLink(e.target.value)} label="Address" placeholder="192.168..smth" />
+        <Input.NetworkStatus value={linkStatus} label="Status"/>
+      </Inspector.Deactivatable>
+      <ServiceButton startLabel="Connect" stopLabel="Disconnect" status={linkStatus} onStart={() => window.API.pubsub.linkConnect()} onStop={() => window.API.pubsub.linkDisconnect()} />
       <button className="btn btn-sm btn-ghost" onClick={() => window.API.pubsub.copyLinkAddress()}>Copy my address</button>
-
-      {/* <Input.Container label="Link">
-        <div className="btn-group">
-          <button className="btn btn-sm self-end">Copy</button>
-          <button className="btn btn-sm self-end">Copy remote</button>
-          <button className="btn btn-sm btn-warning self-end">Refresh</button>
-        </div>
-      </Input.Container> */}
 
       <div className="opacity-50">Made with 💗 by Mmp</div>
     </Inspector.Content>

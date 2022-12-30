@@ -111,8 +111,6 @@ class Service_Files implements IServiceInterface {
       filesMeta.map((f) => f.id)
     );
 
-    console.log(filesMeta, this.#yFilesBinary.toJSON())
-
     for (let id of add) {
       const metaIndex = filesMeta.findIndex((m) => m.id === id)!;
       const meta = filesMeta[metaIndex]!;

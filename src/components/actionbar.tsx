@@ -1,3 +1,4 @@
+import { appWindow } from "@tauri-apps/api/window";
 import classNames from "classnames";
 import { FC, HtmlHTMLAttributes, PropsWithChildren, ReactNode } from "react";
 import { RiChatVoiceFill, RiMicFill, RiMicOffFill, RiUserVoiceFill, RiVolumeMuteFill, RiVolumeUpFill } from "react-icons/ri";
@@ -27,7 +28,7 @@ const ButtonService: FC<PropsWithChildren<HtmlHTMLAttributes<HTMLButtonElement> 
 }
 
 
-const handleSwitchFullscreenInput = () => window.API.ui.fullscreenInput = !window.API.ui.fullscreenInput;
+const handleSwitchFullscreenInput = () => window.API.state.showOverlay = !window.API.state.showOverlay;
 const handleSwitchMuteSTT = () => window.API.stt.serviceState.muted = !window.API.stt.serviceState.muted;
 const handleSwitchSound = () => window.APIFrontend.sound.serviceState.muted = !window.APIFrontend.sound.serviceState.muted;
 const handleSwitchSTT = () => {
@@ -74,11 +75,20 @@ const AppActions: FC = () => {
 }
 
 const WindowActions: FC = () => {
+  const handleMinimize = () => window.platform === "app" && appWindow.minimize();
+  const handleMaximize = async () => {
+    if (window.platform !== "app")
+      return;
+    const state = await appWindow.isMaximized();
+    state ? appWindow.unmaximize() : appWindow.maximize();
+  };
+  const handleClose = () => window.platform === "app" && appWindow.close();
+
   return <div className="flex z-0 pointer-events-auto items-center space-x-2">
     {/* <button className="btn btn-sm"></button> */}
-    <button className="btn btn-ghost btn-sm btn-square"><VscChromeMinimize /></button>
-    <button className="btn btn-ghost btn-sm btn-square"><VscChromeMaximize /></button>
-    <button className="btn btn-ghost btn-sm btn-square"><VscChromeClose /></button>
+    <button className="btn btn-ghost btn-sm btn-square" onClick={handleMinimize}><VscChromeMinimize /></button>
+    <button className="btn btn-ghost btn-sm btn-square" onClick={handleMaximize}><VscChromeMaximize /></button>
+    <button className="btn btn-ghost btn-sm btn-square" onClick={handleClose}><VscChromeClose /></button>
   </div>
 }
 

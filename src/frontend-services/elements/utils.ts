@@ -15,7 +15,6 @@ export function CssReplaceFileReference(style: unknown) {
   const newStyle = Array.from(style.matchAll(/\[file-.*?\]/g));
   // .reduce((sum, file) => {
   //   const requestedFileId = file[0].substring(6, file[0].length-1);
-  //   // console.log(requestedFileId)
   //   const url = window.API.files.getFileUrl(requestedFileId);
   //   return url ? sum.replace(file[0], url) : sum;
   // }, style);

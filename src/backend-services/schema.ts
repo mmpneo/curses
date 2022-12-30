@@ -7,8 +7,10 @@ import { nanoid } from "nanoid";
 
 export interface BackendState {
   id: string;
+  linkAddress: string;
   clientTheme: string;
   uiScale: number;
+  showOverlay: boolean;
   shortcuts: {
     start: string;
     muteMic: string;
@@ -42,8 +44,10 @@ export const backendSchema: JSONSchemaType<BackendState> = {
   type:       "object",
   properties: {
     id: {type: "string", default: nanoid(42)},
+    linkAddress: {type: "string", default: ""},
     clientTheme: {type: "string", default: "night"},
     uiScale: {type: "number", default: 1},
+    showOverlay: {type: "boolean", default: false},
     shortcuts:    {
       type:       "object",
       properties: {
@@ -67,5 +71,5 @@ export const backendSchema: JSONSchemaType<BackendState> = {
     }
   },
   additionalProperties: false,
-  required:   ["id", "uiScale", "clientTheme", "services"]
+  required:   ["id", "linkAddress", "uiScale", "showOverlay", "clientTheme", "services"]
 }

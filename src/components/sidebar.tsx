@@ -64,8 +64,8 @@ const ElementMenu: FC<{ id: string, title: string }> = ({ id, title }) => {
     <ul className="dropdown p-2">
       <li className="menu-title"><span>{title}</span></li>
       <li><button onClick={() => handleRemove()}>Remove element</button></li>
-      <li><button>Add to scene</button></li>
-      <li><button>Remove from scene</button></li>
+      {/* <li><button>Add to scene</button></li>
+      <li><button>Remove from scene</button></li> */}
     </ul>
   );
 };
@@ -73,7 +73,6 @@ const ElementMenu: FC<{ id: string, title: string }> = ({ id, title }) => {
 const SidebarElementButton: FC<{ id: string }> = memo(({ id }) => {
   const name = useGetState(state => state.elements[id].name);
   const type = useGetState(state => state.elements[id].type);
-  console.log("sidebar ele")
   return <Dropdown interact="context" placement="right" content={<ElementMenu title={name} id={id} />}>
     <SideBarButton tab={{ tab: type, value: id }} tooltip={name}>
       {type === ElementType.text && <TbTextResize />}
@@ -83,19 +82,20 @@ const SidebarElementButton: FC<{ id: string }> = memo(({ id }) => {
 
 });
 
-const ElementList: FC = () => {
+const ElementList: FC = memo(() => {
   const ids = useGetState(state => state.elementsIds);
   return <>
     {ids.map(id => <SidebarElementButton key={id} id={id} />)}
   </>
-}
+})
 
 const Sidebar: FC = memo(() => {
-  const { fullscreenInput, sidebarState: { tab, show, expand } } = useSnapshot(window.API.ui);
+  const { sidebarState: { tab, show, expand } } = useSnapshot(window.API.ui);
+  const {showOverlay} = useSnapshot(window.API.state);
   useEffect(() => {
-    if (fullscreenInput && show)
+    if (showOverlay && show)
       window.API.ui.sidebarState.show = false;
-  }, [fullscreenInput]);
+  }, [showOverlay]);
 
   const switchExpand = () => {
     window.API.ui.sidebarState.expand = !window.API.ui.sidebarState.expand;

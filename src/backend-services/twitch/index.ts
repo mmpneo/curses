@@ -16,6 +16,8 @@ const scope = [
 class Service_Twitch implements IServiceInterface {
   constructor() {}
   
+  liveCheckInterval?: any = null;
+
   chatClient?: ChatClient;
   apiClient?: ApiClient;
 
@@ -28,9 +30,11 @@ class Service_Twitch implements IServiceInterface {
       id: string
       name: string
       avatar: string
-    } | null
+    } | null,
+    live: false
   }>({
-    user: null
+    user: null,
+    live: false
   });
 
   get #state() {
@@ -88,7 +92,7 @@ class Service_Twitch implements IServiceInterface {
   logout() {
     window.API.state.services.twitch.data.token = "";
     this.state.user = null;
-    // this.chatClient?
+    clearInterval(this.liveCheckInterval);
     // disconnect chat
     // disconnect auth
     // remove token
@@ -113,6 +117,16 @@ class Service_Twitch implements IServiceInterface {
 
   addEmotes(data:  Record<string, string>) {
     this.emotes = {...this.emotes, ...data};
+  }
+
+  startLiveCheck() {
+    if (this.liveCheckInterval !== null)
+      clearInterval(this.liveCheckInterval);
+      this.liveCheckInterval = setInterval(async () => {
+      if (!this.state.user?.name)
+        return;
+      const resp = await this.apiClient?.streams.getStreamByUserName(this.state.user.name);
+    }, 5000);
   }
 
   async connect() {

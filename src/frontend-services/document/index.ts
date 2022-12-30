@@ -48,7 +48,6 @@ class Service_Document implements IServiceInterface {
           const ajv = new Ajv({strict: true, useDefaults: "empty", removeAdditional: true});
           const validator = ajv.compile(documentSchema);
           validator(state);
-          console.log(JSON.parse(JSON.stringify(state)));
         });
 
       } else {

@@ -37,20 +37,23 @@ class Backend {
   }
 
   ui = proxy<{
-    fullscreenInput: boolean;
     sidebarState: {
       tab: InspectorTabPath | undefined;
       show: boolean;
       expand: boolean;
     };
   }>({
-    fullscreenInput: false,
     sidebarState: {
       tab: undefined,
       show: false,
       expand: false
     },
   });
+  closeSidebar() {
+    const sidebar = window.API.ui.sidebarState;
+    sidebar.tab = undefined;
+    sidebar.show = false;
+  }
   changeTab(v?: InspectorTabPath) {
     const sidebar = window.API.ui.sidebarState;
     if (sidebar.tab?.tab === v?.tab && sidebar.tab?.value === v?.value && sidebar.show) {
@@ -137,7 +140,6 @@ class Backend {
     await this.vrc.init();
     await this.shortcuts.init();
     window.mode === "host" && this.changeTheme(this.state.clientTheme);
-    console.log("backend init");
   }
 }
 

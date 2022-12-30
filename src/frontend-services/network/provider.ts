@@ -68,7 +68,6 @@ export class PeerjsProvider {
       hostConn.on("data", handleData => this.readMessage(new Uint8Array(handleData as ArrayBuffer)));
       hostConn.on("open", () => {
         resolve("connected");
-        console.log("connected to host");
       });
     });
     this.#peer.on("error", () => this.tryReconnectClient(netId));

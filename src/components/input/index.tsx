@@ -295,7 +295,7 @@ interface EventProps extends InputBaseProps {
 }
 const Event: FC<EventProps> = memo(({ label, value, onChange }) => {
   const events = Array.from(window.API.pubsub.registeredEvents.values());
-  return <NewSelect options={events} label={label} defaultValue={events.find(e => e.value === value)} onChange={(e: any) => { console.log(e); onChange(e.value || "") }} />
+  return <NewSelect options={events} label={label} defaultValue={events.find(e => e.value === value)} onChange={(e: any) => onChange(e.value || "")} />
 });
 
 const sourceOptions = [

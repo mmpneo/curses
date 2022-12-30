@@ -12,7 +12,6 @@ import { azureLanguages, deepGramLangs } from "./service_data";
 
 const Browser: FC = () => {
   const handleOpen = () => {
-    // console.log(`${window.networkConfiguration.host}:${window.networkConfiguration.port}/mic.html`);
     invoke("plugin:web|open_browser", {
       data: {
         browser: "chrome",

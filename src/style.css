@@ -1,21 +1,65 @@
 @import "simplebar-react/dist/simplebar.min.css";
-/* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap'); */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* toasts */
+.toasts {
+  --toastify-color-light: #fff;
+  --toastify-color-dark: #121212;
+  --toastify-color-info: hsl(var(--in) / 1);
+  --toastify-color-success: hsl(var(--su) / 1);
+  --toastify-color-warning: hsl(var(--wa) / 1);
+  --toastify-color-error: hsl(var(--er) / 1);
+  --toastify-color-transparent: rgba(255, 255, 255, 0.7);
 
-html, body {
-  height: 100%;
+  --toastify-icon-color-info: var(--toastify-color-info);
+  --toastify-icon-color-success: var(--toastify-color-success);
+  --toastify-icon-color-warning: var(--toastify-color-warning);
+  --toastify-icon-color-error: var(--toastify-color-error);
+
+  --toastify-toast-width: 320px;
+  --toastify-toast-background: #fff;
+  --toastify-toast-min-height: 2rem;
+  --toastify-toast-max-height: 800px;
+  --toastify-font-family: sans-serif;
+  --toastify-z-index: 9999;
+
+  --toastify-text-color-light: #757575;
+  --toastify-text-color-dark: #fff;
+
+  /* //Used only for colored theme */
+  --toastify-text-color-info: hsl(var(--inc,var(--nc))/1);
+  --toastify-text-color-success: hsl(var(--suc,var(--nc))/1);
+  --toastify-text-color-warning: hsl(var(--wac,var(--nc))/1);
+  --toastify-text-color-error: hsl(var(--erc,var(--nc))/1);
+
+  --toastify-spinner-color: #616161;
+  --toastify-spinner-color-empty-area: #e0e0e0;
+
+  /* // Used when no type is provided */
+  --toastify-color-progress-dark: #bb86fc;
+  --toastify-color-progress-info: var(--toastify-color-info);
+  --toastify-color-progress-success: var(--toastify-color-success);
+  --toastify-color-progress-warning: var(--toastify-color-warning);
+  --toastify-color-progress-error: var(--toastify-color-error);
 }
 
-#root {
-  height: 100%;
+html.host, html.host body, html.host #root {
+  @apply bg-base-300 !important;
 }
-:root, html, body {
+
+:root, html, body, #root {
   width: 100vw;
-  background-color: transparent !important;
+  height: 100vh;
+  overflow: hidden;
+  background-color: transparent;
+}
+
+@font-face {
+  font-family: 'Outfit';
+  src: url('assets/fonts/Outfit-Variable.ttf') format("truetype-variations");
+  font-weight: 1 999;
 }
 
 @font-face {
@@ -23,15 +67,6 @@ html, body {
   src:
     url('assets/fonts/Mona-Sans.woff2') format('woff2 supports variations'),
     url('assets/fonts/Mona-Sans.woff2') format('woff2-variations');
-  font-weight: 200 900;
-  font-stretch: 75% 125%;
-}
-
-@font-face {
-  font-family: 'Hubot Sans';
-  src:
-    url('assets/fonts/Hubot-Sans.woff2') format('woff2 supports variations'),
-    url('assets/fonts/Hubot-Sans.woff2') format('woff2-variations');
   font-weight: 200 900;
   font-stretch: 75% 125%;
 }
