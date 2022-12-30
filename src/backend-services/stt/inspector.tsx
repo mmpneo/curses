@@ -6,16 +6,17 @@ import { useSnapshot } from "valtio";
 import Input from "../../components/input";
 import Inspector from "../../components/inspector";
 import { ServiceNetworkState } from "../../types";
-import ServiceButton from "../components/service-button";
+import ServiceButton from "../../components/service-button";
 import { STT_Backends, STT_State } from "./schema";
 import { azureLanguages, deepGramLangs } from "./service_data";
 
 const Browser: FC = () => {
   const handleOpen = () => {
+    // console.log(`${window.networkConfiguration.host}:${window.networkConfiguration.port}/mic.html`);
     invoke("plugin:web|open_browser", {
       data: {
         browser: "chrome",
-        url: `http://${window.networkConfiguration.localIp}:${window.networkConfiguration.port}/mic.html`
+        url: `localhost:${window.networkConfiguration.port}/mic.html`
       }
     });
   };
@@ -23,10 +24,10 @@ const Browser: FC = () => {
     <Inspector.SubHeader>Browser options</Inspector.SubHeader>
     <button className="btn btn-sm btn-primary" onClick={handleOpen}>Open chrome</button>
 
-    <QRCodeCanvas
+    {/* <QRCodeCanvas
           size={256}
           style={{ height: "100%", maxHeight: "100%", width: "4.5rem" }}
-          value={`${window.networkConfiguration.localIp}:${window.networkConfiguration.port}/client`} />
+          value={`${window.networkConfiguration.localIp}:${window.networkConfiguration.port}/client`} /> */}
   </>
 }
 
@@ -88,7 +89,7 @@ const Deepgram: FC = () => {
     ]} label="Quality" value={{ value: pr.tier, label: pr.tier }} onChange={(e: any) => handleUpdate("tier", e.value)} />
 
     <span className="text-base-content/60 text-xs">
-      Some languages cannot be used with "enchanced" quality option
+      Some languages cannot be used with "enhanced" quality option
       <br />
       <a className="link link-primary link-hover" target="_blank" href="https://developers.deepgram.com/documentation/features/language/#language-options">See language table</a>
     </span>

@@ -3,8 +3,9 @@ import { listen } from '@tauri-apps/api/event'
 import PubSub from "pubsub-js";
 import { proxyMap } from "valtio/utils";
 import { BaseEvent, IServiceInterface, PartialWithRequired, ServiceNetworkState, TextEvent, TextEventSource, TextEvent_Schema } from "../../types";
-import Ajv from "ajv";
+import Ajv, { ValidateFunction } from "ajv";
 import { proxy } from "valtio";
+import { toast } from "react-toastify";
 
 type RegisteredEvent = {
   label: string;
@@ -19,22 +20,36 @@ class Service_PubSub implements IServiceInterface {
       useDefaults: "empty",
       removeAdditional: true,
     });
-    const textEventValidator = this.#ajv.compile(TextEvent_Schema)
+    this.textEventValidator = this.#ajv.compile(TextEvent_Schema);
+    
     window.platform === "app" && listen('pubsub', (event) => {
-      if (typeof event.payload === "string") try {
-        const {topic, data}: BaseEvent = JSON.parse(event.payload);
-        if (typeof data !== "object")
-          return;
-        const validated = data;
-        textEventValidator(validated);
-        console.log(validated)
-        const textEvent = this.applyEmotes(validated as TextEvent);
-        this.receivePubSub({topic, data: textEvent});
-      } catch (error) {}
+      this.consumePubSubMessage(event.payload as string);
     })
   }
   
+  #socket?: WebSocket;
   #ajv: Ajv;
+  textEventValidator: ValidateFunction<TextEvent>;
+
+  serviceState = proxy({
+    state: ServiceNetworkState.disconnected
+  });
+
+  private consumePubSubMessage(stringEvent: string) {
+    console.log(stringEvent)
+    if (typeof stringEvent === "string") try {
+      const {topic, data}: BaseEvent = JSON.parse(stringEvent);
+      if (typeof data !== "object")
+        return;
+      const validated = data;
+      this.textEventValidator(validated);
+      const textEvent = this.applyEmotes(validated as TextEvent);
+      this.receivePubSub({topic, data: textEvent});
+    } catch (error) {
+      // just ignore invalid messages
+    }
+  }
+
 
   public registeredEvents = proxyMap<string, RegisteredEvent>([]);
 
@@ -69,7 +84,12 @@ class Service_PubSub implements IServiceInterface {
     PubSub.publishSync(topic, data);
   }
   #publishPubSub(msg: BaseEvent) {
-    invoke("plugin:web|pubsub_broadcast", {value: JSON.stringify(msg)});
+    if (window.platform === "app")
+      invoke("plugin:web|pubsub_broadcast", {value: JSON.stringify(msg)});
+  }
+  #publishLink(msg: BaseEvent) {
+    if (this.#socket && this.#socket.readyState === this.#socket.OPEN)
+      this.#socket.send(JSON.stringify(msg));
   }
   #publishToClients(msg: BaseEvent) {
     window.APIFrontend.network.broadcast(msg);
@@ -78,10 +98,12 @@ class Service_PubSub implements IServiceInterface {
   publishText(topic: TextEventSource, textData: PartialWithRequired<TextEvent, "type" | "value">) {
     // if (!textData.value)
     //   return;
-    let data = this.applyEmotes(textData)
-    this.#publishLocally({topic, data});
-    this.#publishToClients({topic, data});
-    this.#publishPubSub({topic, data});
+    let data = this.applyEmotes(textData);
+    let msg = {topic, data};
+    this.#publishLocally(msg);
+    this.#publishToClients(msg);
+    this.#publishPubSub(msg);
+    this.#publishLink(msg);
   }
 
   public unsubscribe(key?: string) {
@@ -105,21 +127,47 @@ class Service_PubSub implements IServiceInterface {
 
   linkState = proxy({
     value: ServiceNetworkState.disconnected
-  })
+  });
 
-  private buildPubSubAddress = (a: string, p: string) => `${a}:${p}/pubsub`
+  copyLinkAddress() {
+    const conf = window.networkConfiguration;
+    navigator.clipboard.writeText(`${conf.localIp}:${conf.port}`)
+    toast.success("Copied!");
+  }
 
-  linkConnect(address: string, port: string) {
-    if (window.platform === "app") {
-      const conf = window.networkConfiguration;
-      if (conf.localIp === address && conf.port === port) {
-        // prevent loop connect
-        return;
-      }
+  linkConnect(fullAddress: string) {
+    const ipValidator = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]):[0-9]+$/;
+    if (!fullAddress.match(ipValidator))
+      return;
+    
+    const conf = window.networkConfiguration;
+    // prevent loop connect
+    if (`${conf.localIp}:${conf.port}` === fullAddress) {
+      toast.error("Cannot connect to self");
+      return;
     }
+
+    this.#socket = new WebSocket(`ws://${fullAddress}/pubsub?id=${window.API.state.id}-${Date.now()}`);
+    this.#socket.onopen = () => {
+      this.serviceState.state = ServiceNetworkState.connected;
+      if (!this.#socket)
+        return;
+      this.#socket.onmessage = (msg) => {
+        console.log(msg);
+        return this.consumePubSubMessage(msg.data);
+      };
+    };
+    this.#socket.onclose = () => {
+      this.serviceState.state = ServiceNetworkState.disconnected;
+    }
+
+    // }
     // const ws = new WebSocket("");
   }
-  linkDisconnect() {}
+  linkDisconnect() {
+    if (this.#socket?.close())
+      this.#socket = undefined;
+  }
 }
 
 export default Service_PubSub;

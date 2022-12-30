@@ -111,6 +111,8 @@ class Service_Files implements IServiceInterface {
       filesMeta.map((f) => f.id)
     );
 
+    console.log(filesMeta, this.#yFilesBinary.toJSON())
+
     for (let id of add) {
       const metaIndex = filesMeta.findIndex((m) => m.id === id)!;
       const meta = filesMeta[metaIndex]!;
@@ -200,6 +202,23 @@ class Service_Files implements IServiceInterface {
       state.filesMeta.splice(fileIndex, 1);
       window.APIFrontend.document.fileArray.delete(fileIndex);
     });
+  }
+
+  uninstallFont(family: string) {
+    const ixs: number[] = [];
+    this.#filesMeta.forEach((file, i) => {
+      if (file.type.startsWith('font/') && file.meta?.family === family)
+        ixs.push(i);
+    });
+
+    this.ui.fontFamilies = this.ui.fontFamilies.filter(f => f !== family);
+
+    ixs.length && window.APIFrontend.document.file.transact(() => {
+      this.#yFilesMeta.delete(ixs[0], ixs.length);
+      this.#yFilesBinary.delete(ixs[0], ixs.length);
+    });
+
+    // find all font/* files with target family
   }
 }
 

@@ -17,7 +17,7 @@ export class STT_DeepgramService implements ISpeechRecognitionService {
   start(state: STT_State): void {
 
     if (Object.values(state.deepgram).some(isEmptyValue))
-      return this.bindings.onStop("Options missing 111");
+      return this.bindings.onStop("Options missing");
 
     navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
       console.log(state.deepgram)

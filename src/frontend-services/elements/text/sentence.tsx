@@ -42,8 +42,9 @@ export const sentenceCtx = createContext<{
   onComplete: () => {},
 });
 
+//todo do actual masking with r2r list
 const checkProfanity = (word: string, mask?: string) => {
-  return mask && word[0] === '*';
+  return mask && (word[0] === '*' || word[1] === '*');
 }
 
 type WordDataSegment = { classes: string, value: string, type: TextWordType };

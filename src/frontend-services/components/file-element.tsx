@@ -127,10 +127,13 @@ export type FontGroupProps = {
   size: number;
 }
 export const FontGroup: FC<{data: FontGroupProps}> = memo(({data}) => {
+  const handleUninstall = () => {
+    window.APIFrontend.files.uninstallFont(data.name);
+  }
   return <FileTemplate 
   name={data.name}
   desc={formatBytes(data.size)}
-  actions={<span className="link link-hover link-primary" onClick={() => {}}>Uninstall font</span>}
+  actions={<span className="link link-hover link-primary" onClick={handleUninstall}>Uninstall font</span>}
   ><FileFont /></FileTemplate>
 })
 

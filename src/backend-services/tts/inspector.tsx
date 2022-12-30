@@ -5,7 +5,7 @@ import { useSnapshot } from "valtio";
 import Input from "../../components/input";
 import Inspector from "../../components/inspector";
 import { ServiceNetworkState } from "../../types";
-import ServiceButton from "../components/service-button";
+import ServiceButton from "../../components/service-button";
 import { TTS_Backends, TTS_State } from "./schema";
 import { azureVoices } from "./service_data";
 

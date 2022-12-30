@@ -105,7 +105,7 @@ const Sidebar: FC = memo(() => {
   const ttsState = useSnapshot(window.API.tts.serviceState);
 
   return <div className="flex h-full z-20">
-    <div className="bg-base-200 flex-none overflow-y-scroll scrollbar-hide">
+    <div className="bg-base-200 flex-none overflow-y-scroll overflow-x-hidden scrollbar-hide">
       <motion.div transition={{ ease: "anticipate", duration: 0.2 }} initial={{ width: "3.5rem" }} animate={{ width: expand ? "13rem" : "3.5rem" }} className="flex flex-col space-y-2 py-2 px-2">
         <button className="w-full btn btn-ghost border-none justify-start min-h-fit h-auto flex-nowrap whitespace-nowrap px-0 gap-1 overflow-hidden" onClick={switchExpand}>
           <span className={classNames("flex-none w-10 h-8 items-center justify-center text-lg text-base-content/50 swap swap-flip", { "swap-active": expand })}>

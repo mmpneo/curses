@@ -6,7 +6,15 @@
 @tailwind utilities;
 
 
+html, body {
+  height: 100%;
+}
+
+#root {
+  height: 100%;
+}
 :root, html, body {
+  width: 100vw;
   background-color: transparent !important;
 }
 

@@ -9,6 +9,7 @@ import { useGetState, useUpdateState } from "../../frontend-services";
 import Dropdown, { useDropdown } from "../dropdown/Dropdown";
 import Tooltip from "../dropdown/Tooltip";
 import Input from "../input";
+import ServiceButton from "../service-button";
 
 const themesLight = [
   'customblack',
@@ -89,8 +90,11 @@ const ObsSetupDropdown: FC = () => {
 
 const Inspector_Settings: FC = () => {
   const { clientTheme, uiScale } = useSnapshot(window.API.state);
+  const {state: linkStatus} = useSnapshot(window.API.pubsub.serviceState);
   const canvas = useGetState(state => state.canvas);
   const updateState = useUpdateState();
+
+  const [linkAddr, setLinkAddr] = useState("");
 
   const handleChangeTheme = (v: string) => window.API.changeTheme(v);
   const handleChangeScale = (v: string | number) => {
@@ -151,10 +155,11 @@ const Inspector_Settings: FC = () => {
 
       <Inspector.SubHeader>Link apps</Inspector.SubHeader>
       <Inspector.Description>Sync text events with remote app instance</Inspector.Description>
-      <Input.Text label="Address" placeholder="127.0.0.1:3030" />
-      <button className="btn btn-sm btn-neutral">Connect</button>
+      <Input.Text value={linkAddr} onChange={e => setLinkAddr(e.target.value)} label="Address" placeholder="192.168..smth" />
+      <Input.NetworkStatus value={linkStatus} label="Status"/>
+      <ServiceButton startLabel="Connect" stopLabel="Disconnect" status={linkStatus} onStart={() => window.API.pubsub.linkConnect(linkAddr)} onStop={() => window.API.pubsub.linkDisconnect()} />
       {/* <Input.NetworkStatus value={ServiceNetworkState.connected} label="Connection" /> */}
-      <button className="btn btn-sm btn-ghost" onClick={handleCopyPubsub}>Copy local address</button>
+      <button className="btn btn-sm btn-ghost" onClick={() => window.API.pubsub.copyLinkAddress()}>Copy my address</button>
 
       {/* <Input.Container label="Link">
         <div className="btn-group">

@@ -436,7 +436,7 @@ const FontSelectDropdown: FC<any> = memo(({ onChange, value }) => {
 const Font: FC<FontProps> = memo(({ label, ...rest }) => {
   return <Dropdown targetOffset={24} placement="right" content={<FontSelectDropdown {...rest} />}>
     <Container label={label}>
-      <button style={{fontFamily: rest.value || "inherit"}} className="btn btn-sm btn-primary btn-outline border-2 field-width">{rest.value || "Select font"}</button>
+      <div style={{fontFamily: rest.value || "inherit"}} className="cursor-pointer hover:bg-base-300 leading-none flex items-center input input-bordered input-sm field-width">{rest.value || "Select font"}</div>
     </Container>
   </Dropdown>
 })
