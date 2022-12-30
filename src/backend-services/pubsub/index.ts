@@ -147,9 +147,14 @@ class Service_PubSub implements IServiceInterface {
       return;
     }
 
+    
     this.serviceState.state = ServiceNetworkState.connecting;
-    this.#socket = new WebSocket(`ws://192.168.0.120:3030/pubsub?id=${window.API.state.id}-${Date.now()}`);
+    this.#socket = new WebSocket(`ws://${fullAddress}/pubsub?id=${window.API.state.id}-${Date.now()}`);
+    const a = setTimeout(() => {
+      this.#socket?.close();
+    }, 5000);
     this.#socket.onopen = () => {
+      clearTimeout(a);
       this.serviceState.state = ServiceNetworkState.connected;
       if (!this.#socket)
         return;
@@ -160,9 +165,6 @@ class Service_PubSub implements IServiceInterface {
     this.#socket.onclose = () => {
       this.serviceState.state = ServiceNetworkState.disconnected;
     }
-
-    // }
-    // const ws = new WebSocket("");
   }
   linkDisconnect() {
     if (this.#socket?.close())

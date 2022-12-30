@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import { proxy } from "valtio";
 import { BaseEvent, IServiceInterface } from "../../types";
 import { PeerjsProvider as PeerProvider } from "./provider";
@@ -18,6 +19,7 @@ class Service_Network implements IServiceInterface {
   }
   copyClientLink() {
     navigator.clipboard.writeText(window.APIFrontend.network.getClientLink());
+    toast.success("Copied!");
   }
 
   async init() {

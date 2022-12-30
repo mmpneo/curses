@@ -2250,7 +2250,7 @@ __metadata:
     react-dom: ^18.2.0
     react-icons: ^4.7.1
     react-reverse-portal: ^2.1.1
-    react-rnd: ^10.3.7
+    react-rnd: ^10.4.1
     react-select: ^5.6.1
     react-shadow: ^19.0.3
     react-toastify: ^9.1.1
@@ -4254,7 +4254,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.6.0, prop-types@npm:^15.6.1, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2":
+"prop-types@npm:^15.6.0, prop-types@npm:^15.6.1, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -4359,16 +4359,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-draggable@npm:4.4.4":
-  version: 4.4.4
-  resolution: "react-draggable@npm:4.4.4"
+"react-draggable@npm:4.4.5":
+  version: 4.4.5
+  resolution: "react-draggable@npm:4.4.5"
   dependencies:
     clsx: ^1.1.1
-    prop-types: ^15.6.0
+    prop-types: ^15.8.1
   peerDependencies:
     react: ">= 16.3.0"
     react-dom: ">= 16.3.0"
-  checksum: b8258a58938c261a79f1b9ffd67774283c1ac732423c1c9c9f5fe4d17a06886edd659891e445ba089828ca59f1885e5b909262e24cf60640b8ed05c8499c88bb
+  checksum: 21c3775db086e13020967627c20acd41d1ddbc7c7d7fca51491a5bbb54a0aa7e1730a4bc9af17141eb50a4954e547a5e25b2368f5f54b70db6f2686a897bacf2
   languageName: node
   linkType: hard
 
@@ -4405,17 +4405,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-rnd@npm:^10.3.7":
-  version: 10.3.7
-  resolution: "react-rnd@npm:10.3.7"
+"react-rnd@npm:^10.4.1":
+  version: 10.4.1
+  resolution: "react-rnd@npm:10.4.1"
   dependencies:
     re-resizable: 6.9.6
-    react-draggable: 4.4.4
+    react-draggable: 4.4.5
     tslib: 2.3.1
   peerDependencies:
     react: ">=16.3.0"
     react-dom: ">=16.3.0"
-  checksum: 312c08f21b6ef9dcfa2e4823ebf63a3142793168b02b2cd54327587ad8159d409577428c6c363e3805ba437403dcfc708df39ebc83b423e9d71002e3fca3f3fc
+  checksum: 65741a091dab3c22093f27d89036a2989d09e1701c08bf7dc3c8322b14c92bf9a78e38a47e7cf2c4873dd5e90fae0666a9e5a9b75e843685dc49ea6392232cca
   languageName: node
   linkType: hard
 

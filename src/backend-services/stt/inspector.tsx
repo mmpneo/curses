@@ -33,7 +33,7 @@ const Browser: FC = () => {
 
 const Azure: FC = () => {
   const pr = useSnapshot(window.API.state.services.stt.data.azure);
-  const handleUpdate = <K extends keyof STT_State["azure"]>(key: K, v: STT_State["azure"][K]) => window.API.state.services.stt.data.azure[key] = v;
+  const up = <K extends keyof STT_State["azure"]>(key: K, v: STT_State["azure"][K]) => window.API.state.services.stt.data.azure[key] = v;
 
   const updateLanguage = (value: { group: string, option: string }) => {
     window.API.state.services.stt.data.azure.language = value.option;
@@ -42,8 +42,8 @@ const Azure: FC = () => {
 
   return <>
     <Inspector.SubHeader>Azure options</Inspector.SubHeader>
-    <Input.Text label="Location" value={pr.location} onChange={e => handleUpdate("location", e.target.value)} />
-    <Input.Text label="Key" type="password" value={pr.key} onChange={e => handleUpdate("key", e.target.value)} />
+    <Input.Text label="Location" value={pr.location} onChange={e => up("location", e.target.value)} />
+    <Input.Text label="Key" type="password" value={pr.key} onChange={e => up("key", e.target.value)} />
 
     <Input.MappedGroupSelect
       labelGroup="Language"
@@ -56,9 +56,9 @@ const Azure: FC = () => {
       { label: 'Masked', value: 'masked' },
       { label: 'Removed', value: 'removed' },
       { label: 'Raw', value: 'raw' },
-    ]} label="Profanity" value={{ value: pr.profanity, label: pr.profanity }} onChange={(e: any) => handleUpdate("profanity", e.value)} />
+    ]} label="Profanity" value={{ value: pr.profanity, label: pr.profanity }} onChange={(e: any) => up("profanity", e.value)} />
 
-    <Input.Checkbox label="Interim result" onChange={e => handleUpdate("interim", e)} value={pr.interim} />
+    <Input.Checkbox label="Interim result" onChange={e => up("interim", e)} value={pr.interim} />
   </>
 }
 
@@ -101,11 +101,11 @@ const Deepgram: FC = () => {
 
 const Speechly: FC = () => {
   const pr = useSnapshot(window.API.state.services.stt.data.speechly);
-  const handleUpdate = <K extends keyof STT_State["speechly"]>(key: K, v: STT_State["speechly"][K]) => window.API.state.services.stt.data.speechly[key] = v;
+  const up = <K extends keyof STT_State["speechly"]>(key: K, v: STT_State["speechly"][K]) => window.API.state.services.stt.data.speechly[key] = v;
 
   return <>
     <Inspector.SubHeader>Speechly options</Inspector.SubHeader>
-    <Input.Text label="Key" type="password" value={pr.key} onChange={e => handleUpdate("key", e.target.value)} />
+    <Input.Text label="Key" type="password" value={pr.key} onChange={e => up("key", e.target.value)} />
   </>
 }
 
@@ -114,19 +114,20 @@ const Inspector_STT: FC = () => {
   const state = useSnapshot(window.API.stt.serviceState);
 
   const handleStart = (v: boolean) => window.API.state.services.stt.showActionButton = v;
-  const handleBackend = (v: STT_Backends) => window.API.state.services.stt.data.backend = v;
+  const up = <K extends keyof STT_State>(key: K, v: STT_State[K]) => window.API.patchService("stt", s => s.data[key] = v);
 
   return <Inspector.Body>
     <Inspector.Header><RiUserVoiceFill /> Speech to Text</Inspector.Header>
     <Inspector.Content>
       <Input.Checkbox label="Add to action bar" onChange={handleStart} value={data.showActionButton} />
+      <Input.Checkbox label="Auto start" value={data.data.autoStart} onChange={e => up("autoStart", e)} />
       <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
         <Input.Select options={[
           { label: "Browser", value: STT_Backends.browser },
           { label: "Azure", value: STT_Backends.azure },
           { label: "Deepgram", value: STT_Backends.deepgram },
           { label: "Speechly", value: STT_Backends.speechly }
-        ]} label="Service" value={{ value: data.data.backend, label: data.data.backend }} onChange={(e: any) => handleBackend(e.value as STT_Backends)} />
+        ]} label="Service" value={{ value: data.data.backend, label: data.data.backend }} onChange={(e: any) => up("backend", e.value as STT_Backends)} />
 
         {data.data.backend === STT_Backends.browser && <Browser />}
         {data.data.backend === STT_Backends.azure && <Azure />}

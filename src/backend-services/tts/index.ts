@@ -28,10 +28,13 @@ class Service_TTS implements IServiceInterface {
       if (data?.type === TextEventType.final)
         this.#serviceInstance?.play(data.value);
     });
+
+    if (this.data.autoStart)
+      this.start();
   }
 
   get data() {
-    return window.API.state.services.tts;
+    return window.API.state.services.tts.data;
   }
 
   stop(): void {
@@ -59,7 +62,7 @@ class Service_TTS implements IServiceInterface {
       },
     };
 
-    let backend = this.data.data.backend;
+    let backend = this.data.backend;
     if (backend === TTS_Backends.windows) {
       this.#serviceInstance = new TTS_WindowsService(bindings);
     }
@@ -69,7 +72,7 @@ class Service_TTS implements IServiceInterface {
 
     if (!this.#serviceInstance) return;
     this.#setStatus(ServiceNetworkState.connecting);
-    this.#serviceInstance.start(this.data.data);
+    this.#serviceInstance.start(this.data);
   }
 }
 

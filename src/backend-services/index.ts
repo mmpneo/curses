@@ -140,6 +140,7 @@ class Backend {
     await this.vrc.init();
     await this.shortcuts.init();
     window.mode === "host" && this.changeTheme(this.state.clientTheme);
+    window.mode === "host" && this.changeScale(this.state.uiScale);
   }
 }
 

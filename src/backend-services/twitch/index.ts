@@ -44,6 +44,8 @@ class Service_Twitch implements IServiceInterface {
   async init() {  
     this.connect();
     serviceSubscibeToSource(this.#state.data, "chatPostSource", data => {
+      if (this.#state.data.chatPostLive && !this.state.live)
+        return;
       this.chatClient?.isConnected 
       && this.#state.data.chatPostEnable
       && data?.value
@@ -51,6 +53,9 @@ class Service_Twitch implements IServiceInterface {
       && this.say(data.value);
     });
     serviceSubscibeToInput(this.#state.data, "chatPostInput", data => {
+      if (this.#state.data.chatPostLive && !this.state.live)
+        return;
+
       this.chatClient?.isConnected 
       && this.#state.data.chatPostEnable
       && data?.textFieldType !== "twitchChat"
@@ -122,11 +127,14 @@ class Service_Twitch implements IServiceInterface {
   startLiveCheck() {
     if (this.liveCheckInterval !== null)
       clearInterval(this.liveCheckInterval);
-      this.liveCheckInterval = setInterval(async () => {
-      if (!this.state.user?.name)
+    this.liveCheckInterval = setInterval(async () => {
+      if (!this.state.user?.name) {
+        this.state.live == false;
         return;
+      }
       const resp = await this.apiClient?.streams.getStreamByUserName(this.state.user.name);
-    }, 5000);
+      this.state.live == !!resp;
+    }, 7000);
   }
 
   async connect() {

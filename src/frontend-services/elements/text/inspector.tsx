@@ -207,7 +207,7 @@ const Inspector_ElementText: FC<{ id: string }> = memo(({ id }) => {
     <Inspector.Header><TbTextResize /> <NameInput id={id} /></Inspector.Header>
     <Inspector.Content>
       <TransformInput id={id} />
-      <Input.Checkbox label="Preview mode" value={data.previewMode} onChange={e => up("previewMode", e)} />
+      <Input.Checkbox label="Preview design" value={data.previewMode} onChange={e => up("previewMode", e)} />
       <Inspector.Tabs>
         <Inspector.Tab tooltip="Text source" tooltipBody="Where should we get the text from" onClick={() => handleTab(0)} active={tab === 0}><IoIosRadio /></Inspector.Tab>
         <Inspector.Tab tooltip="Text" tooltipBody="Colors, size, shadow, stroke" onClick={() => handleTab(1)} active={tab === 1}><RiFontSize /></Inspector.Tab>

@@ -28,7 +28,7 @@ interface InputBaseProps {
 const Container: FC<PropsWithChildren<{ id?: string, vertical?: boolean, label: string }>> = memo(({ id, vertical, label, children }) => {
   const layout = vertical ? "flex-col space-y-2" : "justify-between items-center"
   return <div className={cx("flex min-h-8", layout)}>
-    <label className="flex-grow font-medium text-base-content/70 text-xs cursor-pointer" htmlFor={id}>{label}</label>
+    <label className="flex-grow font-medium text-base-content/80 text-xs cursor-pointer" htmlFor={id}>{label}</label>
     {children}
   </div>
 });

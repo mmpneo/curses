@@ -10,6 +10,7 @@ export enum STT_Backends {
 
 export type STT_State = {
   backend: STT_Backends;
+  autoStart: boolean;
   azure: {
     device: string;
     language_group: string;
@@ -37,6 +38,7 @@ const Schema_STT: JSONSchemaType<STT_State> = {
   type: "object",
   properties: {
     backend: { type: "string", default: STT_Backends.browser },
+    autoStart: { type: "boolean", default: false },
     azure: {
       type: "object",
       properties: {
@@ -79,6 +81,7 @@ const Schema_STT: JSONSchemaType<STT_State> = {
   },
   required: [
     "backend",
+    "autoStart",
     "speechly",
     "azure",
     "deepgram",

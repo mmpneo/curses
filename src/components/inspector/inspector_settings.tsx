@@ -1,7 +1,7 @@
 import classNames from "classnames";
-import { FC, useState } from "react";
+import { FC, memo, useState } from "react";
 import { RiFileCopyLine, RiSettings2Fill } from "react-icons/ri";
-import { SiObsstudio } from "react-icons/si";
+import { SiDiscord, SiObsstudio, SiTwitch, SiTwitter } from "react-icons/si";
 import { toast } from "react-toastify";
 import { useSnapshot } from "valtio";
 import Inspector from ".";
@@ -89,8 +89,17 @@ const ObsSetupDropdown: FC = () => {
   </div>
 }
 
-const Inspector_Settings: FC = () => {
-  const { linkAddress, clientTheme, uiScale } = useSnapshot(window.API.state);
+const AddrInput = () => {
+  const [v, setV] = useState(window.API.state.linkAddress);
+  const upd = (v: string) => {
+    setV(v);
+    window.API.state.linkAddress = v;
+  }
+  return <Input.Text value={v} onChange={e => upd(e.target.value)} label="Address" placeholder="192.168..smth" />
+}
+
+const Inspector_Settings: FC = memo(() => {
+  const {  clientTheme, uiScale } = useSnapshot(window.API.state);
   const {state: linkStatus} = useSnapshot(window.API.pubsub.serviceState);
   const canvas = useGetState(state => state.canvas);
   const updateState = useUpdateState();
@@ -101,20 +110,28 @@ const Inspector_Settings: FC = () => {
     window.API.changeScale(Math.max(UI_SCALE_MIN, Math.min(UI_SCALE_MAX, _v)));
   }
 
-  const updateLink = (value: string) => {
-    window.API.state.linkAddress = value;
-  }
-
   return <Inspector.Body>
     <Inspector.Header><RiSettings2Fill /> Settings</Inspector.Header>
     <Inspector.Content>
-      <Inspector.SubHeader>Canvas</Inspector.SubHeader>
+
+      <div className="flex flex-col items-center space-y-1">
+        <span className="text-6xl leading-none font-header font-black">curses</span>
+        <div className="flex space-x-1 self-center">
+          <a target="_blank" href="https://www.twitch.tv/mmpcode" className="btn text-primary btn-ghost btn-circle text-2xl"><SiTwitch/></a>
+          <a target="_blank" href="https://twitter.com/mmpneo" className="btn text-primary btn-ghost btn-circle text-2xl"><SiTwitter/></a>
+          <a target="_blank" href="https://discord.gg/SMKjA2yGf7" className="btn text-primary btn-ghost btn-circle text-2xl"><SiDiscord/></a>
+        </div>
+        <div className="self-center text-sm font-semibold opacity-50">Made with 💗 by Mmp</div>
+      </div>
+      <div className="divider"></div>
+
+      {/* <Inspector.SubHeader>Canvas</Inspector.SubHeader> */}
+      <Inspector.SubHeader>UI</Inspector.SubHeader>
       <Input.DoubleCountainer label="Canvas Size">
         <Input.BaseText value={canvas?.w} onChange={e => updateState(state => { state.canvas.w = parseFloat(e.target.value) })} type="number"/>
         <Input.BaseText value={canvas?.h} onChange={e => updateState(state => { state.canvas.h = parseFloat(e.target.value) })} type="number"/>
       </Input.DoubleCountainer>
 
-      <Inspector.SubHeader>UI</Inspector.SubHeader>
       <Input.Select label="Theme" options={options} value={{ value: clientTheme, label: clientTheme }} onChange={(e: any) => handleChangeTheme(e.value)} />
       <Input.Chips label="UI scale" value={uiScale} onChange={e => handleChangeScale(e)} options={[
         { label: "S", value: .8 },
@@ -138,15 +155,14 @@ const Inspector_Settings: FC = () => {
       <Inspector.SubHeader>Link apps</Inspector.SubHeader>
       <Inspector.Description>Sync text events with remote app instance</Inspector.Description>
       <Inspector.Deactivatable active={linkStatus === ServiceNetworkState.disconnected}>
-        <Input.Text value={linkAddress} onChange={e => updateLink(e.target.value)} label="Address" placeholder="192.168..smth" />
+        <AddrInput/>
         <Input.NetworkStatus value={linkStatus} label="Status"/>
       </Inspector.Deactivatable>
       <ServiceButton startLabel="Connect" stopLabel="Disconnect" status={linkStatus} onStart={() => window.API.pubsub.linkConnect()} onStop={() => window.API.pubsub.linkDisconnect()} />
       <button className="btn btn-sm btn-ghost" onClick={() => window.API.pubsub.copyLinkAddress()}>Copy my address</button>
 
-      <div className="opacity-50">Made with 💗 by Mmp</div>
     </Inspector.Content>
   </Inspector.Body>
-}
+})
 
 export default Inspector_Settings;

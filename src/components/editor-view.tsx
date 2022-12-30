@@ -16,13 +16,13 @@ const EditorView: FC = () => {
   const { showOverlay } = useSnapshot(window.API.state);
   return <AnimatePresence>
     <motion.div
-      initial={{ opacity: 0, scale: 0.97 }}
+      initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ ease: "anticipate", duration: .7}}
+      transition={{ ease: "anticipate", duration: .4}}
       className="relative bg-base-200 w-screen h-screen flex overflow-hidden">
       <NiceModal.Provider>
         <Sidebar />
-        <div className="relative flex flex-col w-full h-full">
+        <div className="relative flex flex-col overflow-hidden w-full h-full">
           <ActionBar />
           <EditorViewport />
           <AnimatePresence initial={false}>

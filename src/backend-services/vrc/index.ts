@@ -14,6 +14,8 @@ class Service_VRC implements IServiceInterface {
     }
 
     serviceSubscibeToSource(this.#state, "source", data => {
+      if (!this.#state.enable)
+        return;
       if (data && data.type === TextEventType.final) {
         this.#sendText(data.value, true);
         this.#state.indicator && this.#sendIndicator(false);
@@ -22,6 +24,8 @@ class Service_VRC implements IServiceInterface {
       }
     });
     serviceSubscibeToInput(this.#state, "inputField", data => {
+      if (!this.#state.enable)
+        return;
       if (data?.type === TextEventType.final) {
         this.#sendText(data.value, true);
         this.#state.indicator && this.#sendIndicator(false);

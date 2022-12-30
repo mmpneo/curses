@@ -12,6 +12,7 @@ const Inspector_VRC: FC = () => {
   return <Inspector.Body>
     <Inspector.Header><RiMessage2Fill /> VRChat Chatbox</Inspector.Header>
     <Inspector.Content>
+      <Input.Checkbox label="Enable" value={state.enable} onChange={e => up("enable", e)} />
       <Input.TextSource label="Source" value={state.source} onChange={e => up("source", e)} />
       <Input.Checkbox label="Send from input field" value={state.inputField} onChange={e => up("inputField", e)} />
       <Input.Checkbox label="Show indicator" value={state.indicator} onChange={e => up("indicator", e)} />
