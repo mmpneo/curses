@@ -61,7 +61,6 @@ struct OpenBrowserCommand {
 }
 #[command]
 fn open_browser(data: OpenBrowserCommand) {
-    println!("Open chrome");
     if cfg!(target_os = "windows") {
         Command::new("cmd")
             .args(&["/C", format!("start {} {}", &data.browser, &data.url).as_str()])

@@ -37,37 +37,35 @@ export const ElementEditorTransform: FC<{ id: string }> = memo(({ id }) => {
     });
   }
 
-  return <>
-    <Rnd className={classNames({ "z-50": selected })}
-      size={{
-        width: rect?.w || 100,
-        height: rect?.h || 100
-      }}
-      default={{
-        x: rect?.x ?? 0,
-        y: rect?.y ?? 0,
-        width: rect?.w || 100,
-        height: rect?.h || 100
-      }}
-      position={{
-        x: rect?.x ?? 0,
-        y: rect?.y ?? 0,
-      }}
-      onDragStop={handleDrag}
-      onResizeStop={handleResize}
-    >
-      <ElementInstance id={id} />
-      <div
-        onDoubleClick={e => { e.preventDefault(); e.stopPropagation(); selectElement() }}
-        className={classNames("absolute inset-0 border-2 border-dashed opacity-0 border-secondary/50 transition-opacity",
-          selected ? "opacity-100 border-primary" : ""
-        )}>
+  return <Rnd className={classNames("group", { "z-50": selected })}
+    size={{
+      width: rect?.w || 100,
+      height: rect?.h || 100
+    }}
+    onDrag={e => {
+      if (!selected)
+        return false
+    }}
+    position={{
+      x: rect?.x ?? 0,
+      y: rect?.y ?? 0,
+    }}
+    enableResizing={selected}
+    onDragStop={handleDrag}
+    onResizeStop={handleResize}
+  >
+    <ElementInstance id={id} />
+    <div
+      onDoubleClick={e => { e.preventDefault(); e.stopPropagation(); selectElement() }}
+      className={classNames("absolute inset-0 border-2 border-dashed opacity-0 border-secondary/50 transition-opacity",
+        selected ? "opacity-100 border-primary cursor-move" : "group-hover:opacity-30 cursor-pointer"
+      )}>
+      {selected && <>
         <Knob className="-bottom-1 -left-1" />
         <Knob className="-bottom-1 -right-1" />
         <Knob className="-top-1 -right-1" />
         <Knob className="-top-1 -left-1" />
-      </div>
-    </Rnd>
-    {!selected && <div onDoubleClick={e => selectElement()} style={{ width: rect.w, height: rect.h, transform: `translate(${rect?.x ?? 0}px, ${rect?.y ?? 0}px)` }} className="bg-transparent hover:bg-primary/30 top-0 left-0 absolute"></div>}
-  </>
+      </>}
+    </div>
+  </Rnd>
 });

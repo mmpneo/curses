@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use serde::{Deserialize, Serialize};
 use tauri::{
     command,
@@ -28,15 +26,22 @@ struct SpeechObject {
     pub label: String,
 }
 
-enum SpeechToken {
-    Device(String),
-    Voice(String)
+#[derive(Debug)]
+struct ISpeechToken {
+    id: String,
+    pub t: Intf<ISpeechObjectToken>,
 }
-impl SpeechToken {
-    fn get(&self) -> &String {
-        match self {
-            SpeechToken::Device(v) => v,
-            SpeechToken::Voice(v) => v,
+
+impl ISpeechToken {
+    fn get_desc(&self) -> Option<SpeechObject> {
+        unsafe {
+            self.t.0.Id().ok()
+                .and_then(|id| {
+                    self.t.0
+                        .GetDescription(0).ok()
+                        .map(|label| (id.to_string(), label.to_string()))
+                })
+                .map(|(id, label)| SpeechObject { id, label })
         }
     }
 }
@@ -53,76 +58,17 @@ impl WindowsTTSPlugin {
         Self { intf: Some(Intf(instance)) }
     }
 
-    fn internal_apply_token(&self, token_type: SpeechToken, token: &ISpeechObjectToken) -> Option<()> {
-        unsafe {self.intf.as_ref().and_then(|sp| {
-            match token_type {
-                SpeechToken::Device(_) => sp.putref_AudioOutput(token),
-                SpeechToken::Voice(_) => sp.putref_Voice(token),
-            }
-        }.ok())}
-    }
-
-    fn try_apply_token(&self, token: SpeechToken) -> Result<(), &str> {
-        let Some(tokens) = (match token {
-            SpeechToken::Device(_) => self.device_tokens(),
-            SpeechToken::Voice(_) => self.voice_tokens(),
-        }) else {
-            return Err("Invalid token format");
-        };
-        let Some(cur_token) = tokens.get(token.get()) else {
-            return Err("Invalid token");
-        };
-        let Some(cur_id) = unsafe {cur_token.Id()}.ok() else {
-            return Err("Cannot retrieve token id");
-        };
-
-        let def_id = self.intf.as_ref()
-            .and_then(|sp| unsafe {
-                match token {
-                    SpeechToken::Device(_) => sp.AudioOutput(),
-                    SpeechToken::Voice(_) => sp.Voice(),
-                }
-            }.ok())
-            .and_then(|v| unsafe {v.Id()}.ok());
-
-        if let Some(def_id) = def_id {
-            if !cur_id.eq(&def_id) {
-                let Some(()) = self.internal_apply_token(token, cur_token) else {
-                    return Err("Error applying token");
-                };
-            }
-        } 
-        else {
-            let Some(()) = self.internal_apply_token(token, cur_token) else {
-                return Err("Error applying token");
-            };
-        };
-        Ok(())
-    }
-
-    fn voice_tokens(&self) -> Option<HashMap<String, ISpeechObjectToken>> {
-        self.intf
-            .as_ref()
-            .and_then(|sp| unsafe { sp.GetVoices(&BSTR::new(), &BSTR::new()) }.ok())
-            .and_then(get_id_token_map)
-    }
-    fn device_tokens(&self) -> Option<HashMap<String, ISpeechObjectToken>> {
+    fn list_devices(&self) -> Option<Vec<ISpeechToken>> {
         self.intf
             .as_ref()
             .and_then(|sp| unsafe { sp.GetAudioOutputs(&BSTR::new(), &BSTR::new()) }.ok())
-            .and_then(get_id_token_map)
+            .and_then(into_speech_tokens)
     }
-    fn voices(&self) -> Option<HashMap<String, SpeechObject>> {
+    fn list_voices(&self) -> Option<Vec<ISpeechToken>> {
         self.intf
             .as_ref()
             .and_then(|sp| unsafe { sp.GetVoices(&BSTR::new(), &BSTR::new()) }.ok())
-            .and_then(get_object_map)
-    }
-    fn devices(&self) -> Option<HashMap<String, SpeechObject>> {
-        self.intf
-            .as_ref()
-            .and_then(|sp| unsafe { sp.GetAudioOutputs(&BSTR::new(), &BSTR::new()) }.ok())
-            .and_then(get_object_map)
+            .and_then(into_speech_tokens)
     }
 }
 
@@ -133,35 +79,24 @@ pub struct RpcWindowsTTSSpeak {
     value: String,
 }
 
-fn get_id_token_map(tokens: ISpeechObjectTokens) -> Option<HashMap<String, ISpeechObjectToken>> {
+fn into_speech_tokens(tokens: ISpeechObjectTokens) -> Option<Vec<ISpeechToken>> {
     let i_m = unsafe { tokens.Count() }.unwrap();
-    Some(
-        (0..i_m)
-            .into_iter()
-            .map(|i| {
-                unsafe { tokens.Item(i) }
-                    .ok()
-                    .and_then(|t| unsafe { t.Id() }.ok().map(|id| (t, id)))
-                    .and_then(|(t, id)| Some((id.to_string(), t)))
-            })
-            .flatten()
-            .collect(),
-    )
-}
-
-fn get_object_map(tokens: ISpeechObjectTokens) -> Option<HashMap<String, SpeechObject>> {
-    get_id_token_map(tokens).and_then(|m| {
-        Some(
-            m.iter()
-                .map(|(id, token)| {
-                    Some(token)
-                        .and_then(|t| unsafe { t.GetDescription(0) }.ok())
-                        .and_then(|label| {Some((id.clone(), SpeechObject {id: id.clone(),label: label.to_string()},))})
+    let ll = (0..i_m)
+        .into_iter()
+        .map(|i| {
+            unsafe { tokens.Item(i) }
+                .ok()
+                .and_then(|token| unsafe { token.Id() }.ok().map(|id| (token, id)))
+                .and_then(|(t, id)| {
+                    Some(ISpeechToken {
+                        id: id.to_string(),
+                        t: Intf(t),
+                    })
                 })
-                .flatten()
-                .collect(),
-        )
-    })
+        })
+        .flatten()
+        .collect();
+    Some(ll)
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -172,18 +107,16 @@ pub struct RpcWindowsTTSConfig {
 
 #[command]
 fn get_voices(state: State<WindowsTTSPlugin>) -> Result<RpcWindowsTTSConfig, &str> {
-    if state.intf.is_none() {
-        return Err("Plugin is not initialized");
+    let Some(devices): Option<Vec<SpeechObject>> = state
+        .list_devices()
+        .map(|list| list.iter().map(|t| t.get_desc()).flatten().collect()) else {
+        return Err("Failed to get device list");
     };
-    let Some(voices_map) = state.voices() else {
-        return Err("Plugin is not initialized");
+    let Some(voices): Option<Vec<SpeechObject>> = state
+        .list_voices()
+        .map(|list| list.iter().map(|t| t.get_desc()).flatten().collect()) else {
+        return Err("Failed to get voice list");
     };
-    let Some(devices_map) = state.devices() else {
-        return Err("Plugin is not initialized");
-    };
-
-    let voices: Vec<SpeechObject> = voices_map.into_values().collect();
-    let devices: Vec<SpeechObject> = devices_map.into_values().collect();
 
     Ok(RpcWindowsTTSConfig { voices, devices })
 }
@@ -193,22 +126,29 @@ fn speak(data: RpcWindowsTTSSpeak, state: State<WindowsTTSPlugin>) -> Result<(),
     if data.value == "" {
         return Ok(());
     }
-
-    let Some(sp) = &state.intf else {
+    let Some(sp_voice) = &state.intf else {
         return Err("Plugin is not initialized");
     };
 
-    match state.try_apply_token(SpeechToken::Voice(data.voice)) {
-        Ok(_) => (),
-        Err(err) => println!("{}",err),
-    }
-    match state.try_apply_token(SpeechToken::Device(data.device)) {
-        Ok(_) => (),
-        Err(err) => println!("{}",err),
-    }
+    let Some(_apply_res_device) = state
+        .list_devices()
+        .as_deref()
+        .and_then(|list| list.iter().find(|t| t.id == data.device))
+        .and_then(|token| unsafe { sp_voice.0.putref_AudioOutput(&token.t.0).ok() })
+        else {
+        return Err("Failed to apply device");
+    };
+    let Some(_apply_res_voice) = state
+        .list_voices()
+        .as_deref()
+        .and_then(|list| list.iter().find(|t| t.id == data.voice))
+        .and_then(|token| unsafe { sp_voice.0.putref_Voice(&token.t.0).ok() }) else {
+        return Err("Failed to apply voice");
+    };
 
     unsafe {
-        sp.Speak(&data.value.into(), SpeechVoiceSpeakFlags(SVSFDefault.0 | SVSFlagsAsync.0))
+        sp_voice
+            .Speak(&data.value.into(), SpeechVoiceSpeakFlags(SVSFDefault.0 | SVSFlagsAsync.0))
             .unwrap();
     }
     Ok(())

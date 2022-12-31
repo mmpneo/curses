@@ -31,7 +31,6 @@ export const elementStyle = `
         }
         
         .char.animate {
-          animation: charAppear 0.3s ease-in-out;
           animation-fill-mode: both;
           animation-iteration-count: 1;
         }

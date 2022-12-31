@@ -68,7 +68,7 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
       }
     }
     else {
-      
+
       const lookForInterim = sentencesRef.current.findIndex(s => s.interim); // todo cache index
       // ignore interim results if has sentence animating and no active interim
       if (lookForInterim < 0 && isRunning.current && isInterim) {
@@ -214,13 +214,16 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
     .scroll-container {
       min-height: calc((${state.textFontSize}px + (${state.boxPadding}px * 2)) * ${state.textLineHeight});
     }
+    .char.animate {
+      animation: charAppear ${state.animateDelayChar || 20}ms ease-in-out;
+    }
     `}</style>
     <style>{state.css}</style>
     <div className="container">
       <BoxElement className={classNames("box", { active: active || state.previewMode })}>
         <span className="text">
           {state.previewMode && <TextSentenceTest state={state} />}
-          {sentences.map(data => <sentenceCtx.Provider key={data.id} value={{data, onActivity, onComplete}}>
+          {sentences.map(data => <sentenceCtx.Provider key={data.id} value={{ data, onActivity, onComplete }}>
             <TextSentence key={data.id} />
           </sentenceCtx.Provider>)}
         </span>

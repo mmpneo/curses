@@ -15,7 +15,7 @@ const Browser: FC = () => {
     invoke("plugin:web|open_browser", {
       data: {
         browser: "chrome",
-        url: `localhost:${window.networkConfiguration.port}/mic.html`
+        url: `http://localhost:${window.networkConfiguration.port}/mic.html`
       }
     });
   };
