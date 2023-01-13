@@ -1,3 +1,4 @@
+import { invoke } from "@tauri-apps/api/tauri";
 import { proxy } from "valtio";
 import { IServiceInterface } from "../../types";
 
@@ -21,6 +22,15 @@ class Service_Sound implements IServiceInterface {
   });
 
   async playVoiceBuffer(buffer: ArrayBuffer) {
+    console.log("play");
+    
+    if (window.mode === "host") {
+      await invoke<any>("plugin:audio|play_async", {
+        data: Array.from(new Uint8Array(buffer))
+      });
+      return
+    }
+
     return new Promise(async (res, rej) => {
       try {
         const audio = await this.audioContext.decodeAudioData(buffer);

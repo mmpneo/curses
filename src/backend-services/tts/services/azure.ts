@@ -17,7 +17,10 @@ export class TTS_AzureService implements ITTSService {
   #isPlaying = false;
 
   start(state: TTS_State): void {
-    if (Object.values(state.azure).some(isEmptyValue)) return this.bindings.onStop("Options missing");
+    console.log(state.azure)
+    // exclude optional
+    const {voiceStyle, voiceRole, device, ...test} = state.azure;
+    if (Object.values(test).some(isEmptyValue)) return this.bindings.onStop("Options missing");
 
     try {
       // const audioConfig                     = AudioConfig.fromSpeakerOutput(p);
@@ -49,19 +52,40 @@ export class TTS_AzureService implements ITTSService {
     this.#tryDequeueAndPlay();
   }
 
+  get state() {
+    return window.API.state.services.tts.data.azure;
+  }
+
   play(value: string): void {
+    const ssml = `
+    <speak version="1.0" xmlns="https://www.w3.org/2001/10/synthesis" xml:lang="en-US">
+      <voice name="${this.state.voice}" ${this.state.voiceStyle ? `style="${this.state.voiceStyle}"` : ''} ${this.state.voiceRole ? `role="${this.state.voiceRole}"` : ''}>
+      <prosody volume="${this.state.voiceVolume || "default"}" rate="${this.state.voiceRate || "default"}" pitch="${this.state.voicePitch || "default"}" range="${this.state.voiceRange || "default"}">
+        ${value}
+      </prosody>
+      </voice>
+    </speak>
+    `
     value &&
-      this.#instance?.speakTextAsync(
-        value,
-        result => {
-          this.#audioQueue.push(result.audioData);
-          this.#tryDequeueAndPlay();
-        },
-        (e) => {
-          this.#instance?.close();
-          this.bindings.onStop(e);
-        }
-      );
+    this.#instance?.speakSsmlAsync(ssml, result => {
+      this.#audioQueue.push(result.audioData);
+      this.#tryDequeueAndPlay();
+    },
+    (e) => {
+      this.#instance?.close();
+      this.bindings.onStop(e);
+    })
+      // this.#instance?.speakTextAsync(
+      //   value,
+      //   result => {
+      //     this.#audioQueue.push(result.audioData);
+      //     this.#tryDequeueAndPlay();
+      //   },
+      //   (e) => {
+      //     this.#instance?.close();
+      //     this.bindings.onStop(e);
+      //   }
+      // );
   }
   stop(): void {
     this.#instance?.close();

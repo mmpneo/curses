@@ -1,11 +1,16 @@
 import difference from "lodash/difference";
 import { subscribeKey } from "valtio/utils";
+import { BackendState } from "../backend-services/schema";
 import { TextEvent, TextEventSource, TextEventType } from "../types";
 
 export function GetArrayDiff(source: string[], target: string[]) {
   const add      = difference(target, source);
   const remove = difference(source, target);
   return {add, remove}
+}
+
+export const useBackendUpdate = <Servicekey extends keyof BackendState["services"]>(serviceKey: Servicekey) => {
+  return (key: keyof BackendState["services"][Servicekey]["data"], value: any) => window.API.patchService(serviceKey, s => (s.data as any)[key] = value)
 }
 
 // allows to dynamically switch text source

@@ -42,8 +42,8 @@ const Azure: FC = () => {
 
   return <>
     <Inspector.SubHeader>Azure options</Inspector.SubHeader>
-    <Input.Text label="Location" value={pr.location} onChange={e => up("location", e.target.value)} />
     <Input.Text label="Key" type="password" value={pr.key} onChange={e => up("key", e.target.value)} />
+    <Input.Text label="Location" value={pr.location} onChange={e => up("location", e.target.value)} />
 
     <Input.MappedGroupSelect
       labelGroup="Language"

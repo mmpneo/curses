@@ -17,7 +17,7 @@ mod intf;
 
 #[derive(Default)]
 pub struct WindowsTTSPlugin {
-    intf: Option<Intf<ISpeechVoice>>,
+    intf: Option<Intf<ISpeechVoice>>
 }
 
 #[derive(Serialize, Deserialize, Debug)]

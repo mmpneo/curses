@@ -1,8 +1,9 @@
 import { MappedGroupDictionary } from "../../types";
 
-export type ServiceVoiceLibrary = [string, string, [string, string][]][];
-
-export const azureVoices: MappedGroupDictionary = {
+export const azureVoices: MappedGroupDictionary<{
+  styles?: string[],
+  roles?: string[]
+}> = {
   "Arabic (Egypt)": [
     ["ar-EG-SalmaNeural", "SalmaNeural"],
     ["ar-EG-ShakirNeural", "ShakirNeural"]
@@ -26,15 +27,24 @@ export const azureVoices: MappedGroupDictionary = {
     ["zh-HK-WanLungNeural", "WanLungNeural"]
   ],
   "Chinese (Mandarin, Simplified)": [
-    ["zh-CN-XiaoxiaoNeural", "XiaoxiaoNeural"],
+    ["zh-CN-XiaoxiaoNeural", "XiaoxiaoNeural", {styles: ["assistant", "chat", "customerservice", "newscast", "affectionate", "angry", "calm", "cheerful", "disgruntled", "fearful", "gentle", "lyrical", "sad", "serious", "poetry-reading"]}],
     ["zh-CN-XiaoyouNeural", "XiaoyouNeural"],
-    ["zh-CN-XiaomoNeural", "XiaomoNeural"],
-    ["zh-CN-XiaoxuanNeural", "XiaoxuanNeural"],
-    ["zh-CN-XiaohanNeural", "XiaohanNeural"],
-    ["zh-CN-XiaoruiNeural", "XiaoruiNeural"],
-    ["zh-CN-YunyangNeural", "YunyangNeural"],
-    ["zh-CN-YunyeNeural", "YunyeNeural"],
-    ["zh-CN-YunxiNeural", "YunxiNeural"],
+    ["zh-CN-XiaomoNeural", "XiaomoNeural", {styles: ["embarrassed", "calm", "fearful", "cheerful", "disgruntled", "serious", "angry", "sad", "depressed", "affectionate", "gentle", "envious"], roles: ["YoungAdultFemale", "YoungAdultMale", "OlderAdultFemale", "OlderAdultMale", "SeniorFemale", "SeniorMale", "Girl", "Boy"]}],
+    ["zh-CN-XiaoxuanNeural", "XiaoxuanNeural", {styles: ["calm", "fearful", "cheerful", "disgruntled", "serious", "angry", "gentle", "depressed"], roles: ["YoungAdultFemale", "YoungAdultMale", "OlderAdultFemale", "OlderAdultMale", "SeniorFemale", "SeniorMale", "Girl", "Boy"]}],
+    ["zh-CN-XiaohanNeural", "XiaohanNeural", {styles: ["calm", "fearful", "cheerful", "disgruntled", "serious", "angry", "sad", "gentle", "affectionate", "embarrassed"]}],
+    ["zh-CN-XiaomengNeural", "XiaomengNeural", {styles: ["chat"]}],
+    ["zh-CN-XiaoruiNeural", "XiaoruiNeural", {styles: ["calm", "fearful", "angry", "sad"]}],
+    ["zh-CN-XiaoshuangNeural", "XiaoshuangNeural", {styles: ["chat"]}],
+    ["zh-CN-XiaoyiNeural,", "XiaoyiNeural,", {styles: ["angry", "disgruntled", "affectionate", "cheerful", "fearful", "sad", "embarrassed", "serious", "gentle"]}],
+    ["zh-CN-XiaozhenNeural,", "XiaozhenNeural,", {styles: ["angry", "disgruntled", "affectionate", "cheerful", "fearful", "sad", "embarrassed", "serious", "gentle"]}],
+    ["zh-CN-YunfengNeural,", "YunfengNeural,", {styles: ["angry", "disgruntled", "cheerful", "fearful", "sad", "serious", "depressed"]}],
+    ["zh-CN-YunjianNeural,", "YunjianNeural,", {styles: ["narration-relaxed", "sports-commentary", "sports-commentary-excited"]}],
+    ["zh-CN-YunhaoNeural,", "YunhaoNeural,", {styles: ["advertisement-upbeat"]}],
+    ["zh-CN-YunxiaNeural,", "YunxiaNeural,", {styles: ["calm", "fearful", "cheerful", "angry", "sad"]}],
+    ["zh-CN-YunyangNeural", "YunyangNeural", {styles: ["customerservice", "narration-professional", "newscast-casual"]}],
+    ["zh-CN-YunzeNeural", "YunzeNeural", {styles: ["calm", "fearful", "cheerful", "disgruntled", "serious", "angry", "sad", "depressed", "documentary-narration"], roles: ["OlderAdultMale", "SeniorMale"]}],
+    ["zh-CN-YunyeNeural", "YunyeNeural", {styles: ["embarrassed", "calm", "fearful", "cheerful", "disgruntled", "serious", "angry", "sad"], roles: ["YoungAdultFemale, YoungAdultMale, OlderAdultFemale, OlderAdultMale, SeniorFemale, SeniorMale, Girl, Boy"]}],
+    ["zh-CN-YunxiNeural", "YunxiNeural", {styles: ["narration-relaxed", "embarrassed", "fearful", "cheerful", "disgruntled", "serious", "angry", "sad", "depressed", "chat", "assistant", "newscast"], roles: ["Narrator", "YoungAdultMale", "Boy"]}],
   ],
   "Chinese (Taiwanese Mandarin)": [
     ["zh-TW-HsiaoChenNeural", "HsiaoChenNeural"],
@@ -101,12 +111,19 @@ export const azureVoices: MappedGroupDictionary = {
   "English (United Kingdom)": [
     ["en-GB-LibbyNeural", "LibbyNeural"],
     ["en-GB-MiaNeural", "MiaNeural"],
-    ["en-GB-RyanNeural", "RyanNeural"]
+    ["en-GB-RyanNeural", "RyanNeural", {styles: ["cheerful", "chat"]}],
+    ["en-GB-SoniaNeural", "SoniaNeural", {styles: ["cheerful", "sad"]}],
   ],
   "English (United States)": [
-    ["en-US-AriaNeural", "AriaNeural"],
-    ["en-US-JennyNeural", "JennyNeural"],
-    ["en-US-GuyNeural", "GuyNeural"]
+    ["en-US-AriaNeural", "AriaNeural", {styles: ["chat", "customerservice", "narration-professional", "newscast-casual", "newscast-formal", "cheerful", "empathetic", "angry", "sad", "excited", "friendly", "terrified", "shouting", "unfriendly", "whispering", "hopeful"]}],
+    ["en-US-DavisNeural", "DavisNeural", {styles: ["chat", "angry", "cheerful", "excited", "friendly", "hopeful", "sad", "shouting", "terrified", "unfriendly", "whispering"]}],
+    ["en-US-GuyNeural", "GuyNeural", {styles: ["newscast", "angry", "cheerful", "sad", "excited", "friendly", "terrified", "shouting", "unfriendly", "whispering", "hopeful"]}],
+    ["en-US-JaneNeural", "JaneNeural", {styles: ["angry", "cheerful", "excited", "friendly", "hopeful", "sad", "shouting", "terrified", "unfriendly", "whispering"]}],
+    ["en-US-JasonNeural", "JasonNeural", {styles: ["angry", "cheerful", "excited", "friendly", "hopeful", "sad", "shouting", "terrified", "unfriendly", "whispering"]}],
+    ["en-US-JennyNeural", "JennyNeural", {styles: ["assistant", "chat", "customerservice", "newscast", "angry", "cheerful", "sad", "excited", "friendly", "terrified", "shouting", "unfriendly", "whispering", "hopeful"]}],
+    ["en-US-NancyNeural", "NancyNeural", {styles: ["angry", "cheerful", "excited", "friendly", "hopeful", "sad", "shouting", "terrified", "unfriendly", "whispering"]}],
+    ["en-US-SaraNeural", "SaraNeural", {styles: ["angry", "cheerful", "excited", "friendly", "hopeful", "sad", "shouting", "terrified", "unfriendly", "whispering"]}],
+    ["en-US-TonyNeural", "TonyNeural", {styles: ["angry", "cheerful", "excited", "friendly", "hopeful", "sad", "shouting", "terrified", "unfriendly", "whispering"]}],
   ],
   "Estonian (Estonia)": [
     ["et-EE-AnuNeural", "AnuNeural"],
@@ -127,8 +144,8 @@ export const azureVoices: MappedGroupDictionary = {
     ["fr-CA-JeanNeural", "JeanNeural"]
   ],
   "French (France)": [
-    ["fr-FR-DeniseNeural", "DeniseNeural"],
-    ["fr-FR-HenriNeural", "HenriNeural"]
+    ["fr-FR-DeniseNeural", "DeniseNeural", {styles: ["cheerful", "sad"]}],
+    ["fr-FR-HenriNeural", "HenriNeural", {styles: ["cheerful", "sad"]}]
   ],
   "French (Switzerland)": [
     ["fr-CH-ArianeNeural", "ArianeNeural"],
@@ -176,11 +193,11 @@ export const azureVoices: MappedGroupDictionary = {
   ],
   "Italian (Italy)": [
     ["it-IT-ElsaNeural", "ElsaNeural"],
-    ["it-IT-IsabellaNeural", "IsabellaNeural"],
+    ["it-IT-IsabellaNeural", "IsabellaNeural", {styles: ["cheerful","chat"]}],
     ["it-IT-DiegoNeural", "DiegoNeural"]
   ],
   "Japanese (Japan)": [
-    ["ja-JP-NanamiNeural", "NanamiNeural"],
+    ["ja-JP-NanamiNeural", "NanamiNeural", {styles: ["cheerful", "chat", "customerservice"]}],
     ["ja-JP-KeitaNeural", "KeitaNeural"]
   ],
   "Korean (Korea)": [
@@ -253,7 +270,7 @@ export const azureVoices: MappedGroupDictionary = {
   ],
   "Spanish (Mexico)": [
     ["es-MX-DaliaNeural", "DaliaNeural"],
-    ["es-MX-JorgeNeural", "JorgeNeural"]
+    ["es-MX-JorgeNeural", "JorgeNeural", {styles: ["cheerful", "chat"]}]
   ],
   "Spanish (Spain)": [
     ["es-ES-ElviraNeural", "ElviraNeural"],

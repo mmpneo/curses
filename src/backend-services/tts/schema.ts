@@ -10,8 +10,8 @@ export type TTS_State = {
   source: TextEventSource;
   inputField: boolean;
   backend: TTS_Backends;
-  autoStart: boolean,
-  replaceWords: Record<string, string>
+  autoStart: boolean;
+  replaceWords: Record<string, string>;
   windows: {
     device: string;
     voice: string;
@@ -20,6 +20,14 @@ export type TTS_State = {
     device: string;
     language: string;
     voice: string;
+    voiceStyle: string;
+    voiceRole: string;
+
+    voiceVolume: string;
+    voiceRate: string;
+    voicePitch: string;
+    voiceRange: string;
+
     key: string;
     location: string;
   };
@@ -49,10 +57,30 @@ const Schema_STT: JSONSchemaType<TTS_State> = {
         device: { type: "string", default: "" },
         language: { type: "string", default: "" },
         voice: { type: "string", default: "" },
+        voiceStyle: { type: "string", default: "" },
+        voiceRole: { type: "string", default: "" },
+
+        voiceVolume: { type: "string", default: "default" },
+        voiceRate: { type: "string", default: "default" },
+        voicePitch: { type: "string", default: "default" },
+        voiceRange: { type: "string", default: "default" },
+
         key: { type: "string", default: "" },
         location: { type: "string", default: "" },
       },
-      required: ["device", "language", "voice", "key", "location"],
+      required: [
+        "device",
+        "voiceStyle",
+        "voiceRole",
+        "voiceVolume",
+        "voiceRate",
+        "voiceRange",
+        "voicePitch",
+        "language",
+        "voice",
+        "key",
+        "location",
+      ],
       default: {} as any,
       additionalProperties: false,
     },

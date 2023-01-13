@@ -44,6 +44,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![get_port])
         .plugin(services::osc::init())
         .plugin(services::web::init())
+        .plugin(services::audio::init())
         .plugin(services::windows_tts::init())
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

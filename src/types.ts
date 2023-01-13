@@ -2,7 +2,7 @@ import { JSONSchemaType } from "ajv";
 import { Services } from "./backend-services";
 import { ElementType } from "./frontend-services/schema/element";
 
-export type MappedGroupDictionary = Record<string, ([string] | [string, string])[]>
+export type MappedGroupDictionary<Options = any> = Record<string, ([string] | [string, string] | [string, string, Options])[]>
 
 export interface IServiceInterface {
   init(): void;
