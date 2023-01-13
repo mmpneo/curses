@@ -13,7 +13,6 @@ import Input from "../input";
 import ServiceButton from "../service-button";
 
 const themesLight = [
-  'customblack',
   'light',
   'lofi',
   'cupcake',
@@ -36,16 +35,18 @@ const themesLight = [
 ]
 
 const themesDark = [
+  'matrix',
+  'staffy',
   'dark',
   'synthwave',
   'halloween',
   'forest',
   'black',
-  'luxury',
   'dracula',
   'business',
   'night',
   'coffee',
+  // 'luxury',
 ]
 
 const options = [

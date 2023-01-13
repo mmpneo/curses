@@ -84,7 +84,7 @@ const STTInput: FC = () => {
     className="flex items-center space-x-2 w-96">
     {/* <button className="btn btn-circle btn-ghost"><RiChatDeleteFill/></button> */}
     <form onSubmit={submit} className="w-full">
-      <input type="text" autoComplete="off" name="sttimput" placeholder="Type something and press [Enter]" className="w-full textarea" value={inputValue} onChange={e => handleChange(e.target.value)} />
+      <input type="text" autoComplete="off" name="sttinput" placeholder="Type something and press [Enter]" className="w-full textarea" value={inputValue} onChange={e => handleChange(e.target.value)} />
     </form>
   </motion.div>
 }

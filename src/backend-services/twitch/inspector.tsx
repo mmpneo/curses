@@ -5,16 +5,8 @@ import { RiTwitchFill } from "react-icons/ri";
 import { useSnapshot } from "valtio";
 import Tooltip from "../../components/dropdown/Tooltip";
 import Input from "../../components/input";
-import Inspector from "../../components/inspector";
+import Inspector, { useInspectorTabs } from "../../components/inspector";
 import { Twitch_State } from "./schema";
-
-export const useInspectorTabs = () => {
-  const [[tab, direction], setTab] = useState<[number, number]>([0, 0]);
-  const handleTab = (v: number) => {
-    setTab([v, Math.sign(v - tab)]);
-  }
-  return [[tab, direction], handleTab] as [[number, number], (v: number) => void];
-}
 
 const ChatInspector: FC = () => {
   const pr = useSnapshot(window.API.state.services.twitch.data);
@@ -22,8 +14,9 @@ const ChatInspector: FC = () => {
   const chatState = useSnapshot(window.API.twitch.chatState);
 
   return <>
-    <Inspector.SubHeader>Chat options</Inspector.SubHeader>
-    <Input.NetworkStatus label="Chat connection" value={chatState.status} />
+    <Inspector.SubHeader>Chat</Inspector.SubHeader>
+    <Input.Checkbox label="Enable" value={pr.chatEnable} onChange={e => up("chatEnable", e)} />
+    <Input.NetworkStatus label="Connection" value={chatState.status} />
     <Input.Checkbox label="Post in chat" value={pr.chatPostEnable} onChange={e => up("chatPostEnable", e)} />
     <Inspector.Description>Post speech to text or translation results in chat</Inspector.Description>
     <Inspector.Switchable visible={pr.chatPostEnable}>
@@ -40,10 +33,10 @@ const EmotesInspector: FC = () => {
   return <>
     <Inspector.SubHeader>Emotes ({Object.keys(window.API.twitch.emotes).length})</Inspector.SubHeader>
     <div className="grid grid-cols-8 gap-1">
-      {Object.keys(window.API.twitch.emotes).map((k, i) => 
-      <Tooltip key={k} className="relative aspect-square" placement="top" content={k}>
-        <img className="w-full h-full aspect-square object-contain" src={window.API.twitch.emotes[k]} />
-      </Tooltip>
+      {Object.keys(window.API.twitch.emotes).map((k, i) =>
+        <Tooltip key={k} className="relative aspect-square" placement="top" content={k}>
+          <img className="w-full h-full aspect-square object-contain" src={window.API.twitch.emotes[k]} />
+        </Tooltip>
       )
       }
     </div>

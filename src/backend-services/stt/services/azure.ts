@@ -75,8 +75,9 @@ export class STT_AzureService implements ISpeechRecognitionService {
   stop(): void {
     this.#instance?.stopContinuousRecognitionAsync(() => {
       this.#instance?.close();
+      this.bindings.onStop();
     }, err => {
-      this.bindings.onStop(err);
+      // ignore results 
     });
   }
 }

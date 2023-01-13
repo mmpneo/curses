@@ -67,7 +67,7 @@ const Azure: FC = () => {
     <Input.MappedGroupSelect
       labelGroup="Language"
       labelOption="Voice"
-      value={{group: pr.language, option: pr.voice}}
+      value={{ group: pr.language, option: pr.voice }}
       onChange={updateVoice}
       library={azureVoices} />
 
@@ -101,14 +101,17 @@ const Inspector_TTS: FC = () => {
 
         {data.data.backend === TTS_Backends.windows && <Windows />}
         {data.data.backend === TTS_Backends.azure && <Azure />}
-        
+
         <Inspector.SubHeader>Source</Inspector.SubHeader>
         <Input.TextSource label="Source" value={data.data.source} onChange={e => up("source", e)} />
         <Input.Checkbox label="Input field" value={data.data.inputField} onChange={e => up("inputField", e)} />
+
       </Inspector.Deactivatable>
 
-
       <ServiceButton status={state.status} onStart={() => window.API.tts.start()} onStop={() => window.API.tts.stop()} />
+
+      <Inspector.SubHeader>Replace words</Inspector.SubHeader>
+      <Input.Object keyPlaceholder="Word" valuePlaceholder="Replacement" addLabel="Add word" value={data.data.replaceWords} onChange={e => up("replaceWords", e)} label="" />
 
     </Inspector.Content>
   </Inspector.Body>

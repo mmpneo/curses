@@ -4,6 +4,7 @@ import { StaticAuthProvider } from "@twurple/auth";
 import { ChatClient } from "@twurple/chat";
 import { DataObject, rawDataSymbol } from "@twurple/common";
 import { proxy } from "valtio";
+import { subscribeKey } from "valtio/utils";
 import { IServiceInterface, ServiceNetworkState, TextEvent, TextEventSource, TextEventType } from "../../types";
 import { serviceSubscibeToInput, serviceSubscibeToSource } from "../../utils";
 import { Load_7TV_CHANNEL, Load_7TV_GLOBAL, Load_BTTV_CHANNEL, Load_BTTV_GLOBAL, Load_FFZ_CHANNEL, Load_FFZ_GLOBAL } from "./emote_loaders";
@@ -43,6 +44,9 @@ class Service_Twitch implements IServiceInterface {
 
   async init() {  
     this.connect();
+    subscribeKey(this.#state.data, "chatEnable", value => {
+      value ? this.chatConnect() : this.chatDisconnect();
+    });
     serviceSubscibeToSource(this.#state.data, "chatPostSource", data => {
       if (this.#state.data.chatPostLive && !this.state.live)
         return;
@@ -63,6 +67,16 @@ class Service_Twitch implements IServiceInterface {
       && data?.type === TextEventType.final
       && this.say(data.value);
     });
+  }
+
+  chatConnect() {
+    if (this.chatClient?.isConnecting || this.chatClient?.isConnected)
+      return;
+    this.chatState.status = ServiceNetworkState.connecting;
+    this.chatClient?.connect();
+  }
+  chatDisconnect() {
+    this.chatClient?.quit();
   }
 
   say(value: string) {
@@ -106,6 +120,8 @@ class Service_Twitch implements IServiceInterface {
   emotes: Record<string, string> = {}
   scanForEmotes(sentence: string) {
     let emotes: TextEvent["emotes"] = {}
+    if (!sentence)
+      return {};
     const wl = sentence.split(" ");
     for (let i = 0; i < wl.length; i++) {
       if (wl[i] in this.emotes) {
@@ -171,7 +187,6 @@ class Service_Twitch implements IServiceInterface {
         this.addTwitchEmotes(emotes);
         this.addTwitchEmotes(globalEmotes);
 
-        this.chatState.status = ServiceNetworkState.connecting;
         this.chatClient = new ChatClient({authProvider, channels: [me.name]});
         this.chatClient.onConnect(() => this.chatState.status = ServiceNetworkState.connected)
         this.chatClient.onDisconnect(() => this.chatState.status = ServiceNetworkState.disconnected)
@@ -186,7 +201,8 @@ class Service_Twitch implements IServiceInterface {
             }
           }
         });
-        await this.chatClient.connect();
+        if (this.#state.data.chatEnable)
+          this.chatConnect();
       } catch (error) {
         this.logout();
       }

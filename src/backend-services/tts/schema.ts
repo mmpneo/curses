@@ -11,6 +11,7 @@ export type TTS_State = {
   inputField: boolean;
   backend: TTS_Backends;
   autoStart: boolean,
+  replaceWords: Record<string, string>
   windows: {
     device: string;
     voice: string;
@@ -31,6 +32,7 @@ const Schema_STT: JSONSchemaType<TTS_State> = {
     autoStart: { type: "boolean", default: false },
     source: { type: "string", default: TextEventSource.stt },
     inputField: { type: "boolean", default: true },
+    replaceWords: { type: "object", default: {}, required: [] },
     windows: {
       type: "object",
       properties: {
@@ -56,6 +58,7 @@ const Schema_STT: JSONSchemaType<TTS_State> = {
     },
   },
   required: [
+    "replaceWords",
     "backend",
     "autoStart",
     "source",

@@ -1,7 +1,6 @@
-use std::{sync::Arc, process::Command};
-
 use local_ip_address::local_ip;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+use std::{process::Command, sync::Arc};
 use tauri::{
     async_runtime::Mutex,
     command,
@@ -57,7 +56,7 @@ async fn config(config: State<'_, AppConfiguration>) -> Result<WebConfig, String
 #[derive(Serialize, Deserialize)]
 struct OpenBrowserCommand {
     browser: String,
-    url: String
+    url: String,
 }
 #[command]
 fn open_browser(data: OpenBrowserCommand) {

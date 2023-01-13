@@ -3,7 +3,7 @@ import { useId } from "@floating-ui/react-dom-interactions";
 import classNames from "classnames/bind";
 import { FC, InputHTMLAttributes, memo, PropsWithChildren, ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { RgbaColor, RgbaColorPicker } from "react-colorful";
-import { RiUpload2Fill } from "react-icons/ri";
+import { RiDeleteBack2Fill, RiUpload2Fill } from "react-icons/ri";
 import Select, { MenuListProps, MenuProps, OptionProps, Props as SelectProps } from 'react-select';
 import SimpleBar from "simplebar-react";
 import FileElement from "../../frontend-services/components/file-element";
@@ -19,6 +19,7 @@ import { MappedGroupDictionary, ServiceNetworkState, TextEventSource } from "../
 
 import { useSnapshot } from "valtio";
 import styles from "./style.module.css";
+import produce from "immer";
 const cx = classNames.bind(styles);
 
 interface InputBaseProps {
@@ -144,7 +145,7 @@ const SelectOption: FC<OptionProps> = ({ innerRef, innerProps, ...props }) => {
     if (props.isFocused)
       ref.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }, [props.isFocused])
-  return <li><a onClick={() => props.selectOption(props.data)} ref={ref as any} className={cx("font-medium", {
+  return <li><a onClick={() => props.selectOption(props.data)} ref={ref as any} className={cx("font-medium capitalize", {
     disabled: props.isDisabled,
     "bg-neutral/60 text-neutral-content": props.isFocused,
     active: props.isSelected
@@ -419,11 +420,11 @@ const FontSelectDropdown: FC<any> = memo(({ onChange, value }) => {
   return <div className="flex flex-col space-y-2 bg-base-100 rounded-box p-4 w-64">
     <span className="text-xs text-primary font-bold font-header">Installed</span>
     <label className="flex justify-between items-center cursor-pointer">
-      <span className="label-text font-semibold" style={{fontFamily: "Outfit"}}>Outfit</span> 
+      <span className="label-text font-semibold" style={{ fontFamily: "Outfit" }}>Outfit</span>
       <input type="radio" name="font" value={value} checked={value === "Outfit"} onChange={e => onChange("Outfit")} className="radio radio-primary" />
     </label>
     {fonts.map(font => <label key={font} className="flex justify-between items-center cursor-pointer">
-      <span className="label-text font-semibold" style={{fontFamily: font}}>{font}</span> 
+      <span className="label-text font-semibold" style={{ fontFamily: font }}>{font}</span>
       <input type="radio" name="font" value={value} checked={value === font} onChange={e => onChange(font)} className="radio radio-primary" />
     </label>)}
     <div className="input-group w-full">
@@ -436,9 +437,65 @@ const FontSelectDropdown: FC<any> = memo(({ onChange, value }) => {
 const Font: FC<FontProps> = memo(({ label, ...rest }) => {
   return <Dropdown targetOffset={24} placement="right" content={<FontSelectDropdown {...rest} />}>
     <Container label={label}>
-      <div style={{fontFamily: rest.value || "inherit"}} className="cursor-pointer hover:bg-base-300 leading-none flex items-center input input-bordered input-sm field-width">{rest.value || "Select font"}</div>
+      <div style={{ fontFamily: rest.value || "inherit" }} className="cursor-pointer hover:bg-base-300 leading-none flex items-center input input-bordered input-sm field-width">{rest.value || "Select font"}</div>
     </Container>
   </Dropdown>
 })
 
-export default { BaseText, Text, Chips, Range, Color, Font, Select: NewSelect, MappedGroupSelect, Checkbox, File, Event, Code, TextSource, Container, DoubleCountainer, NetworkStatus };
+type ObjectRecord = Record<string, string>;
+interface ObjectProps extends InputBaseProps {
+  value: ObjectRecord,
+  onChange: (value: ObjectRecord) => void,
+  keyPlaceholder?: string,
+  valuePlaceholder?: string,
+  addLabel?: string
+}
+const MapObject: FC<ObjectProps> = memo(({ label, onChange, ...rest }) => {
+  const [value, setValue] = useState<ObjectRecord>(rest.value);
+
+  const handleAdd = () => {
+    if (value[" "])
+      return;
+    const newVal = produce(value, v => { v[""] = ""; });
+    setValue(newVal);
+    onChange(newVal);
+  };
+  const handleRemove = (key: string) => {
+    const newVal = produce(value, v => { delete v[key]; });
+    setValue(newVal);
+    onChange(newVal);
+  };
+
+  const handleUpdateKey = (oldKey: string, newKey: string) => {
+    if (newKey.includes(" ") || value[newKey])
+      return;
+    // preserve key order
+    const ent = Object.entries(value).map(([k, v]) => [k === oldKey ? newKey : k, v]);
+    const v = Object.fromEntries(ent);
+    setValue(v);
+    onChange(v);
+  }
+  const handleUpdateValue = (key: string, val: string) => {
+    const newVal = produce(value, v => { v[key] = val; });
+    setValue(newVal);
+    onChange(newVal);
+  }
+
+  return <Container vertical label={label}>
+    <div className="flex flex-col space-y-2">
+      {!Object.keys(value).length && <div className="h-20 px-4 flex justify-center items-center rounded-md border-2 border-primary/10 border-dashed ">
+        <span className="text-sm font-medium text-center">
+          Nothing here <br/> <span className="text-primary cursor-pointer font-semibold" onClick={handleAdd}>{rest.addLabel || "Add pair"}</span>
+        </span>
+      </div>}
+      {Object.entries(value).map(([key,], i) => <div key={i} className="flex space-x-2">
+        <BaseText placeholder={rest.keyPlaceholder || "Key"} value={key} onChange={v => handleUpdateKey(key, v.target.value)} />
+        <BaseText placeholder={rest.valuePlaceholder || "Value"} value={value[key]} onChange={v => handleUpdateValue(key, v.target.value)} />
+        <button className="btn btn-sm btn-circle btn-ghost" onClick={() => handleRemove(key)}><RiDeleteBack2Fill /></button>
+      </div>)}
+      {Object.keys(value).length > 0 && <button className="btn btn-sm btn-neutral" onClick={handleAdd}>{rest.addLabel || "Add pair"}</button>}
+    </div>
+  </Container>
+})
+
+export default { BaseText, Text, Chips, Object: MapObject, Range, Color, Font, Select: NewSelect, MappedGroupSelect, Checkbox, File, Event, Code, TextSource, Container, DoubleCountainer, NetworkStatus };

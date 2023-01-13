@@ -3,6 +3,7 @@ import { TextEventSource } from "../../types";
 
 export type Twitch_State = {
   token: string
+  chatEnable: boolean,
   chatPostEnable: boolean,
   chatPostLive: boolean,
   chatPostSource: TextEventSource,
@@ -14,6 +15,7 @@ const Schema_Twitch: JSONSchemaType<Twitch_State> = {
   type: "object",
   properties: {
     token: { type: "string", default: "" },
+    chatEnable: { type: "boolean", default: false },
     chatPostEnable: { type: "boolean", default: false },
     chatPostLive: { type: "boolean", default: false },
     chatPostSource: { type: "string", default: TextEventSource.stt },
@@ -22,6 +24,7 @@ const Schema_Twitch: JSONSchemaType<Twitch_State> = {
   },
   required: [
     "token",
+    "chatEnable",
     "chatPostEnable",
     "chatPostLive",
     "chatPostSource",

@@ -21,12 +21,12 @@ class Service_TTS implements IServiceInterface {
   async init() {
     serviceSubscibeToSource(window.API.state.services.tts.data, "source", data => {
       if (data?.type === TextEventType.final)
-        this.#serviceInstance?.play(data.value);
+        this.play(data.value);
     });
 
     serviceSubscibeToInput(window.API.state.services.tts.data, "inputField", data => {
       if (data?.type === TextEventType.final)
-        this.#serviceInstance?.play(data.value);
+        this.play(data.value);
     });
 
     if (this.data.autoStart)
@@ -37,13 +37,25 @@ class Service_TTS implements IServiceInterface {
     return window.API.state.services.tts.data;
   }
 
+  
   stop(): void {
     this.#serviceInstance?.stop();
     this.#serviceInstance = undefined;
   }
-
+  
   #setStatus(value: ServiceNetworkState) {
     this.serviceState.status = value;
+  }
+  
+  #replaceWords(sentence: string): string {
+    return sentence
+    .split(" ")
+    .map(word => this.data.replaceWords[word] ?? word)
+    .join(" ")
+  }
+
+  play(value: string) {
+    this.#serviceInstance?.play(this.#replaceWords(value));
   }
 
   start() {

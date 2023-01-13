@@ -3,6 +3,7 @@
 use clap::Parser;
 use tauri::{command, State, Manager};
 use window_shadows::set_shadow;
+use windows::{Win32::UI::WindowsAndMessaging::{MB_OK, MB_ICONWARNING, MessageBoxA}, s, core::PCSTR};
 
 use crate::services::AppConfiguration;
 
@@ -21,6 +22,18 @@ fn get_port(state: State<'_, InitArguments>) -> u16 {
 
 fn main() {
     let args = InitArguments::parse();
+    
+    // crash if port is not available
+    let port_availability = std::net::TcpListener::bind(format!("0.0.0.0:{}", args.port));
+    match port_availability {
+        Ok(l) => l.set_nonblocking(true).unwrap(),
+        Err(_err) => {
+            unsafe{
+                MessageBoxA(None, PCSTR(format!("Port {} is not available!", args.port).as_ptr()), s!("Curses error"), MB_OK | MB_ICONWARNING);}
+            return;
+        },
+    };
+
     tauri::Builder::default()
         .setup(|app| {
             let window = app.get_window("main").unwrap();

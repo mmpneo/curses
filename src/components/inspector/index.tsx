@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { AnimatePresence, motion } from "framer-motion";
-import { ButtonHTMLAttributes, FC, forwardRef, memo, PropsWithChildren } from "react";
+import { ButtonHTMLAttributes, FC, forwardRef, memo, PropsWithChildren, useState } from "react";
 import SimpleBar from "simplebar-react";
 import { Services } from "../../backend-services";
 import Inspector_STT from "../../backend-services/stt/inspector";
@@ -102,6 +102,14 @@ const variants = {
     };
   }
 };
+
+export const useInspectorTabs = () => {
+  const [[tab, direction], setTab] = useState<[number, number]>([0, 0]);
+  const handleTab = (v: number) => {
+    setTab([v, Math.sign(v - tab)]);
+  }
+  return [[tab, direction], handleTab] as [[number, number], (v: number) => void];
+}
 
 const TabsContent: FC<PropsWithChildren<{ tabKey: number | string, direction: number }>> = forwardRef(({ children, tabKey, direction }, ref: any) => {
   return <div>

@@ -1,10 +1,9 @@
-import { FC, useState } from "react";
+import { FC } from "react";
 import { RiImageFill, RiImageLine } from "react-icons/ri";
 import { SiCsswizardry } from "react-icons/si";
 import { useGetState, useUpdateState } from "../..";
-import { useInspectorTabs } from "../../../backend-services/twitch/inspector";
 import Input from "../../../components/input";
-import Inspector from "../../../components/inspector";
+import Inspector, { useInspectorTabs } from "../../../components/inspector";
 import NameInput from "../../components/name-input";
 import TransformInput from "../../components/transform-input";
 import { Element_ImageState } from "./schema";

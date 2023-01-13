@@ -40,7 +40,13 @@ window.mode = window.location.pathname.startsWith('/client') ? "client" : "host"
 if (window.mode === "host")
   document.documentElement.className = "host";
 
-window.addEventListener('contextmenu', e => e.preventDefault(), false);
+window.addEventListener('contextmenu', e => {
+  const ele = e.target as HTMLElement;
+  if (ele.nodeName !== "INPUT" && ele.nodeName !== "TEXTAREA") {
+    e.preventDefault();
+    return false;
+  }
+}, false);
 
 window.API = new Backend();
 window.APIFrontend = new Frontend();
