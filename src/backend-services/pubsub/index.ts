@@ -113,12 +113,12 @@ class Service_PubSub implements IServiceInterface {
     return PubSub.subscribe(eventname, (_, data) => fn(data));
   }
 
-  public subscribeText(source: TextEventSource, fn: (value?: TextEvent) => void, allowEmpty = false) {
-    return PubSub.subscribe(source, (a, data: TextEvent) => {
+  public subscribeText(source: TextEventSource, fn: (value?: TextEvent, eventName?: string) => void, allowEmpty = false) {
+    return PubSub.subscribe(source, (eventName, data: TextEvent) => {
       if (allowEmpty)
-        fn(data);
+        fn(data, eventName);
       else if (data.value)
-        fn(data);
+        fn(data, eventName);
     })
   }
 

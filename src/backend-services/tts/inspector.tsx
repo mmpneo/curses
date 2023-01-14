@@ -48,8 +48,15 @@ const Windows: FC = () => {
 const Azure: FC = () => {
   const pr = useSnapshot(window.API.state.services.tts.data.azure);
   const handleUpdate = <K extends keyof TTS_State["azure"]>(key: K, v: TTS_State["azure"][K]) => window.API.state.services.tts.data.azure[key] = v;
-
   const state = useSnapshot(window.API.tts.serviceState);
+  const [config, setConfig] = useState<WindowsConfig>();
+  const [outputDevices, setOutputDevices] = useState<MediaDeviceInfo[]>([]);
+  const [voiceStyles, setVoiceStyles] = useState<{ label: string, value: string }[]>([]);
+  const [voiceRoles, setVoiceRoles] = useState<{ label: string, value: string }[]>([]);
+
+  useEffect(() => {
+    invoke<WindowsConfig>("plugin:windows_tts|get_voices").then(setConfig);
+  }, []);
 
   const updateVoice = (value: { group: string, option: string }) => {
     window.API.state.services.tts.data.azure.language = value.group;
@@ -58,10 +65,6 @@ const Azure: FC = () => {
     window.API.state.services.tts.data.azure.voiceStyle = "";
     window.API.state.services.tts.data.azure.voiceRole = "";
   };
-  const [outputDevices, setOutputDevices] = useState<MediaDeviceInfo[]>([]);
-
-  const [voiceStyles, setVoiceStyles] = useState<{ label: string, value: string }[]>([]);
-  const [voiceRoles, setVoiceRoles] = useState<{ label: string, value: string }[]>([]);
 
   const updateDevices = async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
@@ -79,15 +82,21 @@ const Azure: FC = () => {
 
     const voice = azureVoices[pr.language].find(voice => voice[0] === pr.voice)
     const voiceParams = voice?.[2];
-    setVoiceStyles(voiceParams?.styles ? voiceParams.styles.map(style => ({ label: style, value: style })) : []);
-    setVoiceRoles(voiceParams?.roles ? voiceParams.roles.map(roles => ({ label: roles, value: roles })) : []);
+    setVoiceStyles(voiceParams?.styles ? [{ label: "None", value: "" }, ...voiceParams.styles.map(style => ({ label: style, value: style }))] : []);
+    setVoiceRoles(voiceParams?.roles ? [{ label: "None", value: "" }, ...voiceParams.roles.map(roles => ({ label: roles, value: roles }))] : []);
 
   }, [pr.language, pr.voice]);
 
   return <>
     <Inspector.SubHeader>Azure options</Inspector.SubHeader>
     <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
-      <Input.Select options={outputDevices.map(d => ({ label: d.label, value: d.deviceId }))} label="Audio Output" onChange={(e: any) => handleUpdate("device", e.value as TTS_Backends)} />
+    <Input.Select
+      value={{ value: pr.device, label: pr.device }}
+      onChange={(e: any) => handleUpdate("device", e.value)}
+      getOptionLabel={({ value }: any) => config?.devices.find(d => d.label === value)?.label || value}
+      options={config?.devices.map(d => ({ ...d, value: d.label }))}
+      placeholder="Device"
+      label="Audio output" />
       <Input.Text type="password" label="Key" value={pr.key} onChange={e => handleUpdate("key", e.target.value)} />
       <Input.Text type="password" label="Location" value={pr.location} onChange={e => handleUpdate("location", e.target.value)} />
     </Inspector.Deactivatable>

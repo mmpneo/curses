@@ -11,6 +11,7 @@ export interface BackendState {
   clientTheme: string;
   uiScale: number;
   showOverlay: boolean;
+  showOverlayLogs: boolean;
   shortcuts: {
     start: string;
     muteMic: string;
@@ -48,6 +49,7 @@ export const backendSchema: JSONSchemaType<BackendState> = {
     clientTheme: {type: "string", default: "night"},
     uiScale: {type: "number", default: 1},
     showOverlay: {type: "boolean", default: false},
+    showOverlayLogs: {type: "boolean", default: false},
     shortcuts:    {
       type:       "object",
       properties: {
@@ -71,5 +73,5 @@ export const backendSchema: JSONSchemaType<BackendState> = {
     }
   },
   additionalProperties: false,
-  required:   ["id", "linkAddress", "uiScale", "showOverlay", "clientTheme", "services"]
+  required:   ["id", "linkAddress", "uiScale", "showOverlay", "showOverlayLogs", "clientTheme", "services"]
 }

@@ -1,8 +1,7 @@
 import { ApiClient } from "@twurple/api";
-import { HelixEmoteData } from "@twurple/api/lib/api/helix/chat/HelixEmote";
+import { HelixEmote } from "@twurple/api/lib/api/helix/chat/HelixEmote";
 import { StaticAuthProvider } from "@twurple/auth";
 import { ChatClient } from "@twurple/chat";
-import { DataObject, rawDataSymbol } from "@twurple/common";
 import { proxy } from "valtio";
 import { subscribeKey } from "valtio/utils";
 import { IServiceInterface, ServiceNetworkState, TextEvent, TextEventSource, TextEventType } from "../../types";
@@ -131,8 +130,8 @@ class Service_Twitch implements IServiceInterface {
     return emotes;
   }
 
-  addTwitchEmotes(data:  DataObject<HelixEmoteData>[]) {
-    const newEmotes = Object.fromEntries(data.map(e => [e[rawDataSymbol].name, e[rawDataSymbol].images.url_1x]))
+  addTwitchEmotes(data: HelixEmote[]) {
+    const newEmotes = Object.fromEntries(data.map(e => [e.name, e.getImageUrl(1)]))
     this.emotes = {...this.emotes, ...newEmotes};
   }
 

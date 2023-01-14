@@ -21,9 +21,10 @@ warp = "0.3.3"
 tokio = { version = "1.23.0", features = ["full"] }
 tokio-stream = "0.1.11"
 futures = "0.3.25"
-windows = { version = "0.43.0", features = [
+windows = { version = "0.44.0", features = [
   "Win32_UI_WindowsAndMessaging",
   "Win32_Foundation",
+  "Media_SpeechRecognition",
   "Win32_Media_Speech",
   "Win32_Media_Audio",
   "Win32_System_Com",

@@ -17,9 +17,8 @@ export class TTS_AzureService implements ITTSService {
   #isPlaying = false;
 
   start(state: TTS_State): void {
-    console.log(state.azure)
     // exclude optional
-    const {voiceStyle, voiceRole, device, ...test} = state.azure;
+    const {voiceStyle, voiceRole, ...test} = state.azure;
     if (Object.values(test).some(isEmptyValue)) return this.bindings.onStop("Options missing");
 
     try {
@@ -47,7 +46,7 @@ export class TTS_AzureService implements ITTSService {
     if (!clip) return;
 
     this.#isPlaying = true;
-    await window.APIFrontend.sound.playVoiceBuffer(clip);
+    await window.APIFrontend.sound.playSoundAsync(clip, this.state.device);
     this.#isPlaying = false;
     this.#tryDequeueAndPlay();
   }

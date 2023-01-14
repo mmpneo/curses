@@ -1,16 +1,15 @@
-import { WebviewWindow } from "@tauri-apps/api/window";
+import OBSWebSocket from "obs-websocket-js";
+import { proxy } from "valtio";
+import { InspectorTabPath } from "../types";
 import Service_PubSub from "./pubsub";
 import { BackendState } from "./schema";
 import Service_Shortcuts from "./shortcuts";
 import Service_State from "./state";
 import Service_STT from "./stt";
-import Service_TTS from "./tts";
 import Service_Translation from "./translation";
-import Service_VRC from "./vrc";
+import Service_TTS from "./tts";
 import Service_Twitch from "./twitch";
-import { proxy } from "valtio";
-import { InspectorTabPath } from "../types";
-import OBSWebSocket from "obs-websocket-js";
+import Service_VRC from "./vrc";
 
 export enum Services {
   vrc = "vrc",
@@ -106,26 +105,6 @@ class Backend {
     } finally {
       obs.disconnect();
     }
-  }
-
-  private inputWindow?: WebviewWindow;
-  private initInputWIndow() {
-    if (window.platform !== "app" || window.mode !== "host") return;
-    this.inputWindow = new WebviewWindow("theUniqueLabel", {
-      visible: false,
-      transparent: true,
-      skipTaskbar: true,
-      fileDropEnabled: false,
-      titleBarStyle: "overlay",
-      decorations: false,
-      alwaysOnTop: true,
-      url: "inputfield.html",
-    });
-  }
-  async switchInputWindow() {
-    if (!this.inputWindow) return;
-    const isVisible = await this.inputWindow.isVisible();
-    isVisible ? this.inputWindow.hide() : this.inputWindow.show();
   }
 
   public async init() {

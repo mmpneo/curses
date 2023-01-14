@@ -21,12 +21,15 @@ class Service_Sound implements IServiceInterface {
     muted: false,
   });
 
-  async playVoiceBuffer(buffer: ArrayBuffer) {
-    console.log("play");
-    
+  async playSoundAsync(buffer: ArrayBuffer, device_name: string) {
+    if (!device_name)
+      return;
     if (window.mode === "host") {
       await invoke<any>("plugin:audio|play_async", {
-        data: Array.from(new Uint8Array(buffer))
+        data: {
+          device_name,
+          data: Array.from(new Uint8Array(buffer))
+        }
       });
       return
     }

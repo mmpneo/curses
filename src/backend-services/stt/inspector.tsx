@@ -19,9 +19,14 @@ const Browser: FC = () => {
       }
     });
   };
+
+  const handleStartStt = () => {
+    invoke("plugin:windows_stt|start");
+  };
   return <>
     <Inspector.SubHeader>Browser options</Inspector.SubHeader>
     <button className="btn btn-sm btn-primary" onClick={handleOpen}>Open chrome</button>
+    <button className="btn btn-sm btn-primary" onClick={handleStartStt}>Start windows stt</button>
 
     {/* <QRCodeCanvas
           size={256}

@@ -40,7 +40,33 @@ module.exports = {
           "base-100": "#111"
         },
       },
+      
       {
+        curses: {
+          "color-scheme": "dark",
+          primary: "#FC6471",
+          // "primary-content": "#000000",
+          secondary: "#55D6BE",
+          accent: "#E5625E",
+          "base-content": "#ACFCD9",
+          "base-100": "#1C1F33",
+          // "base-200": "#d41344",
+          "base-300": "#151625",
+          // neutral: "#272626",
+          // "neutral-focus": "#343232",
+          info: "#0000ff",
+          success: "#008000",
+          warning: "#ffff00",
+          error: "#ff0000",
+          "--rounded-box": ".8rem",
+          "--rounded-btn": "0.2rem",
+          "--rounded-badge": "0",
+          "--animation-btn": "0",
+          "--animation-input": "0.5rem",
+          "--btn-text-case": "lowercase",
+          "--btn-focus-scale": "1",
+          "--tab-radius": "0",
+        },
         staffy: {
           "color-scheme": "dark",
           primary: "#f4e32a",
