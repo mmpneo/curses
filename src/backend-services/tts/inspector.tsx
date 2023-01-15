@@ -159,7 +159,7 @@ const TTSInspector: FC = () => {
     <Inspector.SubHeader>Options</Inspector.SubHeader>
     <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
       <Input.TextSource label="Source" value={data.data.source} onChange={e => up("source", e)} />
-      <Input.Checkbox label="Input field" value={data.data.inputField} onChange={e => up("inputField", e)} />
+      <Input.Checkbox label="Text field" value={data.data.inputField} onChange={e => up("inputField", e)} />
       <Input.Select value={serviceOptions.find(o => o.value === data.data.backend)} options={serviceOptions} label="Service" onChange={(e: any) => up("backend", e.value as TTS_Backends)} />
     </Inspector.Deactivatable>
 

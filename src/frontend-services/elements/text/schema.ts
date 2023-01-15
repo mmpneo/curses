@@ -36,8 +36,21 @@ export type Element_TextState = {
   textProfanityInterimColor: string;
 
   //box
+  //bgType - 9slice | solid
+  //bgImage - url
+  //bgImageFillType - cover | fit
+  boxBackgroundType: "solid" | "slice"
   boxColor: string;
-  boxPadding: number;
+  boxImageFileId: string;
+
+  boxSliceTileSize: string;
+  boxSliceTop: string;
+  boxSliceRight: string;
+  boxSliceBottom: string;
+  boxSliceLeft: string;
+
+  //box
+  boxPadding: string;
   boxAutoWidth: boolean;
   boxAutoHeight: boolean;
   boxAlignH: FlexAlign;
@@ -75,6 +88,24 @@ export type Element_TextState = {
   soundPlaybackMin: number;
   soundPlaybackMax: number;
 
+  // particles
+  particlesEnable: boolean;
+  particlesSpriteFileIdFirst: string
+  particlesSpriteFileIdSecond: string
+  particlesSpriteFileIdThird: string
+  particlesCountMin: string
+  particlesCountMax: string
+  particlesDurationMin: string
+  particlesDurationMax: string
+  particlesDirectionXMin: string
+  particlesDirectionXMax: string
+  particlesDirectionYMin: string
+  particlesDirectionYMax: string
+  particlesScaleMin: string
+  particlesScaleMax: string
+  particlesRotationMin: string
+  particlesRotationMax: string
+
   //css
   css: string;
 };
@@ -101,8 +132,16 @@ export const Element_TextStateSchema: JSONSchemaType<Element_TextState> = {
     textProfanityMask: { type: "string", default: "[redacted]" },
     textProfanityColor: { type: "string", default: "rgba(255,255,255,1)" },
     textProfanityInterimColor: { type: "string", default: "rgba(255,255,255,1)" },
+
+    boxBackgroundType: { type: "string", default: "solid" },
     boxColor: { type: "string", default: "rgba(0,0,0,0.5)" },
-    boxPadding: { type: "number", default: 10 },
+    boxImageFileId: { type: "string", default: "rgba(0,0,0,0.5)" },
+    boxSliceTileSize: { type: "string", default: "10" },
+    boxSliceTop: { type: "string", default: "10" },
+    boxSliceRight: { type: "string", default: "10" },
+    boxSliceBottom: { type: "string", default: "10" },
+    boxSliceLeft: { type: "string", default: "10" },
+    boxPadding: { type: "string", default: "10" },
     boxAutoWidth: { type: "boolean", default: false },
     boxAutoHeight: { type: "boolean", default: true },
     boxAlignH: { type: "string", default: FlexAlign.center },
@@ -110,19 +149,23 @@ export const Element_TextStateSchema: JSONSchemaType<Element_TextState> = {
     boxBorderRadius: { type: "string", default: "5" },
     boxBorderWidth: { type: "string", default: "0" },
     boxBorderColor: { type: "string", default: "rgba(0,0,0,0)" },
+
     animateEnable: { type: "boolean", default: false },
     animateDelayChar: { type: "number", default: 100 },
     animateDelayWord: { type: "number", default: 100 },
     animateDelaySentence: { type: "number", default: 100 },
     animateScroll: { type: "boolean", default: true },
     animateEvent: { type: "boolean", default: false },
+
     sourceMain: { type: "string", default: TextEventSource.stt },
     sourceInterim: { type: "boolean", default: true },
     sourceInputField: { type: "boolean", default: true },
+
     behaviorClearTimer: { type: "number", default: 5000 },
     behaviorClearDelay: { type: "number", default: 200 },
     behaviorLastSentence: { type: "boolean", default: false },
     behaviorBreakLine: { type: "boolean", default: false },
+    
     soundEnable: { type: "boolean", default: false },
     soundFile: { type: "string", default: "" },
     soundVolume: { type: "number", default: 1 },
@@ -130,6 +173,24 @@ export const Element_TextStateSchema: JSONSchemaType<Element_TextState> = {
     soundDetuneMax: { type: "number", default: 0 },
     soundPlaybackMin: { type: "number", default: 1 },
     soundPlaybackMax: { type: "number", default: 1 },
+    
+    particlesEnable: { type: "boolean", default: false },
+    particlesSpriteFileIdFirst: { type: "string", default: "" },
+    particlesSpriteFileIdSecond: { type: "string", default: "" },
+    particlesSpriteFileIdThird: { type: "string", default: "" },
+    particlesCountMin: { type: "string", default: "5" },
+    particlesCountMax: { type: "string", default: "5" },
+    particlesDurationMin: { type: "string", default: "200" },
+    particlesDurationMax: { type: "string", default: "200" },
+    particlesDirectionXMin: { type: "string", default: "20" },
+    particlesDirectionXMax: { type: "string", default: "50" },
+    particlesDirectionYMin: { type: "string", default: "10" },
+    particlesDirectionYMax: { type: "string", default: "50" },
+    particlesScaleMin: { type: "string", default: "1" },
+    particlesScaleMax: { type: "string", default: "1" },
+    particlesRotationMin: { type: "string", default: "-100" },
+    particlesRotationMax: { type: "string", default: "100" },
+
     css: { type: "string", default: "" },
   },
   additionalProperties: false,
@@ -152,7 +213,14 @@ export const Element_TextStateSchema: JSONSchemaType<Element_TextState> = {
     "textAlignH",
     "textAlignV",
     "textProfanityMask",
+    "boxBackgroundType",
     "boxColor",
+    "boxImageFileId",
+    "boxSliceTileSize",
+    "boxSliceTop",
+    "boxSliceRight",
+    "boxSliceBottom",
+    "boxSliceLeft",
     "boxPadding",
     "boxAutoWidth",
     "boxAutoHeight",
@@ -181,6 +249,21 @@ export const Element_TextStateSchema: JSONSchemaType<Element_TextState> = {
     "soundDetuneMax",
     "soundPlaybackMin",
     "soundPlaybackMax",
+    "particlesSpriteFileIdFirst",
+    "particlesSpriteFileIdSecond",
+    "particlesSpriteFileIdThird",
+    "particlesCountMin",
+    "particlesCountMax",
+    "particlesDurationMin",
+    "particlesDurationMax",
+    "particlesDirectionXMin",
+    "particlesDirectionXMax",
+    "particlesDirectionYMin",
+    "particlesDirectionYMax",
+    "particlesScaleMin",
+    "particlesScaleMax",
+    "particlesRotationMin",
+    "particlesRotationMax",
     "css",
   ],
 };

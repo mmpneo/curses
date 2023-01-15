@@ -46,7 +46,7 @@ export const backendSchema: JSONSchemaType<BackendState> = {
   properties: {
     id: {type: "string", default: nanoid(42)},
     linkAddress: {type: "string", default: ""},
-    clientTheme: {type: "string", default: "night"},
+    clientTheme: {type: "string", default: "curses"},
     uiScale: {type: "number", default: 1},
     showOverlay: {type: "boolean", default: false},
     showOverlayLogs: {type: "boolean", default: false},

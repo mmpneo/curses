@@ -1357,6 +1357,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/animejs@npm:^3.1.6":
+  version: 3.1.6
+  resolution: "@types/animejs@npm:3.1.6"
+  checksum: da54d122376212ce9fd3a57d385e4b800b3ec4026dcf55d99a32c0aedf799b169abdea9f1e54b5d81a4be0edd8e0c9b245a57bf48778d1d59c607582f34aabdc
+  languageName: node
+  linkType: hard
+
 "@types/js-cookie@npm:^2.2.6":
   version: 2.2.7
   resolution: "@types/js-cookie@npm:2.2.7"
@@ -1620,6 +1627,13 @@ __metadata:
     require-from-string: ^2.0.2
     uri-js: ^4.2.2
   checksum: 4dc13714e316e67537c8b31bc063f99a1d9d9a497eb4bbd55191ac0dcd5e4985bbb71570352ad6f1e76684fb6d790928f96ba3b2d4fd6e10024be9612fe3f001
+  languageName: node
+  linkType: hard
+
+"animejs@npm:^3.2.1":
+  version: 3.2.1
+  resolution: "animejs@npm:3.2.1"
+  checksum: 6939171bed17d6b28307747e564d33e93312c26169b98498c833117d86f174ce7a318469bfd81716c223860a6d13bd76b761e79e765b86b2a2f851963caaa851
   languageName: node
   linkType: hard
 
@@ -2221,6 +2235,7 @@ __metadata:
     "@twurple/api": ^5.3.2
     "@twurple/auth": ^5.3.2
     "@twurple/chat": ^5.3.2
+    "@types/animejs": ^3.1.6
     "@types/lodash": ^4.14.189
     "@types/node": ^18.7.10
     "@types/pubsub-js": ^1.8.3
@@ -2232,6 +2247,7 @@ __metadata:
     "@welldone-software/why-did-you-render": ^7.0.1
     ace-builds: ^1.14.0
     ajv: ^8.12.0
+    animejs: ^3.2.1
     autoprefixer: ^10.4.13
     browser-fs-access: ^0.31.2
     classnames: ^2.3.2

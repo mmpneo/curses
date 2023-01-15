@@ -7,6 +7,7 @@ import { VscChromeClose, VscChromeMaximize, VscChromeMinimize } from "react-icon
 import { useSnapshot } from "valtio";
 import { ServiceNetworkState } from "../types";
 import Tooltip from "./dropdown/Tooltip";
+import Logo from "./logo";
 
 const Divider: FC = () => {
   return <div className="flex-none h-4 w-1 bg-neutral rounded-full"></div>
@@ -46,7 +47,11 @@ const handleSwitchTTS = () => {
 
 const ActionBar: FC = () => {
   return <div data-tauri-drag-region className="relative w-full py-1 flex items-center space-x-1 sm:space-x-2 px-2">
-    <div className="w-full pointer-events-none font-black text-2xl align-middle leading-tight font-header"><span className="hidden sm:block">curses</span></div>
+    <div className="w-full pointer-events-none font-black text-2xl align-middle leading-tight font-header">
+      <span className="hidden sm:block text-sm">
+        <Logo/>
+      </span>
+      </div>
     <AppActions />
     <div className="pointer-events-none w-full flex justify-end">
       <WindowActions />

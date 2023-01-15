@@ -22,10 +22,10 @@ const ChatInspector: FC = () => {
     <Inspector.Switchable visible={pr.chatPostEnable}>
       <Input.Checkbox label="Post only when live" value={pr.chatPostLive} onChange={e => up("chatPostLive", e)} />
       <Input.TextSource label="Post from" value={pr.chatPostSource} onChange={e => up("chatPostSource", e)} />
-      <Input.Checkbox label="Post from input field" value={pr.chatPostInput} onChange={e => up("chatPostInput", e)} />
+      <Input.Checkbox label="Post from text field" value={pr.chatPostInput} onChange={e => up("chatPostInput", e)} />
     </Inspector.Switchable>
     <Input.Checkbox label="Post from chat" value={pr.chatReceiveEnable} onChange={e => up("chatReceiveEnable", e)} />
-    <Inspector.Description>Use your chat as an input field</Inspector.Description>
+    <Inspector.Description>Chat as a text field</Inspector.Description>
   </>
 }
 
@@ -65,14 +65,17 @@ const Inspector_Twitch: FC = () => {
 
       {!user && <button className="btn btn-primary" onClick={handleLogin}>Login</button>}
 
-      <Inspector.Tabs>
-        <Inspector.Tab tooltip="Chat" tooltipBody="Chat options" onClick={() => handleTab(0)} active={tab === 0}><MdChat /></Inspector.Tab>
-        <Inspector.Tab tooltip="Emotes" tooltipBody="Available emotes" onClick={() => handleTab(1)} active={tab === 1}><BsEmojiHeartEyesFill /></Inspector.Tab>
-      </Inspector.Tabs>
-      <Inspector.TabsContent direction={direction} tabKey={tab}>
-        {tab === 0 && <ChatInspector />}
-        {tab === 1 && <EmotesInspector />}
-      </Inspector.TabsContent>
+      <Inspector.Switchable visible={!!user}>
+        <Inspector.Tabs>
+          <Inspector.Tab tooltip="Chat" tooltipBody="Chat options" onClick={() => handleTab(0)} active={tab === 0}><MdChat /></Inspector.Tab>
+          <Inspector.Tab tooltip="Emotes" tooltipBody="Available emotes" onClick={() => handleTab(1)} active={tab === 1}><BsEmojiHeartEyesFill /></Inspector.Tab>
+        </Inspector.Tabs>
+        <Inspector.TabsContent direction={direction} tabKey={tab}>
+          {tab === 0 && <ChatInspector />}
+          {tab === 1 && <EmotesInspector />}
+        </Inspector.TabsContent>
+      </Inspector.Switchable>
+
     </Inspector.Content>
   </Inspector.Body>
 }

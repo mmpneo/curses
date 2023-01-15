@@ -1,21 +1,22 @@
-import { IServiceInterface } from "../../types";
-import { nanoid } from "nanoid";
-import { ElementState, ElementType } from "../schema/element";
-import Element_Image from "./image";
-import Element_Text from "./text";
 import Ajv from "ajv";
+import { nanoid } from "nanoid";
+import { IServiceInterface } from "../../types";
+import { ElementState, ElementType } from "../schema/element";
+import { TransformRect } from "../schema/transform-rect";
 import { Element_ImageStateSchema } from "./image/schema";
 import { Element_TextStateSchema } from "./text/schema";
 
 class Service_Elements implements IServiceInterface {
-  #ajv!: Ajv;
-
-  init(): void {
+  constructor() {
     this.#ajv = new Ajv({
       strict: false,
       useDefaults: "empty",
       removeAdditional: true,
     });
+  }
+  #ajv!: Ajv;
+
+  init(): void {
     
     const validator_text = this.#ajv.compile(Element_TextStateSchema);
     const validator_image = this.#ajv.compile(Element_ImageStateSchema);
@@ -38,7 +39,7 @@ class Service_Elements implements IServiceInterface {
 
   }
 
-  addElement(type: ElementType, sceneId: string = "main") {
+  addElement(type: ElementType, sceneId: string = "main", rect?: TransformRect) {
     let data = {};
 
     if (type === ElementType.text) {
@@ -52,10 +53,10 @@ class Service_Elements implements IServiceInterface {
       state.elements[id] = {
         id,
         type,
-        name: "New Element",
+        name: `Element - ${type}`,
         scenes: {
           [sceneId]: {
-            rect: { x: 100, y: 100, w: 100, h: 100, r: 0 },
+            rect: rect || { x: 100, y: 100, w: 100, h: 100, r: 0 },
             data,
           },
         },

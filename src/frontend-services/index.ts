@@ -6,11 +6,13 @@ import Service_Scenes from "./scenes";
 import Service_Elements from "./elements";
 import Service_Files from "./files";
 import Service_Sound from "./sound";
+import Service_Particles from "./particles";
 class Frontend {
   network = new Service_Network();
   document = new Service_Document();
   scenes = new Service_Scenes();
   sound = new Service_Sound();
+  particles = new Service_Particles();
   elements = new Service_Elements();
   files = new Service_Files();
 
@@ -20,6 +22,7 @@ class Frontend {
     await this.scenes.init();
     await this.files.init();
     await this.sound.init();
+    await this.particles.init();
     await this.elements.init();
   }
 }

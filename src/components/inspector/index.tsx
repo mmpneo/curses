@@ -73,6 +73,7 @@ const Switchable: FC<PropsWithChildren<{ visible: boolean }>> = ({ visible, chil
     exit={{ marginTop: 0, height: 0, opacity: 0 }}
     animate={{ marginTop: ".5rem", height: "auto", opacity: 1 }}
     className="flex flex-col w-full space-y-2">
+      <span></span>
       {children}
   </motion.div>}
   </AnimatePresence>
@@ -80,6 +81,7 @@ const Switchable: FC<PropsWithChildren<{ visible: boolean }>> = ({ visible, chil
 
 const Deactivatable: FC<PropsWithChildren<{ active: boolean }>> = ({active, children}) => {
   return <div className={classNames("flex flex-col w-full space-y-2 transition-opacity", !active ? "opacity-50 pointer-events-none" : "")}>
+    <span></span>
     {children}
   </div>
 }

@@ -45,11 +45,24 @@
   --toastify-color-progress-error: var(--toastify-color-error);
 }
 
+
+
 html.host, html.host body, html.host #root {
+  /* color: #34f09f; */
   @apply bg-base-300 !important;
 }
-.bg-base-300 {
-  /* background-image: linear-gradient(45deg, rgb(24, 26, 43) 0%, #2c112c 100%); */
+
+.dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: block;
+  z-index: 1;
+  /* opacity: 0; */
+  /*background-color: tomato;*/
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
 }
 :root, html, body, #root {
   width: 100vw;

@@ -34,7 +34,6 @@ export class TTS_AzureService implements ITTSService {
 
       this.bindings.onStart();
     } catch (error: any) {
-      console.log(error);
       this.bindings.onStop(error?.message as string);
     }
   }

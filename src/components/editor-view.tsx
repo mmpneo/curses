@@ -1,9 +1,8 @@
 import NiceModal from "@ebay/nice-modal-react";
-import { FC, FormEvent, useState } from "react";
+import { FC, FormEvent, memo, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.min.css';
 import { TextEventSource, TextEventType } from "../types";
-import Canvas from "./canvas";
 import Sidebar from "./sidebar";
 
 import { AnimatePresence, motion } from "framer-motion";
@@ -11,6 +10,8 @@ import { useSnapshot } from "valtio";
 import ActionBar from "./actionbar";
 import "./file-modal";
 import OverlayInput from "./overlay-input";
+import { ElementEditorTransform } from "./element-transform";
+import { useGetState } from "../frontend-services";
 
 const EditorView: FC = () => {
   const { showOverlay } = useSnapshot(window.API.state);
@@ -18,7 +19,7 @@ const EditorView: FC = () => {
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ ease: "anticipate", duration: .4}}
+      transition={{ ease: "anticipate", duration: .4 }}
       className="relative bg-base-200 w-screen h-screen flex overflow-hidden">
       <NiceModal.Provider>
         <Sidebar />
@@ -37,6 +38,16 @@ const EditorView: FC = () => {
     </motion.div>
   </AnimatePresence>
 }
+
+const Canvas: FC = memo(() => {
+  const canvas = useGetState(state => state.canvas);
+  const ids = useGetState(state => state.elementsIds);
+  return <>
+    <div style={{ width: canvas?.w, height: canvas?.h }} className="relative">
+      {ids?.map((elementId) => <ElementEditorTransform id={elementId} key={elementId} />)}
+    </div>
+  </>
+})
 
 export const EditorViewport: FC = () => {
   const [[x, y], setTranslate] = useState([0, 0]);

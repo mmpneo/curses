@@ -61,7 +61,7 @@ export const TextSentenceTest: FC<{state: Element_TextState}> = ({state}) => {
   </>
 }
 
-function nativeRender(container: HTMLSpanElement, data: TextSentenceData, onActivity: (r: DOMRect) => void, onComplete: () => void) {
+function nativeRender(container: HTMLSpanElement, data: TextSentenceData, onActivity: (rect: DOMRect) => void, onComplete: () => void) {
   if (!container) // skip when destroying sentence ele
     return;
   container.replaceChildren();
@@ -104,6 +104,7 @@ function nativeRender(container: HTMLSpanElement, data: TextSentenceData, onActi
       }
       newNode.className = segment.classes + (data.interim ? " interim" : "");
       container.appendChild(newNode);
+      onActivity(newNode.getBoundingClientRect());
     }
     !data.interim && onComplete();
 }

@@ -18,6 +18,7 @@ export type STT_State = {
     key: string;
     location: string;
     profanity: string;
+    silenceTimeout: string;
     interim: boolean;
   };
   speechly: {
@@ -48,9 +49,10 @@ const Schema_STT: JSONSchemaType<STT_State> = {
         key: { type: "string", default: "" },
         location: { type: "string", default: "" },
         profanity: { type: "string", default: "masked" },
+        silenceTimeout: { type: "string", default: "20" },
         interim: { type: "boolean", default: true },
       },
-      required: ["device", "language_group", "language", "key", "location", "profanity", "interim"],
+      required: ["device", "language_group", "language", "key", "location", "profanity", "silenceTimeout", "interim"],
       default: {} as any,
       additionalProperties: false,
     },

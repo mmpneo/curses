@@ -42,7 +42,7 @@ export class STT_AzureService implements ISpeechRecognitionService {
     );
     speechConfig.setProperty(
       PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs,
-      "20000"
+      ((parseInt(state.azure.silenceTimeout) || 20) * 1000).toString()
     );
     speechConfig.enableDictation();
 

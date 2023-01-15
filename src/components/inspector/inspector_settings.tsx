@@ -1,7 +1,7 @@
 import classNames from "classnames";
-import { FC, memo, useState } from "react";
+import { FC, memo, useEffect, useState } from "react";
 import { RiFileCopyLine, RiSettings2Fill } from "react-icons/ri";
-import { SiDiscord, SiObsstudio, SiTwitch, SiTwitter } from "react-icons/si";
+import { SiDiscord, SiKofi, SiObsstudio, SiTwitch, SiTwitter } from "react-icons/si";
 import { toast } from "react-toastify";
 import { useSnapshot } from "valtio";
 import Inspector from ".";
@@ -10,13 +10,13 @@ import { ServiceNetworkState } from "../../types";
 import Dropdown, { useDropdown } from "../dropdown/Dropdown";
 import Tooltip from "../dropdown/Tooltip";
 import Input from "../input";
+import Logo from "../logo";
 import ServiceButton from "../service-button";
-
+import { getVersion } from '@tauri-apps/api/app';
 const themesLight = [
   'light',
   'lofi',
   'cupcake',
-  'corporate',
   'retro',
   'valentine',
   'garden',
@@ -25,6 +25,7 @@ const themesLight = [
   'wireframe',
   'winter',
   'cyberpunk',
+  // 'corporate',
   // 'bumblebee',
   // 'emerald',
   // 'fantasy',
@@ -101,10 +102,15 @@ const AddrInput = () => {
 }
 
 const Inspector_Settings: FC = memo(() => {
-  const {  clientTheme, uiScale } = useSnapshot(window.API.state);
-  const {state: linkStatus} = useSnapshot(window.API.pubsub.serviceState);
+  const { clientTheme, uiScale } = useSnapshot(window.API.state);
+  const { state: linkStatus } = useSnapshot(window.API.pubsub.serviceState);
   const canvas = useGetState(state => state.canvas);
   const updateState = useUpdateState();
+
+  const [version, setVersion] = useState("")
+  useEffect(() => {
+    getVersion().then(setVersion);
+  }, [])
 
   const handleChangeTheme = (v: string) => window.API.changeTheme(v);
   const handleChangeScale = (v: string | number) => {
@@ -115,25 +121,30 @@ const Inspector_Settings: FC = memo(() => {
   return <Inspector.Body>
     <Inspector.Header><RiSettings2Fill /> Settings</Inspector.Header>
     <Inspector.Content>
-
       <div className="flex flex-col items-center space-y-1">
-        <span className="text-6xl leading-none font-header font-black">curses</span>
+        <span className="text-4xl leading-none font-header font-black"><Logo/></span>
         <div className="flex space-x-1 self-center">
-          <a target="_blank" href="https://www.twitch.tv/mmpcode" className="btn text-primary btn-ghost btn-circle text-2xl"><SiTwitch/></a>
-          <a target="_blank" href="https://twitter.com/mmpneo" className="btn text-primary btn-ghost btn-circle text-2xl"><SiTwitter/></a>
-          <a target="_blank" href="https://discord.gg/SMKjA2yGf7" className="btn text-primary btn-ghost btn-circle text-2xl"><SiDiscord/></a>
+          <Tooltip content="/mmpcode" body={<span>I stream app development, vrc udon <br/> stuff and games sometimes</span>}>
+            <a target="_blank" href="https://www.twitch.tv/mmpcode" className="btn text-primary btn-ghost btn-circle text-2xl"><SiTwitch /></a>
+          </Tooltip>
+          <Tooltip content="@mmpneo" body="I tweet once a year, LUL">
+            <a target="_blank" href="https://twitter.com/mmpneo" className="btn text-primary btn-ghost btn-circle text-2xl"><SiTwitter /></a>
+          </Tooltip>
+          <Tooltip content="Code and Curses" body={<span>App updates and help</span>}>
+            <a target="_blank" href="https://discord.gg/SMKjA2yGf7" className="btn text-primary btn-ghost btn-circle text-2xl"><SiDiscord /></a>
+          </Tooltip>
+          <Tooltip content="Donate" body={<span>😊 Donations will greatly help development</span>}>
+            <a target="_blank" href="https://ko-fi.com/mmpcode" className="btn text-primary btn-ghost btn-circle text-2xl"><SiKofi /></a>
+          </Tooltip>
         </div>
-        <div className="self-center text-sm font-semibold opacity-50">Made with 💗 by Mmp</div>
+        <div className="self-center text-sm opacity-50">Made with 💗 by Mmp</div>
+        <div className="self-center text-sm opacity-50">Join discord for updates and help!</div>
+        <div className="self-center text-sm opacity-50">v.{version}</div>
       </div>
       <div className="divider"></div>
 
       {/* <Inspector.SubHeader>Canvas</Inspector.SubHeader> */}
-      <Inspector.SubHeader>UI</Inspector.SubHeader>
-      <Input.DoubleCountainer label="Canvas Size">
-        <Input.BaseText value={canvas?.w} onChange={e => updateState(state => { state.canvas.w = parseFloat(e.target.value) })} type="number"/>
-        <Input.BaseText value={canvas?.h} onChange={e => updateState(state => { state.canvas.h = parseFloat(e.target.value) })} type="number"/>
-      </Input.DoubleCountainer>
-
+      {/* <Inspector.SubHeader>UI</Inspector.SubHeader> */}
       <Input.Select label="Theme" options={options} value={{ value: clientTheme, label: clientTheme }} onChange={(e: any) => handleChangeTheme(e.value)} />
       <Input.Chips label="UI scale" value={uiScale} onChange={e => handleChangeScale(e)} options={[
         { label: "S", value: .8 },
@@ -154,11 +165,21 @@ const Inspector_Settings: FC = memo(() => {
         </Tooltip>
       </div>
 
+      <Inspector.SubHeader>Template</Inspector.SubHeader>
+      <Input.DoubleCountainer label="Canvas Size">
+        <Input.BaseText value={canvas?.w} onChange={e => updateState(state => { state.canvas.w = parseFloat(e.target.value) })} type="number" />
+        <Input.BaseText value={canvas?.h} onChange={e => updateState(state => { state.canvas.h = parseFloat(e.target.value) })} type="number" />
+      </Input.DoubleCountainer>
+      <div className="flex items-center space-x-2">
+        <button onClick={() => window.APIFrontend.document.importDocument()} className="flex-grow btn btn-sm gap-2"><RiFileCopyLine /> Import</button>
+        <button onClick={() => window.APIFrontend.document.exportDocument()} className="flex-grow btn btn-sm gap-2"><RiFileCopyLine /> Export</button>
+      </div>
+
       <Inspector.SubHeader>Link apps</Inspector.SubHeader>
       <Inspector.Description>Sync text events with remote app instance</Inspector.Description>
       <Inspector.Deactivatable active={linkStatus === ServiceNetworkState.disconnected}>
-        <AddrInput/>
-        <Input.NetworkStatus value={linkStatus} label="Status"/>
+        <AddrInput />
+        <Input.NetworkStatus value={linkStatus} label="Status" />
       </Inspector.Deactivatable>
       <ServiceButton startLabel="Connect" stopLabel="Disconnect" status={linkStatus} onStart={() => window.API.pubsub.linkConnect()} onStop={() => window.API.pubsub.linkDisconnect()} />
       <button className="btn btn-sm btn-ghost" onClick={() => window.API.pubsub.copyLinkAddress()}>Copy my address</button>

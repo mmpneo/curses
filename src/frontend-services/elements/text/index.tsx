@@ -135,7 +135,7 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
       startClearTimer();
   }, [state.behaviorClearTimer]);
 
-  const onActivity = () => {
+  const onActivity = (rect?: DOMRect) => {
     // play sound
     if (stateRef.current.soundEnable && stateRef.current.soundFile) {
       window.APIFrontend.sound.playFile(stateRef.current.soundFile, {
@@ -144,6 +144,29 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
         detuneMax: stateRef.current.soundDetuneMax || 0,
         playbackMin: stateRef.current.soundPlaybackMin || 1,
         playbackMax: stateRef.current.soundPlaybackMax || 1,
+      });
+    }
+    if (rect && stateRef.current.particlesEnable) {
+      //TODO cache particle config
+      window.APIFrontend.particles.emit(rect, {
+        imageIds: [
+          stateRef.current.particlesSpriteFileIdFirst,
+          stateRef.current.particlesSpriteFileIdSecond,
+          stateRef.current.particlesSpriteFileIdThird,
+          // "https://www.pngkit.com/png/full/114-1146708_sushi-sashimi-pixel-art-pixelart-food-asian-pixel.png"
+        ].filter(s => !!s),
+        particlesCountMin: parseFloat(stateRef.current.particlesCountMin) || 0,
+        particlesCountMax: parseFloat(stateRef.current.particlesCountMax) || 0,
+        particlesDurationMin: parseFloat(stateRef.current.particlesDurationMin) || 0,
+        particlesDurationMax: parseFloat(stateRef.current.particlesDurationMax) || 0,
+        particlesDirectionXMin: parseFloat(stateRef.current.particlesDirectionXMin) || 0,
+        particlesDirectionXMax: parseFloat(stateRef.current.particlesDirectionXMax) || 0,
+        particlesDirectionYMin: parseFloat(stateRef.current.particlesDirectionYMin) || 0,
+        particlesDirectionYMax: parseFloat(stateRef.current.particlesDirectionYMax) || 0,
+        particlesScaleMin: parseFloat(stateRef.current.particlesScaleMin) || 1,
+        particlesScaleMax: parseFloat(stateRef.current.particlesScaleMax) || 1,
+        particlesRotationMin: parseFloat(stateRef.current.particlesRotationMin) || 0,
+        particlesRotationMax: parseFloat(stateRef.current.particlesRotationMax) || 0,
       });
     }
 
@@ -163,13 +186,26 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
     .box{
       overflow-y: scroll;
       justify-content: start;
-      background-color: ${state.boxColor};
       width: ${state.boxAutoWidth ? 'auto' : '100%'};
       height: ${state.boxAutoHeight ? 'auto' : '100%'};
+      
+      ${state.boxBackgroundType == "solid" ? 
+      `
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: ${state.boxColor};
+      background-image: url("${window.APIFrontend.files.getFileUrl(state.boxImageFileId)}");
       border-style: solid;
       border-radius: ${state.boxBorderRadius}px;
       border-width: ${state.boxBorderWidth}px;
       border-color: ${state.boxBorderColor};
+      ` : 
+      `
+      border-image: url(${window.APIFrontend.files.getFileUrl(state.boxImageFileId)}) ${state.boxSliceTileSize} round;
+      border-image-slice: ${state.boxSliceTop} ${state.boxSliceRight} ${state.boxSliceBottom} ${state.boxSliceBottom} fill;
+      border-image-width: ${state.boxSliceTop}px ${state.boxSliceRight}px ${state.boxSliceBottom}px ${state.boxSliceBottom}px;
+      `}
     }
     .box::-webkit-scrollbar {
       display: none;

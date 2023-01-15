@@ -26,7 +26,7 @@ const Browser: FC = () => {
   return <>
     <Inspector.SubHeader>Browser options</Inspector.SubHeader>
     <button className="btn btn-sm btn-primary" onClick={handleOpen}>Open chrome</button>
-    <button className="btn btn-sm btn-primary" onClick={handleStartStt}>Start windows stt</button>
+    {/* <button className="btn btn-sm btn-primary" onClick={handleStartStt}>Start windows stt</button> */}
 
     {/* <QRCodeCanvas
           size={256}
@@ -62,7 +62,7 @@ const Azure: FC = () => {
       { label: 'Removed', value: 'removed' },
       { label: 'Raw', value: 'raw' },
     ]} label="Profanity" value={{ value: pr.profanity, label: pr.profanity }} onChange={(e: any) => up("profanity", e.value)} />
-
+    <Input.Text type="number" step="1" label="Silence timeout" value={pr.silenceTimeout} onChange={e => up("silenceTimeout", e.target.value)} />
     <Input.Checkbox label="Interim result" onChange={e => up("interim", e)} value={pr.interim} />
   </>
 }

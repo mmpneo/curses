@@ -58,7 +58,7 @@ class Service_PubSub implements IServiceInterface {
   async init() {
     this.registerEvent({label: "Speech to text", value: TextEventSource.stt});
     this.registerEvent({label: "Translation",value: TextEventSource.translation});
-    this.registerEvent({label: "Input field",value: TextEventSource.textfield});
+    this.registerEvent({label: "Text field",value: TextEventSource.textfield});
     this.registerEvent({label: "Any text source",value: TextEventSource.any});
   }
 

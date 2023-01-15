@@ -1,7 +1,6 @@
 {
   "package": {
-    "productName": "curses",
-    "version": "0.0.1"
+    "productName": "curses"
   },
   "build": {
     "beforeDevCommand": "yarn dev --host",

@@ -282,8 +282,8 @@ const File: FC<FileProps> = ({ label, type, onChange, value }) => {
         <RiUpload2Fill className="text-xl" />
       </div>
       <div className="flex flex-col items-start text-sm">
-        <span className="font-medium link link-accent link-hover">Upload file</span>
-        <span className="font-medium">or select from <span onClick={handleSelect} className="link link-accent link-hover">exising</span></span>
+        <span className="font-medium link link-accent link-hover">Add new file</span>
+        <span className="font-medium">or select from <span onClick={handleSelect} className="link link-accent link-hover">library</span></span>
         {/* <button onClick={handleSelect} className="flex-grow btn btn-sm btn-primary">Select existing file</button> */}
       </div>
     </div>}
@@ -414,7 +414,7 @@ const FontSelectDropdown: FC<any> = memo(({ onChange, value }) => {
   const fonts = useSnapshot(window.APIFrontend.files.ui.fontFamilies)
 
   const handleInstall = () => {
-    name && window.APIFrontend.files.installFont(name);
+    name && window.APIFrontend.files.installFont(name.trim());
   }
 
   return <div className="flex flex-col space-y-2 bg-base-100 rounded-box p-4 w-64">
