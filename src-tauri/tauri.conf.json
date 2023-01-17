@@ -12,6 +12,9 @@
   "tauri": {
     "allowlist": {
       "all": true,
+      "globalShortcut": {
+        "all": false
+      },
       "fs":{
         "all": true,
         "scope": ["$APPDATA/**"]

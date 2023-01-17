@@ -12,6 +12,8 @@ import "./file-modal";
 import OverlayInput from "./overlay-input";
 import { ElementEditorTransform } from "./element-transform";
 import { useGetState } from "../frontend-services";
+import classNames from "classnames";
+import { RiCheckFill, RiCloseCircleFill, RiCloseFill } from "react-icons/ri";
 
 const EditorView: FC = () => {
   const { showOverlay } = useSnapshot(window.API.state);
@@ -33,9 +35,30 @@ const EditorView: FC = () => {
         <AnimatePresence>
           {showOverlay && <OverlayInput onClose={() => window.API.state.showOverlay = false} />}
         </AnimatePresence>
+        <ShortcutRecorder />
         <ToastContainer className="toasts" draggable={false} closeOnClick limit={3} hideProgressBar theme="colored" />
       </NiceModal.Provider>
     </motion.div>
+  </AnimatePresence>
+}
+
+const ShortcutRecorder: FC = () => {
+  const { showRecorder, currentValue } = useSnapshot(window.API.keyboard.ui);
+
+  return <AnimatePresence>
+    {showRecorder && <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ ease: "anticipate", duration: 0.3 }}
+      className="fixed inset-0 z-50 bg-base-300/90 flex flex-col space-y-5 items-center justify-center">
+      {/* <span className="text-2xl">Recording hotkey</span> */}
+      <span className={classNames("font-bold text-5xl", { "opacity-50": !currentValue })}>{currentValue || "Listening for input.."}</span>
+      <div className="flex space-x-2">
+        <button className="btn btn-sm btn-ghost gap-2 leading-none items-center" onClick={() => window.API.keyboard.cancelComboRecord()}>Cancel</button>
+        <button className="btn btn-sm btn-primary gap-2 leading-none items-center" onClick={() => window.API.keyboard.confirmComboRecord()}><RiCheckFill className="text-xl" /> Update shortcut</button>
+      </div>
+    </motion.div>}
   </AnimatePresence>
 }
 

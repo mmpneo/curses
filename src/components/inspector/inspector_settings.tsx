@@ -118,6 +118,13 @@ const Inspector_Settings: FC = memo(() => {
     window.API.changeScale(Math.max(UI_SCALE_MIN, Math.min(UI_SCALE_MAX, _v)));
   }
 
+  const shortuctsOn = () => {
+    window.API.keyboard.start()
+  }
+  const shortuctsOff = () => {
+    window.API.keyboard.stop()
+  }
+
   return <Inspector.Body>
     <Inspector.Header><RiSettings2Fill /> Settings</Inspector.Header>
     <Inspector.Content>
@@ -142,6 +149,11 @@ const Inspector_Settings: FC = memo(() => {
         <div className="self-center text-sm opacity-50">v.{version}</div>
       </div>
       <div className="divider"></div>
+
+      <Input.Shortcut label="Background input" shortcut="bgInput" />
+      <Input.Shortcut label="Mute speech to text" shortcut="muteMic" />
+      {/* <button className="btn btn-sm" onClick={() => shortuctsOn()}>Start</button>
+      <button className="btn btn-sm" onClick={() => shortuctsOff()}>Stop</button> */}
 
       {/* <Inspector.SubHeader>Canvas</Inspector.SubHeader> */}
       {/* <Inspector.SubHeader>UI</Inspector.SubHeader> */}

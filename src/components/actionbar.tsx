@@ -98,7 +98,7 @@ const WindowActions: FC = () => {
   const handleClose = () => window.platform === "app" && appWindow.close();
 
   return <div className="flex z-0 pointer-events-auto items-center space-x-2">
-    <Button tooltip={alwaysOnTop ? "Normal order" : "Keep on top"} onClick={handlePin}>{alwaysOnTop ? <RiPushpin2Fill /> : <RiPushpinFill />}</Button>
+    <Button tooltip={alwaysOnTop ? "Unpin window" : "Pin window on top"} onClick={handlePin}>{alwaysOnTop ? <RiPushpin2Fill /> : <RiPushpinFill />}</Button>
     <button className="btn btn-ghost btn-sm btn-square" onClick={handleMinimize}><VscChromeMinimize /></button>
     <button className="btn btn-ghost btn-sm btn-square" onClick={handleMaximize}><VscChromeMaximize /></button>
     <button className="btn btn-ghost btn-sm btn-square" onClick={handleClose}><VscChromeClose /></button>

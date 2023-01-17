@@ -2253,6 +2253,7 @@ __metadata:
     classnames: ^2.3.2
     daisyui: ^2.46.0
     framer-motion: ^8.4.2
+    hotkeys-js: ^3.10.1
     immer: ^9.0.16
     immer-yjs: ^1.1.0
     lodash: ^4.17.21
@@ -3029,6 +3030,13 @@ __metadata:
   dependencies:
     react-is: ^16.7.0
   checksum: b1538270429b13901ee586aa44f4cc3ecd8831c061d06cb8322e50ea17b3f5ce4d0e2e66394761e6c8e152cd8c34fb3b4b690116c6ce2bd45b18c746516cb9e8
+  languageName: node
+  linkType: hard
+
+"hotkeys-js@npm:^3.10.1":
+  version: 3.10.1
+  resolution: "hotkeys-js@npm:3.10.1"
+  checksum: f6ca367fbcc52e6d6a4f735ada8d6ebfd38d7a1bc5574ffb3dafb5e7a0b5ad1d2a23b46c59eb482b09aca4ca76152738d1be32553580a3e8c7dad6f46a0fa738
   languageName: node
   linkType: hard
 

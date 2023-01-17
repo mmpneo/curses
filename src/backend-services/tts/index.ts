@@ -51,7 +51,7 @@ class Service_TTS implements IServiceInterface {
     return sentence
     .split(" ")
     .map(word => {
-      const cleared = word.replace(/([.,\/#!$%\^&\*;:{}=\-_`~()\]\[])+$/g, "");
+      const cleared = word.replace(/([.,\/#!?$%\^&\*;:{}=\-_`~()\]\[])+$/g, "");
       return this.data.replaceWords[cleared] ? word.replace(cleared, this.data.replaceWords[cleared]) : word;
     })
     .join(" ")

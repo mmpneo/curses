@@ -15,13 +15,7 @@ use super::AppConfiguration;
 mod assets;
 mod peer;
 mod pubsub;
-pub struct WebPlugin {}
 
-impl Default for WebPlugin {
-    fn default() -> Self {
-        Self {}
-    }
-}
 struct PubSubInput {
     tx: Mutex<mpsc::Sender<String>>,
 }
@@ -74,7 +68,6 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
     Builder::new("web")
         .invoke_handler(tauri::generate_handler![open_browser, pubsub_broadcast, config])
         .setup(|app| {
-            app.manage(WebPlugin::default());
             app.manage(PubSubInput {
                 tx: Mutex::new(pubsub_input_tx),
             });

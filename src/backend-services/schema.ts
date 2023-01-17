@@ -1,9 +1,9 @@
-import {JSONSchemaType}              from "ajv";
-import Schema_STT, {STT_State}       from "./stt/schema";
-import Schema_Twitch, {Twitch_State} from "./twitch/schema";
-import Schema_VRC, {VRC_State}       from "./vrc/schema";
-import Schema_TTS, {TTS_State}       from "./tts/schema";
-import { nanoid } from "nanoid";
+import { JSONSchemaType } from "ajv";
+import Schema_STT, { STT_State } from "./stt/schema";
+import Schema_Twitch, { Twitch_State } from "./twitch/schema";
+import Schema_VRC, { VRC_State } from "./vrc/schema";
+import Schema_TTS, { TTS_State } from "./tts/schema";
+import { customAlphabet, urlAlphabet } from "nanoid";
 
 export interface BackendState {
   id: string;
@@ -13,65 +13,77 @@ export interface BackendState {
   showOverlay: boolean;
   showOverlayLogs: boolean;
   shortcuts: {
+    bgInput: string;
     start: string;
     muteMic: string;
     muteSound: string;
-  },
+  };
   services: {
-    stt: ServiceState<STT_State>
-    tts: ServiceState<TTS_State>
-    twitch: ServiceState<Twitch_State>
-    vrc: ServiceState<VRC_State>
-  }
+    stt: ServiceState<STT_State>;
+    tts: ServiceState<TTS_State>;
+    twitch: ServiceState<Twitch_State>;
+    vrc: ServiceState<VRC_State>;
+  };
 }
-
 
 type ServiceState<Data = any> = {
-  showActionButton: boolean
-  data: Data
-}
+  showActionButton: boolean;
+  data: Data;
+};
 
-const genServiceSchema = <T>(schema: JSONSchemaType<T>): JSONSchemaType<ServiceState<T>> => ({
-  type:       "object",
-  properties: {
-    showActionButton: {type: "boolean", default: false},
-    data:      schema
-  },
-  default:    {},
-  required:   ["showActionButton", "data"]
-} as JSONSchemaType<ServiceState<T>>)
+const genServiceSchema = <T>(
+  schema: JSONSchemaType<T>
+): JSONSchemaType<ServiceState<T>> =>
+  ({
+    type: "object",
+    properties: {
+      showActionButton: { type: "boolean", default: false },
+      data: schema,
+    },
+    default: {},
+    required: ["showActionButton", "data"],
+  } as JSONSchemaType<ServiceState<T>>);
 
 export const backendSchema: JSONSchemaType<BackendState> = {
-  type:       "object",
+  type: "object",
   properties: {
-    id: {type: "string", default: nanoid(42)},
-    linkAddress: {type: "string", default: ""},
-    clientTheme: {type: "string", default: "curses"},
-    uiScale: {type: "number", default: 1},
-    showOverlay: {type: "boolean", default: false},
-    showOverlayLogs: {type: "boolean", default: false},
-    shortcuts:    {
-      type:       "object",
+    id: { type: "string", default: customAlphabet(urlAlphabet, 42)() },
+    linkAddress: { type: "string", default: "" },
+    clientTheme: { type: "string", default: "curses" },
+    uiScale: { type: "number", default: 1 },
+    showOverlay: { type: "boolean", default: false },
+    showOverlayLogs: { type: "boolean", default: false },
+    shortcuts: {
+      type: "object",
       properties: {
-        muteMic: {type: "string", default: ""},
-        muteSound: {type: "string", default: ""},
-        start: {type: "string", default: ""},
+        bgInput: { type: "string", default: "" },
+        muteMic: { type: "string", default: "" },
+        muteSound: { type: "string", default: "" },
+        start: { type: "string", default: "" },
       },
-      default:    {} as any,
-      required:   ["muteMic", "muteSound", "start"],
+      default: {} as any,
+      required: ["bgInput", "muteMic", "muteSound", "start"],
     },
-    services:    {
-      type:       "object",
+    services: {
+      type: "object",
       properties: {
-        vrc:    genServiceSchema(Schema_VRC),
-        stt:    genServiceSchema(Schema_STT),
-        tts:    genServiceSchema(Schema_TTS),
+        vrc: genServiceSchema(Schema_VRC),
+        stt: genServiceSchema(Schema_STT),
+        tts: genServiceSchema(Schema_TTS),
         twitch: genServiceSchema(Schema_Twitch),
       },
-      default:    {} as any,
-      required:   ["vrc", "stt", "tts", "twitch"],
-    }
+      default: {} as any,
+      required: ["vrc", "stt", "tts", "twitch"],
+    },
   },
   additionalProperties: false,
-  required:   ["id", "linkAddress", "uiScale", "showOverlay", "showOverlayLogs", "clientTheme", "services"]
-}
+  required: [
+    "id",
+    "linkAddress",
+    "uiScale",
+    "showOverlay",
+    "showOverlayLogs",
+    "clientTheme",
+    "services",
+  ],
+};

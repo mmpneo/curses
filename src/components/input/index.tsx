@@ -3,7 +3,7 @@ import { useId } from "@floating-ui/react-dom-interactions";
 import classNames from "classnames/bind";
 import { FC, InputHTMLAttributes, memo, PropsWithChildren, ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { RgbaColor, RgbaColorPicker } from "react-colorful";
-import { RiDeleteBack2Fill, RiUpload2Fill } from "react-icons/ri";
+import { RiDeleteBack2Fill, RiUpload2Fill, RiKeyboardBoxFill } from "react-icons/ri";
 import Select, { MenuListProps, MenuProps, OptionProps, Props as SelectProps } from 'react-select';
 import SimpleBar from "simplebar-react";
 import FileElement from "../../frontend-services/components/file-element";
@@ -20,6 +20,8 @@ import { MappedGroupDictionary, ServiceNetworkState, TextEventSource } from "../
 import { useSnapshot } from "valtio";
 import styles from "./style.module.css";
 import produce from "immer";
+import { BackendState } from "../../backend-services/schema";
+import Tooltip from "../dropdown/Tooltip";
 const cx = classNames.bind(styles);
 
 interface InputBaseProps {
@@ -498,4 +500,31 @@ const MapObject: FC<ObjectProps> = memo(({ label, onChange, ...rest }) => {
   </Container>
 })
 
-export default { BaseText, Text, Chips, Object: MapObject, Range, Color, Font, Select: NewSelect, MappedGroupSelect, Checkbox, File, Event, Code, TextSource, Container, DoubleCountainer, NetworkStatus };
+interface ShortuctProps extends InputBaseProps {
+  shortcut: keyof BackendState["shortcuts"],
+  value?: string,
+  onChange?: (value: string) => void
+}
+const Shortcut: FC<ShortuctProps> = ({shortcut, label, onChange, ...rest}) => {
+  const id = useId();
+  const {shortcuts} = useSnapshot(window.API.state);
+
+  const startRecord = () => {
+    window.API.keyboard.startComboRecord(shortcut);
+  }
+  const stopRecord = () => {
+    window.API.keyboard.confirmComboRecord();
+  }
+
+  return <Container vertical label={label} id={id}>
+    <div className="input-group w-full">
+      <input type="text" value={shortcuts[shortcut]} id={id} disabled className="w-full input input-sm input-bordered" />
+      <Tooltip content="Listen" className="btn btn-sm btn-primary btn-square">
+        <button className="w-full h-full flex items-center justify-center" onClick={startRecord}><RiKeyboardBoxFill/></button>
+      </Tooltip>
+    </div>
+    {/* <BaseText disabled type="text" /> */}
+  </Container>
+}
+
+export default { BaseText, Text, Chips, Object: MapObject, Range, Color, Font, Select: NewSelect, MappedGroupSelect, Checkbox, File, Event, Code, TextSource, Container, DoubleCountainer, NetworkStatus, Shortcut };

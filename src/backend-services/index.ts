@@ -3,7 +3,7 @@ import { proxy } from "valtio";
 import { InspectorTabPath } from "../types";
 import Service_PubSub from "./pubsub";
 import { BackendState } from "./schema";
-import Service_Shortcuts from "./shortcuts";
+import Service_Keyboard from "./keyboard";
 import Service_State from "./state";
 import Service_STT from "./stt";
 import Service_Translation from "./translation";
@@ -29,7 +29,7 @@ class Backend {
   public readonly twitch = new Service_Twitch();
   public readonly vrc = new Service_VRC();
   public readonly pubsub = new Service_PubSub();
-  public readonly shortcuts = new Service_Shortcuts();
+  public readonly keyboard = new Service_Keyboard();
 
   get state() {
     return this._state.state;
@@ -117,7 +117,7 @@ class Backend {
     await this.tts.init();
     await this.translation.init();
     await this.vrc.init();
-    await this.shortcuts.init();
+    await this.keyboard.init();
     window.mode === "host" && this.changeTheme(this.state.clientTheme);
     window.mode === "host" && this.changeScale(this.state.uiScale);
   }

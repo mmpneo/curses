@@ -62,6 +62,7 @@ class Service_Document implements IServiceInterface {
         const template = this.#file.getMap("template");
         this.#file.transact(() => {
           createDocumentState(template);
+          this.saveDocument();
 
         });
 
@@ -75,7 +76,6 @@ class Service_Document implements IServiceInterface {
           y: (canvas.h - 65) / 2,
           r: 0
         });
-        this.saveDocument();
       }
       this.#file.on("update", () => {
         this.saveDocument();
