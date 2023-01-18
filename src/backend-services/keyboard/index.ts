@@ -1,25 +1,35 @@
+import NiceModal from "@ebay/nice-modal-react";
 import { listen } from "@tauri-apps/api/event";
+import { A } from "@tauri-apps/api/path-e12e0e34";
 import { invoke } from "@tauri-apps/api/tauri";
 import hotkeys from "hotkeys-js";
 import uniqBy from "lodash/uniqBy";
 import { proxy } from "valtio";
-import { IServiceInterface } from "../../types";
+import { IServiceInterface, TextEventSource, TextEventType } from "../../types";
 import { BackendState } from "../schema";
 
 type ShortcutKeys = keyof BackendState["shortcuts"];
+type InputCommands = "submit" | "delete" | "cancel";
 
+/**
+ * pubsub
+ * keyboard.key string
+ * keyboard.cmd left | right | submit | delete
+ */
 class Service_Keyboard implements IServiceInterface {
 
   ui = proxy<{
     currentTarget: ShortcutKeys | "",
     showRecorder: boolean,
     currentValue: string,
-    listening: boolean
+    backgroundInputActive: boolean
+    backgroundInputValue: string
   }>({
     currentTarget: "",
     showRecorder: false,
     currentValue: "",
-    listening: true
+    backgroundInputActive: false,
+    backgroundInputValue: "",
   })
 
   async init() {
@@ -30,16 +40,38 @@ class Service_Keyboard implements IServiceInterface {
     this.rebindShortcutsNative();
 
     // send hotkeys
-
     listen<string>('keyboard', e => {
       const str = e.payload;
+      console.log(e);
       str.startsWith("shortcut:") && this.processShortcut(str.slice(9) as ShortcutKeys)
       str.startsWith("key:") && this.processKey(str.slice(4));
+      str.startsWith("cmd:") && this.processCommand(str.slice(4) as InputCommands);
     }); 
+  }
+
+  inputUpdateValue(value: string) {
+    this.ui.backgroundInputValue  = value
+    window.API.pubsub.publishText(TextEventSource.textfield, { type: TextEventType.interim, value });
   }
   
   private processKey(key: string) {
-    console.log("key", key)
+    this.ui.backgroundInputValue += key;
+    this.triggerBackgroundTimer()
+  }
+  private processCommand(command: InputCommands) {
+    if (command === "submit") {
+      console.log(this.ui.backgroundInputValue);
+      window.API.pubsub.publishText(TextEventSource.textfield, { type: TextEventType.final, value: this.ui.backgroundInputValue });
+      this.stopBackgroundInput();
+    }
+    if (command === "cancel") {
+      this.stopBackgroundInput();
+    }
+  
+    if (command === "delete") {
+      this.ui.backgroundInputValue = this.ui.backgroundInputValue.slice(0, -1);
+      this.triggerBackgroundTimer()
+    }
   }
 
   private processShortcut(shortcut: ShortcutKeys) {
@@ -51,7 +83,7 @@ class Service_Keyboard implements IServiceInterface {
 
   // start/restart background timer
   backgroundTimer: NodeJS.Timeout | null = null;
-  private startBackgroundTimer() {
+  private triggerBackgroundTimer() {
     if (this.backgroundTimer !== null)
       clearTimeout(this.backgroundTimer);
     this.backgroundTimer = setTimeout(() => this.stopBackgroundInput(), 5000);
@@ -59,11 +91,18 @@ class Service_Keyboard implements IServiceInterface {
   private startBackgroundInput() {
     console.log("start bg input");
     invoke("plugin:keyboard|start_tracking");
-    window.API.state.showOverlay = true;
-    this.startBackgroundTimer();
+    this.ui.backgroundInputActive = true;
+    this.triggerBackgroundTimer();
   }
-  private stopBackgroundInput() {
+  stopBackgroundInput() {
     console.log("stop bg input");
+  
+    // for immidiate cancel
+    if (this.backgroundTimer !== null)
+      clearTimeout(this.backgroundTimer);
+    this.ui.backgroundInputActive = false;
+    this.backgroundTimer = null;
+    this.ui.backgroundInputValue = "";
     invoke("plugin:keyboard|stop_tracking");
   }
   
@@ -85,7 +124,7 @@ class Service_Keyboard implements IServiceInterface {
   }
 
   private tempRecordSet = new Set<{key: string, code: number}>;
-  async startComboRecord(target: ShortcutKeys) {
+  async startShortcutRecord(target: ShortcutKeys) {
     this.ui.currentTarget = target;
     this.ui.showRecorder = true;
     hotkeys("*", e => {
@@ -96,7 +135,7 @@ class Service_Keyboard implements IServiceInterface {
       e.preventDefault();
     })
   }
-  confirmComboRecord() {
+  confirmShortcutRecord() {
     this.ui.showRecorder = false;
     this.ui.currentValue = "";
     hotkeys.unbind("*");

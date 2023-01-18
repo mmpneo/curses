@@ -81,7 +81,22 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                         return;
                     }
                     if let rdev::EventType::KeyPress(_) = e.event_type {
-                        if let Some(key) = e.name {
+                        use rdev::*;
+                        println!("{:?}", e);
+                        let EventType::KeyPress(key) = e.event_type else {
+                            return;
+                        };
+
+                        if matches!(key, Key::Backspace | Key::Delete) {
+                            tx.send("cmd:delete".into()).unwrap();
+                        }
+                        else if Key::Escape == key {
+                            tx.send("cmd:cancel".into()).unwrap();
+                        }
+                        else if Key::Return == key {
+                            tx.send("cmd:submit".into()).unwrap();
+                        }
+                        else if let Some(key) = e.name {
                             tx.send(format!("key:{}", key)).unwrap();
                         }
                     }

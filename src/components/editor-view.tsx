@@ -14,6 +14,7 @@ import { ElementEditorTransform } from "./element-transform";
 import { useGetState } from "../frontend-services";
 import classNames from "classnames";
 import { RiCheckFill, RiCloseCircleFill, RiCloseFill } from "react-icons/ri";
+import BackgroundInput from "./background-input";
 
 const EditorView: FC = () => {
   const { showOverlay } = useSnapshot(window.API.state);
@@ -36,6 +37,7 @@ const EditorView: FC = () => {
           {showOverlay && <OverlayInput onClose={() => window.API.state.showOverlay = false} />}
         </AnimatePresence>
         <ShortcutRecorder />
+        <BackgroundInput />
         <ToastContainer className="toasts" draggable={false} closeOnClick limit={3} hideProgressBar theme="colored" />
       </NiceModal.Provider>
     </motion.div>
@@ -56,7 +58,7 @@ const ShortcutRecorder: FC = () => {
       <span className={classNames("font-bold text-5xl", { "opacity-50": !currentValue })}>{currentValue || "Listening for input.."}</span>
       <div className="flex space-x-2">
         <button className="btn btn-sm btn-ghost gap-2 leading-none items-center" onClick={() => window.API.keyboard.cancelComboRecord()}>Cancel</button>
-        <button className="btn btn-sm btn-primary gap-2 leading-none items-center" onClick={() => window.API.keyboard.confirmComboRecord()}><RiCheckFill className="text-xl" /> Update shortcut</button>
+        <button className="btn btn-sm btn-primary gap-2 leading-none items-center" onClick={() => window.API.keyboard.confirmShortcutRecord()}><RiCheckFill className="text-xl" /> Update shortcut</button>
       </div>
     </motion.div>}
   </AnimatePresence>

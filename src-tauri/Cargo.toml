@@ -18,7 +18,7 @@ tauri = { version = "1.2", features = ["api-all"] }
 window-shadows = "0.2.0"
 
 mki = "0.2.3"
-rdev = "0.5.2"
+rdev = {version = "0.5.2", features = ["unstable_grab"]}
 
 
 itertools = "0.10.5"
@@ -28,6 +28,7 @@ tokio = { version = "1.23.0", features = ["full"] }
 tokio-stream = "0.1.11"
 futures = "0.3.25"
 windows = { version = "0.44.0", features = [
+  "Win32_UI_Input_KeyboardAndMouse",
   "Win32_UI_WindowsAndMessaging",
   "Win32_Foundation",
   "Media_SpeechRecognition",

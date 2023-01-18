@@ -1167,7 +1167,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tauri-apps/api@npm:^1.1.0":
+"@tauri-apps/api@npm:^1.2.0":
   version: 1.2.0
   resolution: "@tauri-apps/api@npm:1.2.0"
   checksum: 15b0b805d9a30dce4e722b48330566cb95d79f92d626741f49735dfb7e7a044836a7c45a0537e03fd0acb48965c723ff31a6931289f81c9bcafa4e13c3a2aa2b
@@ -2230,7 +2230,7 @@ __metadata:
     "@floating-ui/react-dom": ^1.2.0
     "@floating-ui/react-dom-interactions": ^0.13.3
     "@speechly/browser-client": ^2.6.2
-    "@tauri-apps/api": ^1.1.0
+    "@tauri-apps/api": ^1.2.0
     "@tauri-apps/cli": ^1.1.0
     "@twurple/api": ^5.3.2
     "@twurple/auth": ^5.3.2

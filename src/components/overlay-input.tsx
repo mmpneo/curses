@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { motion } from "framer-motion";
 import { nanoid } from "nanoid";
-import { FC, forwardRef, useEffect, useRef, useState } from "react";
+import { FC, forwardRef, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { RiSendPlaneFill } from "react-icons/ri";
 import { TbArrowBarToLeft, TbArrowBarToRight } from "react-icons/tb";
 import { useSnapshot } from "valtio";
@@ -45,7 +45,7 @@ const Logs: FC<{ onFillRequest: (value: string) => void }> = ({ onFillRequest })
           // limit to 20
           if (v.length >= 20)
             _v.shift()
-          _v.push({id: nanoid(), event: eventName?.replace("text.", "") || "text", value: event.value });
+          _v.push({ id: nanoid(), event: eventName?.replace("text.", "") || "text", value: event.value });
           return _v;
         });
         // push
@@ -68,20 +68,23 @@ const Logs: FC<{ onFillRequest: (value: string) => void }> = ({ onFillRequest })
 }
 
 const OverlayInput: FC<{ onClose: () => void }> = forwardRef(({ onClose }, ref: any) => {
-  const [inputValue, setInputValue] = useState('');
   const { showOverlayLogs } = useSnapshot(window.API.state);
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const [inputValue, setInputValue] = useState("");
 
   const submit = () => {
-    if (!inputValue)
-      return;
-    setInputValue('');
     window.API.pubsub.publishText(TextEventSource.textfield, { type: TextEventType.final, value: inputValue });
+    setInputValue("");
   }
 
-  const handleChange = (value: string, withFocus: boolean = false) => {
-    window.API.pubsub.publishText(TextEventSource.textfield, { type: TextEventType.interim, value });
-    withFocus && inputRef.current?.focus();
+  const handleChange = (value: string) => {
+    window.API.pubsub.publishText(TextEventSource.textfield, { type: TextEventType.interim, value: inputValue });
+    setInputValue(value);
+  
+  };
+
+  const insertLog = (value: string) => {
+    inputRef.current?.focus();
     setInputValue(value);
   }
 
@@ -91,7 +94,6 @@ const OverlayInput: FC<{ onClose: () => void }> = forwardRef(({ onClose }, ref: 
       submit();
     }
   }
-
 
   const handleLogsSwitch = () => {
     window.API.state.showOverlayLogs = !window.API.state.showOverlayLogs;
@@ -128,9 +130,10 @@ const OverlayInput: FC<{ onClose: () => void }> = forwardRef(({ onClose }, ref: 
           </button>
         </Tooltip>
       </div>
-      <motion.div animate={showOverlayLogs ? "show" : "hidden"} variants={logsVariants} initial={showOverlayLogs ? "show" : "hidden"} className="h-full flex-none"><Logs onFillRequest={v => handleChange(v, true)} /></motion.div>
+      <motion.div animate={showOverlayLogs ? "show" : "hidden"} variants={logsVariants} initial={showOverlayLogs ? "show" : "hidden"} className="h-full flex-none">
+        <Logs onFillRequest={v => insertLog(v)} />
+      </motion.div>
     </div>
-
   </motion.div>
 })
 export default OverlayInput;

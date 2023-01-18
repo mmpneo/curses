@@ -510,10 +510,10 @@ const Shortcut: FC<ShortuctProps> = ({shortcut, label, onChange, ...rest}) => {
   const {shortcuts} = useSnapshot(window.API.state);
 
   const startRecord = () => {
-    window.API.keyboard.startComboRecord(shortcut);
+    window.API.keyboard.startShortcutRecord(shortcut);
   }
   const stopRecord = () => {
-    window.API.keyboard.confirmComboRecord();
+    window.API.keyboard.confirmShortcutRecord();
   }
 
   return <Container vertical label={label} id={id}>
