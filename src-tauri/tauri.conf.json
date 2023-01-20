@@ -11,9 +11,14 @@
   },
   "tauri": {
     "allowlist": {
-      "all": true,
+      "dialog": {
+        "all": true
+      },
+      "window": {
+        "all": true
+      },
       "globalShortcut": {
-        "all": false
+        "all": true
       },
       "fs":{
         "all": true,

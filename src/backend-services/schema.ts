@@ -12,6 +12,7 @@ export interface BackendState {
   uiScale: number;
   showOverlay: boolean;
   showOverlayLogs: boolean;
+  backgroundInputTimer: string;
   shortcuts: {
     bgInput: string;
     start: string;
@@ -53,6 +54,7 @@ export const backendSchema: JSONSchemaType<BackendState> = {
     uiScale: { type: "number", default: 1 },
     showOverlay: { type: "boolean", default: false },
     showOverlayLogs: { type: "boolean", default: false },
+    backgroundInputTimer: { type: "string", default: "5000" },
     shortcuts: {
       type: "object",
       properties: {
@@ -84,6 +86,7 @@ export const backendSchema: JSONSchemaType<BackendState> = {
     "showOverlay",
     "showOverlayLogs",
     "clientTheme",
+    "backgroundInputTimer",
     "services",
   ],
 };

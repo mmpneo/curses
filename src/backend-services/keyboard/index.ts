@@ -1,9 +1,9 @@
-import NiceModal from "@ebay/nice-modal-react";
+import { globalShortcut } from "@tauri-apps/api";
 import { listen } from "@tauri-apps/api/event";
-import { A } from "@tauri-apps/api/path-e12e0e34";
 import { invoke } from "@tauri-apps/api/tauri";
 import hotkeys from "hotkeys-js";
 import uniqBy from "lodash/uniqBy";
+import { toast } from "react-toastify";
 import { proxy } from "valtio";
 import { IServiceInterface, TextEventSource, TextEventType } from "../../types";
 import { BackendState } from "../schema";
@@ -17,32 +17,32 @@ type InputCommands = "submit" | "delete" | "cancel";
  * keyboard.cmd left | right | submit | delete
  */
 class Service_Keyboard implements IServiceInterface {
-
   ui = proxy<{
     currentTarget: ShortcutKeys | "",
     showRecorder: boolean,
     currentValue: string,
     backgroundInputActive: boolean
     backgroundInputValue: string
+    backgroundTimer: number // in %
   }>({
     currentTarget: "",
     showRecorder: false,
     currentValue: "",
     backgroundInputActive: false,
     backgroundInputValue: "",
-  })
+    backgroundTimer: 0,
+  });
 
   async init() {
     if (window.platform === "web" || window.mode === "client") {
       return;
     }
 
-    this.rebindShortcutsNative();
+    this.rebindShortcuts();
 
     // send hotkeys
     listen<string>('keyboard', e => {
       const str = e.payload;
-      console.log(e);
       str.startsWith("shortcut:") && this.processShortcut(str.slice(9) as ShortcutKeys)
       str.startsWith("key:") && this.processKey(str.slice(4));
       str.startsWith("cmd:") && this.processCommand(str.slice(4) as InputCommands);
@@ -60,7 +60,6 @@ class Service_Keyboard implements IServiceInterface {
   }
   private processCommand(command: InputCommands) {
     if (command === "submit") {
-      console.log(this.ui.backgroundInputValue);
       window.API.pubsub.publishText(TextEventSource.textfield, { type: TextEventType.final, value: this.ui.backgroundInputValue });
       this.stopBackgroundInput();
     }
@@ -75,7 +74,6 @@ class Service_Keyboard implements IServiceInterface {
   }
 
   private processShortcut(shortcut: ShortcutKeys) {
-    console.log(shortcut);
     if (shortcut === "bgInput") {
       this.startBackgroundInput();
     }
@@ -83,23 +81,34 @@ class Service_Keyboard implements IServiceInterface {
 
   // start/restart background timer
   backgroundTimer: NodeJS.Timeout | null = null;
+  backgroundInterval: number | null = null;
   private triggerBackgroundTimer() {
-    if (this.backgroundTimer !== null)
+    if (this.backgroundTimer !== null) {
       clearTimeout(this.backgroundTimer);
-    this.backgroundTimer = setTimeout(() => this.stopBackgroundInput(), 5000);
+      clearInterval(this.backgroundInterval as number);
+    }
+
+    // min 1 second
+    const time = Math.max(parseInt(window.API.state.backgroundInputTimer) || 5000, 1000);
+    this.backgroundTimer = setTimeout(() => this.stopBackgroundInput(), time);
+    this.ui.backgroundTimer = 100;
+    this.backgroundInterval = setInterval(() => {
+      this.ui.backgroundTimer -= 1;
+    }, time/100) as unknown as number;
   }
   private startBackgroundInput() {
-    console.log("start bg input");
-    invoke("plugin:keyboard|start_tracking");
-    this.ui.backgroundInputActive = true;
+    if (!this.ui.backgroundInputActive) {
+      invoke("plugin:keyboard|start_tracking");
+      this.ui.backgroundInputActive = true;
+    }
     this.triggerBackgroundTimer();
   }
   stopBackgroundInput() {
-    console.log("stop bg input");
-  
     // for immidiate cancel
-    if (this.backgroundTimer !== null)
+    if (this.backgroundTimer !== null) {
       clearTimeout(this.backgroundTimer);
+      clearInterval(this.backgroundInterval as number);
+    }
     this.ui.backgroundInputActive = false;
     this.backgroundTimer = null;
     this.ui.backgroundInputValue = "";
@@ -114,24 +123,60 @@ class Service_Keyboard implements IServiceInterface {
     invoke("plugin:bg_input|stop");
   }
 
+  private rebindShortcuts() {
+    this.rebindShortcutsTauri();
+  }
+
+  private async rebindShortcutsTauri() {
+    await globalShortcut.unregisterAll();
+    for (let k in window.API.state.shortcuts) {
+      let key: ShortcutKeys = k as any;
+      window.API.state.shortcuts[key] !== "" && globalShortcut.register(window.API.state.shortcuts[key], k => {
+        this.processShortcut(key);
+      }).catch(err => {
+        toast.error(`Invalid shortkey ${window.API.state.shortcuts[key]}`);
+        window.API.state.shortcuts[key] = ""
+        console.log("sc error", err);
+      });
+    }
+    // globalShortcut.registerAll(Object.entries(window.API.state.shortcuts), shortcut => {
+      
+    // });
+  }
+
   private rebindShortcutsNative() {
     const shortcuts =  Object
       .entries(window.API.state.shortcuts)
       .filter(sc => !!sc[1])
       .map(([key, value]) => ({name: key, keys: value.split("+")}));
-      console.log(shortcuts);
     invoke("plugin:keyboard|apply_shortcuts", {shortcuts});
   }
 
-  private tempRecordSet = new Set<{key: string, code: number}>;
+  clearShortcut(shortcut: ShortcutKeys) {
+    window.API.state.shortcuts[shortcut] = "";
+  }
+
+  private tempRecordSet = new Set<{key: string, code: number, location: number}>;
   async startShortcutRecord(target: ShortcutKeys) {
     this.ui.currentTarget = target;
     this.ui.showRecorder = true;
+    globalShortcut.unregisterAll();
     hotkeys("*", e => {
-      this.tempRecordSet.add({key: e.code, code: e.keyCode});
-      let arr = Array.from(this.tempRecordSet).filter(key => hotkeys.isPressed(key.code));
-      this.tempRecordSet = new Set(uniqBy(arr, "code"));
-      this.ui.currentValue = Array.from(this.tempRecordSet).map(k => (<any>NativeKeysMap)[k.key] as string).join("+")
+      // check if already has on location-0 key [TAURI BUG - only one char allowed]
+      let filteredArr = Array.from(this.tempRecordSet).filter(key => hotkeys.isPressed(key.code));
+      if (e.location === 0 && filteredArr.find(key => key.location === 0)) {
+        e.preventDefault();      
+        return;
+      }
+      
+      filteredArr.push({key: e.code, code: e.keyCode, location: e.location});
+      this.tempRecordSet = new Set(uniqBy(filteredArr, "code"));
+
+      // native
+      // this.ui.currentValue = Array.from(this.tempRecordSet).map(k => (<any>NativeKeysMap)[k.key] as string).join("+")
+
+      //tauri
+      this.ui.currentValue = Array.from(this.tempRecordSet).map(k => TauriKeysMap[k.key]).join("+");
       e.preventDefault();
     })
   }
@@ -139,7 +184,12 @@ class Service_Keyboard implements IServiceInterface {
     this.ui.showRecorder = false;
     this.ui.currentValue = "";
     hotkeys.unbind("*");
-    let value = Array.from(this.tempRecordSet).map(k => (<any>NativeKeysMap)[k.key] as string).join("+");
+
+    // native
+    // let value = Array.from(this.tempRecordSet).map(k => (<any>NativeKeysMap)[k.key] as string).join("+");
+    
+    // tauri
+    let value = Array.from(this.tempRecordSet).map(k => TauriKeysMap[k.key]).join("+");
     this.tempRecordSet.clear();
 
     if (!this.ui.currentTarget)
@@ -149,14 +199,130 @@ class Service_Keyboard implements IServiceInterface {
       return;
 
     window.API.state.shortcuts[this.ui.currentTarget] = value;
-    this.rebindShortcutsNative();
+    this.rebindShortcuts();
   }
   cancelComboRecord() {
     this.ui.showRecorder = false;
     this.ui.currentValue = "";
     hotkeys.unbind("*");
     this.tempRecordSet.clear();
+    this.rebindShortcuts();
   }
+}
+
+const TauriKeysMap: Record<string, string> = {
+  KeyA: "A",
+  KeyB: "B",
+  KeyC: "C",
+  KeyD: "D",
+  KeyE: "E",
+  KeyF: "F",
+  KeyG: "G",
+  KeyH: "H",
+  KeyI: "I",
+  KeyJ: "J",
+  KeyK: "K",
+  KeyL: "L",
+  KeyM: "M",
+  KeyN: "N",
+  KeyO: "O",
+  KeyP: "P",
+  KeyQ: "Q",
+  KeyR: "R",
+  KeyS: "S",
+  KeyT: "T",
+  KeyU: "U",
+  KeyV: "V",
+  KeyW: "W",
+  KeyX: "X",
+  KeyY: "Y",
+  KeyZ: "Z",
+  Digit0: "0",
+  Digit1: "1",
+  Digit2: "2",
+  Digit3: "3",
+  Digit4: "4",
+  Digit5: "5",
+  Digit6: "6",
+  Digit7: "7",
+  Digit8: "8",
+  Digit9: "9",
+  AltLeft: "Alt",
+  AltRight: "Alt",
+  ShiftLeft: "Shift",
+  ShiftRight: "Shift",
+  ControlLeft: "Control",
+  ControlRight: "Control",
+  Backspace: "BackSpace",
+  Tab: "Tab",
+  Enter: "Enter",
+  Escape: "Escape",
+  Space: "Space",
+  PageUp: "PageUp",
+  PageDown: "PageDown",
+  Home: "Home",
+  ArrowLeft: "Left",
+  ArrowUp: "Up",
+  ArrowRight: "Right",
+  ArrowDown: "Down",
+  Print: "Print",
+  PrintScreen: "PrintScreen",
+  Insert: "Insert",
+  Delete: "Delete",
+  MetaLeft: "LeftWindows",
+  MetaRight: "RightWindows",
+  Comma: ",",         // ,<
+  Period: ".",        // .>
+  Slash: "/",         // /?
+  Semicolon: ";",     // ;:
+  Quote: "'",    // '"
+  BracketLeft: "[",     // [{
+  BracketRight: "]",    // ]}
+  Backslash: "\\", // \|
+  Backquote: "`",         // `~
+  F1: "F1",
+  F2: "F2",
+  F3: "F3",
+  F4: "F4",
+  F5: "F5",
+  F6: "F6",
+  F7: "F7",
+  F8: "F8",
+  F9: "F9",
+  F10: "F10",
+  F11: "F11",
+  F12: "F12",
+  F13: "F13",
+  F14: "F14",
+  F15: "F15",
+  F16: "F16",
+  F17: "F17",
+  F18: "F18",
+  F19: "F19",
+  F20: "F20",
+  F21: "F21",
+  F22: "F22",
+  F23: "F23",
+  F24: "F24",
+  NumLock: "NumLock",
+  ScrollLock: "ScrollLock",
+  CapsLock: "CapsLock",
+  Numpad0: "Numpad0",
+  Numpad1: "Numpad1",
+  Numpad2: "Numpad2",
+  Numpad3: "Numpad3",
+  Numpad4: "Numpad4",
+  Numpad5: "Numpad5",
+  Numpad6: "Numpad6",
+  Numpad7: "Numpad7",
+  Numpad8: "Numpad8",
+  Numpad9: "Numpad9",
+  NumpadMultiply: "Multiply",
+  NumpadAdd: "Add",
+  Separator: "Separator",
+  NumpadSubtract: "Subtract",
+  NumpadDecimal: "Decimal",
+  NumpadDivide: "Divide",
 }
 
 enum NativeKeysMap {

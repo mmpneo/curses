@@ -17,3 +17,18 @@
       box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
   }
 }
+.progress {
+  position: relative;
+  width: 200px;
+  height: 0.5rem;
+  appearance: none;
+  overflow: hidden;
+  border-radius: var(--rounded-box, 1rem);
+}
+
+.progress > div {
+  border-radius: var(--rounded-box, 1rem);
+  transform: translateX(0);
+  transition: width .2s ease;
+  height: 100%;
+}

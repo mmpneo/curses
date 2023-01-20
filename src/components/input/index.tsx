@@ -3,7 +3,7 @@ import { useId } from "@floating-ui/react-dom-interactions";
 import classNames from "classnames/bind";
 import { FC, InputHTMLAttributes, memo, PropsWithChildren, ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { RgbaColor, RgbaColorPicker } from "react-colorful";
-import { RiDeleteBack2Fill, RiUpload2Fill, RiKeyboardBoxFill } from "react-icons/ri";
+import { RiDeleteBack2Fill, RiUpload2Fill, RiKeyboardBoxFill, RiDeleteBin3Fill } from "react-icons/ri";
 import Select, { MenuListProps, MenuProps, OptionProps, Props as SelectProps } from 'react-select';
 import SimpleBar from "simplebar-react";
 import FileElement from "../../frontend-services/components/file-element";
@@ -512,6 +512,11 @@ const Shortcut: FC<ShortuctProps> = ({shortcut, label, onChange, ...rest}) => {
   const startRecord = () => {
     window.API.keyboard.startShortcutRecord(shortcut);
   }
+  
+  const clear = () => {
+    window.API.keyboard.clearShortcut(shortcut);
+  }
+
   const stopRecord = () => {
     window.API.keyboard.confirmShortcutRecord();
   }
@@ -521,6 +526,9 @@ const Shortcut: FC<ShortuctProps> = ({shortcut, label, onChange, ...rest}) => {
       <input type="text" value={shortcuts[shortcut]} id={id} disabled className="w-full input input-sm input-bordered" />
       <Tooltip content="Listen" className="btn btn-sm btn-primary btn-square">
         <button className="w-full h-full flex items-center justify-center" onClick={startRecord}><RiKeyboardBoxFill/></button>
+      </Tooltip>
+      <Tooltip content="Clear" className="btn btn-sm btn-neutral btn-square">
+        <button className="w-full h-full flex items-center justify-center" onClick={clear}><RiDeleteBin3Fill/></button>
       </Tooltip>
     </div>
     {/* <BaseText disabled type="text" /> */}
