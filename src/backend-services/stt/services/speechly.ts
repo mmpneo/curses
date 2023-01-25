@@ -13,7 +13,8 @@ export class STT_SpeechlyService implements ISpeechRecognitionService {
   #microphone?: BrowserMicrophone;
   #instance?: BrowserClient;
   #initialized?: boolean;
-  
+  #connectTimeout?: NodeJS.Timeout;
+
   dispose(): void {}
 
   async start(state: STT_State) {
@@ -26,7 +27,13 @@ export class STT_SpeechlyService implements ISpeechRecognitionService {
       vad: { enabled: true, noiseGateDb: -24.0 },
     });
 
+    // timeout
+    this.#connectTimeout = setTimeout(() => {
+      this.bindings.onStop("connection timeout");    
+    }, 6000);
+
     this.#instance.onStart(_ => {
+      clearTimeout(this.#connectTimeout);
       if (this.#initialized)
         return;
       this.bindings.onStart();
@@ -38,7 +45,7 @@ export class STT_SpeechlyService implements ISpeechRecognitionService {
     if (!this.#microphone.mediaStream)
       return this.bindings.onStop("Error initialising");
     await this.#instance.attach(this.#microphone.mediaStream);
-
+    
     this.#instance.onSegmentChange((segment: Segment) => {
       let transcript = segment.words
           .map(w => w.value.toLowerCase())

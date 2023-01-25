@@ -85,7 +85,7 @@ const SidebarElementButton: FC<{ id: string }> = memo(({ id }) => {
 const ElementList: FC = memo(() => {
   const ids = useGetState(state => state.elementsIds);
   return <>
-    {ids.map(id => <SidebarElementButton key={id} id={id} />)}
+    {ids?.map(id => <SidebarElementButton key={id} id={id} />)}
   </>
 })
 

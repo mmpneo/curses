@@ -1,6 +1,7 @@
 #![cfg_attr(all(not(debug_assertions), target_os = "windows"), windows_subsystem = "windows")]
 
 use clap::Parser;
+use serde::{Deserialize, Serialize};
 use tauri::{command, State, Manager};
 use window_shadows::set_shadow;
 use windows::{Win32::UI::WindowsAndMessaging::{MB_OK, MB_ICONWARNING, MessageBoxA}, s, core::PCSTR};
@@ -13,6 +14,19 @@ mod services;
 struct InitArguments {
     #[arg(short, long, default_value_t = 3030)]
     port: u16,
+}
+
+
+#[derive(Serialize, Deserialize)]
+struct NativeFeatures {
+    background_input: bool
+}
+
+#[command]
+fn get_native_features() -> NativeFeatures {
+    NativeFeatures {
+        background_input: cfg!(background_input)
+    }
 }
 
 #[command]
@@ -34,20 +48,24 @@ fn main() {
         },
     };
 
-    tauri::Builder::default()
+    
+    let mut app = tauri::Builder::default()
         .setup(|app| {
             let window = app.get_window("main").unwrap();
             set_shadow(&window, true).expect("Unsupported platform!");
             Ok(())
         })
         .manage(AppConfiguration { port: args.port })
-        .invoke_handler(tauri::generate_handler![get_port])
+        .invoke_handler(tauri::generate_handler![get_port, get_native_features])
         .plugin(services::osc::init())
         .plugin(services::web::init())
         .plugin(services::audio::init())
-        .plugin(services::windows_tts::init())
-        .plugin(services::windows_stt::init())
-        .plugin(services::keyboard::init())
-        .run(tauri::generate_context!())
+        .plugin(services::windows_tts::init());
+        // .plugin(services::windows_stt::init())
+        // #[cfg(background_input)]
+        // {
+        //     app.plugin(services::keyboard::init())
+        // }
+        app.run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

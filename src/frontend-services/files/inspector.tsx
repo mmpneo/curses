@@ -40,7 +40,7 @@ const Inspector_Files: FC = memo(() => {
         {fonts.map(font => <FontGroup key={font.name} data={font}></FontGroup>)}
         {data.map(file => <FileElement key={file.id} data={file} actions={fileActions.current} />)}
       </div>
-      {/* <button onClick={() => window.APIFrontend.files.addFile()} className="btn btn-sm btn-ghost">Add file</button> */}
+      <button onClick={() => window.APIFrontend.files.addFile("font")} className="btn btn-sm btn-ghost">Add file</button>
     </Inspector.Content>
   </Inspector.Body>
 })

@@ -415,25 +415,31 @@ const FontSelectDropdown: FC<any> = memo(({ onChange, value }) => {
   const [name, setName] = useState("");
   const fonts = useSnapshot(window.APIFrontend.files.ui.fontFamilies)
 
-  const handleInstall = () => {
+  const handleInstallGFonts = () => {
     name && window.APIFrontend.files.installFont(name.trim());
   }
 
+  const handleInstallDrive = () => {
+    window.APIFrontend.files.addFile("font");
+  }
+
   return <div className="flex flex-col space-y-2 bg-base-100 rounded-box p-4 w-64">
-    <span className="text-xs text-primary font-bold font-header">Installed</span>
+    <span className="text-xs text-primary font-bold font-header">Available fonts</span>
     <label className="flex justify-between items-center cursor-pointer">
       <span className="label-text font-semibold" style={{ fontFamily: "Outfit" }}>Outfit</span>
       <input type="radio" name="font" value={value} checked={value === "Outfit"} onChange={e => onChange("Outfit")} className="radio radio-primary" />
     </label>
-    {fonts.map(font => <label key={font} className="flex justify-between items-center cursor-pointer">
+    {fonts.map((font, index) => <label key={font || index} className="flex justify-between items-center cursor-pointer">
       <span className="label-text font-semibold" style={{ fontFamily: font }}>{font}</span>
       <input type="radio" name="font" value={value} checked={value === font} onChange={e => onChange(font)} className="radio radio-primary" />
     </label>)}
+    <span className="text-xs text-primary font-bold font-header pt-4">Install from google fonts</span>
     <div className="input-group w-full">
       <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Font name" className="w-full input input-sm input-bordered" />
-      <button className="btn btn-sm btn-square" onClick={handleInstall}>+</button>
+      <button className="btn btn-sm btn-square" onClick={handleInstallGFonts}>+</button>
     </div>
     <span className="text-xs text-base-content/50">Find font at <a className="link link-primary link-hover font-medium" target="_blank" href="https://fonts.google.com/">Google Fonts</a> and copypaste it's name here</span>
+    <button className="btn btn-sm btn-primary" onClick={handleInstallDrive}>Install from file system</button>
   </div>
 })
 const Font: FC<FontProps> = memo(({ label, ...rest }) => {

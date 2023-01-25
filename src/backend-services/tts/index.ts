@@ -4,6 +4,7 @@ import { IServiceInterface, ServiceNetworkState, TextEventType } from "../../typ
 import { serviceSubscibeToInput, serviceSubscibeToSource } from "../../utils";
 import { TTS_Backends } from "./schema";
 import { TTS_AzureService } from "./services/azure";
+import { TTS_NativeService } from "./services/native";
 import { TTS_WindowsService } from "./services/windows";
 import {
   ITTSService,
@@ -83,6 +84,9 @@ class Service_TTS implements IServiceInterface {
     }
     if (backend === TTS_Backends.azure) {
       this.#serviceInstance = new TTS_AzureService(bindings);
+    }
+    if (backend === TTS_Backends.native) {
+      this.#serviceInstance = new TTS_NativeService(bindings);
     }
 
     if (!this.#serviceInstance) return;

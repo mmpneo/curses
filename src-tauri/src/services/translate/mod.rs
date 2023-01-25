@@ -9,7 +9,7 @@ async fn translate() {
 }
 
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
-    Builder::new("windows_stt")
+    Builder::new("translate")
         .invoke_handler(tauri::generate_handler![translate])
         .build()
 }

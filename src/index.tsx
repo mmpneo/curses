@@ -1,4 +1,4 @@
-import "./wdyr"
+// import "./wdyr"
 import ReactDOM from "react-dom/client";
 import "./style.css";
 import Backend from "./backend-services";
@@ -15,11 +15,16 @@ type NetworkConfiguration = {
   port: string
 }
 
+type NativeFeatures = {
+  background_input: boolean
+}
+
 declare global {
   interface Window {
     // api: API;
     API: Backend;
     APIFrontend: Frontend;
+    nativeFeatures: NativeFeatures;
     mode: "host" | "client";
     platform: "app" | "web";
     networkConfiguration: NetworkConfiguration
@@ -51,6 +56,16 @@ window.addEventListener('contextmenu', e => {
 window.API = new Backend();
 window.APIFrontend = new Frontend();
 
+async function loadNativeFeatures() {
+  // get_native_features
+  if (window.platform === "app") {
+    const nativeFeatures = await invoke<NativeFeatures>("get_native_features");
+    console.log(nativeFeatures);
+    
+    window.nativeFeatures = nativeFeatures;
+  }
+  }
+
 async function buildNetworkConfiguration() {
   // only host
   if (window.platform === "app") {
@@ -79,6 +94,7 @@ const LazyEditor = React.lazy(() => import("./components/editor-view"));
 
 buildNetworkConfiguration()
   .then(async () => {
+    await loadNativeFeatures(),
     await window.API.init(),
     await window.APIFrontend.init()
   }).then(() => {

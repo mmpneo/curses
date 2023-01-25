@@ -45,6 +45,45 @@ const Windows: FC = () => {
   </>
 }
 
+const Native: FC = () => {
+  const pr = useSnapshot(window.API.state.services.tts.data.native);
+  const handleUpdate = <K extends keyof TTS_State["native"]>(key: K, v: TTS_State["native"][K]) => window.API.patchService("tts", s => s.data.native[key] = v);
+  const state = useSnapshot(window.API.tts.serviceState);
+  const [voices, setVoices] = useState<{label: string, value: string}[]>([]);
+
+  useEffect(() => {
+    let voices = window.speechSynthesis.getVoices();
+
+    if (voices.length) {
+      setVoices(voices.map(v => ({label: v.name,value: v.voiceURI})));
+    }
+    else {
+      window.speechSynthesis.onvoiceschanged = () => {
+        let options = window.speechSynthesis.getVoices().map(v => ({label: v.name,value: v.voiceURI}))
+        setVoices(options);
+      }
+    }
+
+  }, []);
+
+  return <>
+    <Inspector.SubHeader>Native options</Inspector.SubHeader>
+    <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
+      <Input.Select
+        value={voices.find(voice => voice.value === pr.voice)}
+        onChange={(e: any) => handleUpdate("voice", e.value)}
+        getOptionLabel={({ value }: any) => voices.find(voice => voice.value === value)?.label || value}
+        options={voices}
+        placeholder="Voice"
+        label="Audio output" />
+    </Inspector.Deactivatable>
+
+    <Input.Range value={pr.pitch} onChange={e => handleUpdate("pitch", e.target.value) } label={`Pitch (${pr.pitch})`} step="0.1" min="0" max="2"/>
+    <Input.Range value={pr.rate} onChange={e => handleUpdate("rate", e.target.value) } label={`Rate (${pr.rate})`} step="0.1" min="0.1" max="10"/>
+    <Input.Range value={pr.volume} onChange={e => handleUpdate("volume", e.target.value) } label={`Volume (${pr.volume})`} step="0.05" min="0" max="1"/>
+  </>
+}
+
 const Azure: FC = () => {
   const pr = useSnapshot(window.API.state.services.tts.data.azure);
   const handleUpdate = <K extends keyof TTS_State["azure"]>(key: K, v: TTS_State["azure"][K]) => window.API.state.services.tts.data.azure[key] = v;
@@ -147,6 +186,7 @@ const Azure: FC = () => {
 }
 
 const serviceOptions = [
+  { label: "Native", value: TTS_Backends.native },
   { label: "Windows", value: TTS_Backends.windows },
   { label: "Azure", value: TTS_Backends.azure },
 ]
@@ -165,6 +205,7 @@ const TTSInspector: FC = () => {
 
     {data.data.backend === TTS_Backends.windows && <Windows />}
     {data.data.backend === TTS_Backends.azure && <Azure />}
+    {data.data.backend === TTS_Backends.native && <Native />}
 
     <ServiceButton status={state.status} onStart={() => window.API.tts.start()} onStop={() => window.API.tts.stop()} />
   </>

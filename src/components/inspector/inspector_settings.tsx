@@ -178,13 +178,13 @@ const Inspector_Settings: FC = memo(() => {
         <button onClick={() => window.APIFrontend.document.exportDocument()} className="flex-grow btn btn-sm gap-2"><RiFileCopyLine /> Export</button>
       </div>
 
-      <Inspector.SubHeader>Background Input</Inspector.SubHeader>
-      <Input.Shortcut label="Shortcut" shortcut="bgInput" />
+      {/* <Inspector.SubHeader>Background Input</Inspector.SubHeader> */}
+      {/* <Input.Shortcut label="Shortcut" shortcut="bgInput" /> */}
       {/* <Input.Shortcut label="Shortcut" shortcut="muteMic" /> */}
-      <Input.Text label="Timer" value={backgroundInputTimer} onChange={e => window.API.state.backgroundInputTimer = e.target.value} type="number"/>
-      <div className="text-sm border-1 border-neutral">
-        Use <kbd className="kbd kbd-sm font-semibold text-primary">Esc</kbd> to cancel input, <kbd className="kbd kbd-sm font-semibold text-primary">Enter</kbd> to submit and <kbd className="kbd kbd-sm font-semibold text-primary">Backspace</kbd> to delete
-      </div>
+      {/* <Input.Text label="Timer" value={backgroundInputTimer} onChange={e => window.API.state.backgroundInputTimer = e.target.value} type="number"/> */}
+      {/* <div className="text-sm border-1 border-neutral"> */}
+        {/* Use <kbd className="kbd kbd-sm font-semibold text-primary">Esc</kbd> to cancel input, <kbd className="kbd kbd-sm font-semibold text-primary">Enter</kbd> to submit and <kbd className="kbd kbd-sm font-semibold text-primary">Backspace</kbd> to delete */}
+      {/* </div> */}
 
       <Inspector.SubHeader>Link apps</Inspector.SubHeader>
       <Inspector.Description>Sync text events with remote app instance</Inspector.Description>

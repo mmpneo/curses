@@ -9,6 +9,7 @@ import { ServiceNetworkState } from "../../types";
 import ServiceButton from "../../components/service-button";
 import { STT_Backends, STT_State } from "./schema";
 import { azureLanguages, deepGramLangs } from "./service_data";
+import { SiGooglechrome, SiMicrosoftedge } from "react-icons/si";
 
 const Browser: FC = () => {
   const handleOpen = () => {
@@ -20,18 +21,22 @@ const Browser: FC = () => {
     });
   };
 
+  const handleOpenEdge = () => {
+    invoke("plugin:web|open_browser", {
+      data: {
+        browser: "msedge",
+        url: `http://localhost:${window.networkConfiguration.port}/mic.html`
+      }
+    });
+  };
+
   const handleStartStt = () => {
     invoke("plugin:windows_stt|start");
   };
   return <>
     <Inspector.SubHeader>Browser options</Inspector.SubHeader>
-    <button className="btn btn-sm btn-primary" onClick={handleOpen}>Open chrome</button>
-    {/* <button className="btn btn-sm btn-primary" onClick={handleStartStt}>Start windows stt</button> */}
-
-    {/* <QRCodeCanvas
-          size={256}
-          style={{ height: "100%", maxHeight: "100%", width: "4.5rem" }}
-          value={`${window.networkConfiguration.localIp}:${window.networkConfiguration.port}/client`} /> */}
+    <button className="btn btn-sm btn-neutral gap-2" onClick={handleOpen}><SiGooglechrome/> Open Chrome</button>
+    <button className="btn btn-sm btn-neutral gap-2" onClick={handleOpenEdge}><SiMicrosoftedge/> Open Edge</button>
   </>
 }
 
@@ -110,7 +115,7 @@ const Speechly: FC = () => {
 
   return <>
     <Inspector.SubHeader>Speechly options</Inspector.SubHeader>
-    <Input.Text label="Key" type="password" value={pr.key} onChange={e => up("key", e.target.value)} />
+    <Input.Text label="App ID" type="password" value={pr.key} onChange={e => up("key", e.target.value)} />
   </>
 }
 

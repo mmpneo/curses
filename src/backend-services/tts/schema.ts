@@ -2,6 +2,7 @@ import { JSONSchemaType } from "ajv";
 import { TextEventSource } from "../../types";
 
 export enum TTS_Backends {
+  native = "native",
   windows = "windows",
   azure = "azure",
 }
@@ -12,6 +13,12 @@ export type TTS_State = {
   backend: TTS_Backends;
   autoStart: boolean;
   replaceWords: Record<string, string>;
+  native: {
+    voice: string;
+    pitch: string;
+    rate: string;
+    volume: string;
+  };
   windows: {
     device: string;
     voice: string;
@@ -41,6 +48,18 @@ const Schema_STT: JSONSchemaType<TTS_State> = {
     source: { type: "string", default: TextEventSource.stt },
     inputField: { type: "boolean", default: true },
     replaceWords: { type: "object", default: {}, required: [] },
+    native: {
+      type: "object",
+      properties: {
+        voice: { type: "string", default: "" },
+        pitch: { type: "string", default: "1" },
+        rate: { type: "string", default: "1" },
+        volume: { type: "string", default: "1" },
+      },
+      required: ["voice", "pitch", "rate", "volume"],
+      default: {} as any,
+      additionalProperties: false,
+    },
     windows: {
       type: "object",
       properties: {
@@ -91,6 +110,7 @@ const Schema_STT: JSONSchemaType<TTS_State> = {
     "autoStart",
     "source",
     "inputField",
+    "native",
     "windows",
     "azure",
   ],

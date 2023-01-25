@@ -146,8 +146,8 @@ function nativeLoop(chars: CharData[], index: number, container: HTMLSpanElement
   }, index === 0 ? 0 : char[2])
 }
 
-
-
+//todo collapse char interval 0 into words
+//todo add cancel
 const TextSentenceRenderAnimated: FC = memo(() => {
   const { data, onComplete, onActivity } = useContext(sentenceCtx);
 

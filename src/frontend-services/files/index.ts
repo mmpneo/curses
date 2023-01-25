@@ -5,8 +5,9 @@ import { GetArrayDiff } from "../../utils";
 import { createDocumentFile, FileState, FileType } from "./schema";
 import { fileOpen } from "browser-fs-access";
 import { nanoid } from "nanoid";
-import groupBy from "lodash/groupBy";
 import { toast } from "react-toastify";
+import { save, open } from "@tauri-apps/api/dialog";
+import { readBinaryFile } from "@tauri-apps/api/fs";
 
 export interface GoogleFont {
   category: string
@@ -140,33 +141,54 @@ class Service_Files implements IServiceInterface {
   }
 
   async addFile(type?: FileType) {
+    const filters = {
+      font: {
+        name: "Fonts",
+        extensions: ["ttf", "otf", "woff"],
+      },
+      image: {
+        name: "Images",
+        extensions: ["jpeg", "png", "gif", "webp"],
+      },
+      audio: {
+        name: "Sounds",
+        extensions: ["wav", "mp3"],
+      },
+      video: {
+        name: "Videos",
+        extensions: [],
+      }   
+    };
+
+    const path = await open({
+      filters: type ? [filters[type]] : [],
+    });
+
+    if (!path || Array.isArray(path)) 
+      return;
+
+    const splitPath = path.split(".");
+    const extension = splitPath.pop();
+    const fileName = splitPath.join(".").split("\\").pop() || "new file"
+    
+    if (!extension)
+      return;
+
+    const data = await readBinaryFile(path);
+
+    let fileType = `${type}/${extension}`;
+    if (type === "font") {
+      this.installFonts([{
+        family: fileName,
+        weight: "900",
+        style: "normal"
+      }], [data]);
+      return;
+    }
+
     try {
-      let mimeTypes: string[] = [
-        "image/*",
-        "audio/*",
-        "video/*",
-        "text/javascript",
-      ];
-      let extensions = [];
-      if (type === "image") 
-        mimeTypes = ["image/*"];
-      else if (type === "audio")
-        mimeTypes = ["audio/*"];
-      else if (type === "video")
-        mimeTypes = ["video/*"];
-      else if (type === "font")
-        mimeTypes = ["application/x-font-ttf"];
 
-      let file: File = await fileOpen({ mimeTypes });
-      const buffer = await file?.arrayBuffer();
-      const arr = new Uint8Array(buffer);
-
-      let fileType = file.type;
-
-      if (file.name.split(".").pop() === "ttf")
-        fileType = "font/ttf";
-
-      return this.#saveFiles([{ type: fileType, name: file.name, meta: {} }], [arr]);
+      return this.#saveFiles([{ type: fileType, name: fileName, meta: {} }], [data]);
     } catch (error) {
       console.error(error);
     }
