@@ -81,6 +81,9 @@ export type Element_TextState = {
   //sound
   soundEnable: boolean;
   soundFile: string;
+  soundFileNewSentence: string;
+  soundFileOnShow: string;
+  soundFileOnHide: string;
   soundVolume: number;
   // sound effects
   soundDetuneMin: number;
@@ -168,6 +171,9 @@ export const Element_TextStateSchema: JSONSchemaType<Element_TextState> = {
     
     soundEnable: { type: "boolean", default: false },
     soundFile: { type: "string", default: "" },
+    soundFileNewSentence: { type: "string", default: "" },
+    soundFileOnShow: { type: "string", default: "" },
+    soundFileOnHide: { type: "string", default: "" },
     soundVolume: { type: "number", default: 1 },
     soundDetuneMin: { type: "number", default: 0 },
     soundDetuneMax: { type: "number", default: 0 },

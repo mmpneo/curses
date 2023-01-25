@@ -5,6 +5,7 @@ export enum TTS_Backends {
   native = "native",
   windows = "windows",
   azure = "azure",
+  tiktok = "tiktok",
 }
 
 export type TTS_State = {
@@ -18,6 +19,10 @@ export type TTS_State = {
     pitch: string;
     rate: string;
     volume: string;
+  };
+  tiktok: {
+    device: string;
+    voice: string;
   };
   windows: {
     device: string;
@@ -57,6 +62,16 @@ const Schema_STT: JSONSchemaType<TTS_State> = {
         volume: { type: "string", default: "1" },
       },
       required: ["voice", "pitch", "rate", "volume"],
+      default: {} as any,
+      additionalProperties: false,
+    },
+    tiktok: {
+      type: "object",
+      properties: {
+        device: { type: "string", default: "" },
+        voice: { type: "string", default: "" },
+      },
+      required: ["device", "voice"],
       default: {} as any,
       additionalProperties: false,
     },
@@ -111,6 +126,7 @@ const Schema_STT: JSONSchemaType<TTS_State> = {
     "source",
     "inputField",
     "native",
+    "tiktok",
     "windows",
     "azure",
   ],

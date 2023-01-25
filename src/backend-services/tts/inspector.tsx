@@ -8,7 +8,7 @@ import ServiceButton from "../../components/service-button";
 import { ServiceNetworkState } from "../../types";
 import { useBackendUpdate } from "../../utils";
 import { TTS_Backends, TTS_State } from "./schema";
-import { azureVoices } from "./service_data";
+import { azureVoices, tiktokVoices } from "./service_data";
 
 type WindowsToken = {
   id: string;
@@ -27,19 +27,28 @@ const Windows: FC = () => {
 
   return <>
     <Inspector.SubHeader>WindowsTTS options</Inspector.SubHeader>
-    <Input.Select
-      value={{ value: pr.device, label: pr.device }}
-      onChange={(e: any) => handleUpdate("device", e.value)}
-      getOptionLabel={({ value }: any) => config?.devices.find(d => d.id === value)?.label || value}
-      options={config?.devices.map(d => ({ ...d, value: d.id }))}
-      placeholder="Device"
-      label="Audio output" />
-
+    <Input.NativeAudioOutput label="Audio Output" value={pr.device} onChange={e => handleUpdate("device", e)} />
     <Input.Select
       value={{ value: pr.voice, label: pr.voice }}
       onChange={(e: any) => handleUpdate("voice", e.value)}
       getOptionLabel={({ value }: any) => config?.voices.find(d => d.id === value)?.label || value}
       options={config?.voices.map(d => ({ ...d, value: d.id }))}
+      placeholder="Select voice"
+      label="Voice" />
+  </>
+}
+
+const TikTok: FC = () => {
+  const pr = useSnapshot(window.API.state.services.tts.data.tiktok);
+  const handleUpdate = <K extends keyof TTS_State["tiktok"]>(key: K, v: TTS_State["tiktok"][K]) => window.API.patchService("tts", s => s.data.tiktok[key] = v);
+  return <>
+    <Inspector.SubHeader>WindowsTTS options</Inspector.SubHeader>
+    <Input.NativeAudioOutput label="Audio Output" value={pr.device} onChange={e => handleUpdate("device", e)} />
+    <Input.Select
+      value={tiktokVoices.find(d => pr.voice === d.value)}
+      onChange={(e: any) => handleUpdate("voice", e.value)}
+      getOptionLabel={({ value }: any) => tiktokVoices.find(d => value === d.value)?.label || value}
+      options={tiktokVoices}
       placeholder="Select voice"
       label="Voice" />
   </>
@@ -89,7 +98,6 @@ const Azure: FC = () => {
   const handleUpdate = <K extends keyof TTS_State["azure"]>(key: K, v: TTS_State["azure"][K]) => window.API.state.services.tts.data.azure[key] = v;
   const state = useSnapshot(window.API.tts.serviceState);
   const [config, setConfig] = useState<WindowsConfig>();
-  const [outputDevices, setOutputDevices] = useState<MediaDeviceInfo[]>([]);
   const [voiceStyles, setVoiceStyles] = useState<{ label: string, value: string }[]>([]);
   const [voiceRoles, setVoiceRoles] = useState<{ label: string, value: string }[]>([]);
 
@@ -104,14 +112,6 @@ const Azure: FC = () => {
     window.API.state.services.tts.data.azure.voiceStyle = "";
     window.API.state.services.tts.data.azure.voiceRole = "";
   };
-
-  const updateDevices = async () => {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    setOutputDevices(devices.filter(device => device.kind === "audiooutput"));
-  }
-  useEffect(() => {
-    updateDevices();
-  }, []);
 
   useEffect(() => {
     // find voice
@@ -129,13 +129,7 @@ const Azure: FC = () => {
   return <>
     <Inspector.SubHeader>Azure options</Inspector.SubHeader>
     <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
-    <Input.Select
-      value={{ value: pr.device, label: pr.device }}
-      onChange={(e: any) => handleUpdate("device", e.value)}
-      getOptionLabel={({ value }: any) => config?.devices.find(d => d.label === value)?.label || value}
-      options={config?.devices.map(d => ({ ...d, value: d.label }))}
-      placeholder="Device"
-      label="Audio output" />
+      <Input.NativeAudioOutput label="Audio Output" value={pr.device} onChange={e => handleUpdate("device", e)} />
       <Input.Text type="password" label="Key" value={pr.key} onChange={e => handleUpdate("key", e.target.value)} />
       <Input.Text type="password" label="Location" value={pr.location} onChange={e => handleUpdate("location", e.target.value)} />
     </Inspector.Deactivatable>
@@ -189,6 +183,7 @@ const serviceOptions = [
   { label: "Native", value: TTS_Backends.native },
   { label: "Windows", value: TTS_Backends.windows },
   { label: "Azure", value: TTS_Backends.azure },
+  { label: "TikTok", value: TTS_Backends.tiktok },
 ]
 
 const TTSInspector: FC = () => {
@@ -206,6 +201,7 @@ const TTSInspector: FC = () => {
     {data.data.backend === TTS_Backends.windows && <Windows />}
     {data.data.backend === TTS_Backends.azure && <Azure />}
     {data.data.backend === TTS_Backends.native && <Native />}
+    {data.data.backend === TTS_Backends.tiktok && <TikTok />}
 
     <ServiceButton status={state.status} onStart={() => window.API.tts.start()} onStop={() => window.API.tts.stop()} />
   </>

@@ -183,7 +183,10 @@ const EffectsInspector: FC<{ id: string }> = ({ id }) => {
   return <>
     <Inspector.SubHeader>Audio</Inspector.SubHeader>
     <Input.Checkbox label="Enabled" value={data.soundEnable} onChange={e => up("soundEnable", e)} />
-    <Input.File label="Audio file" type="audio" value={data.soundFile} onChange={e => up("soundFile", e)} />
+    <Input.File label="Typing sound" type="audio" value={data.soundFile} onChange={e => up("soundFile", e)} />
+    <Input.File label="New sentence sound" type="audio" value={data.soundFileNewSentence} onChange={e => up("soundFileNewSentence", e)} />
+    <Input.File label="Show sound" type="audio" value={data.soundFileOnShow} onChange={e => up("soundFileOnShow", e)} />
+    <Input.File label="Hide sound" type="audio" value={data.soundFileOnHide} onChange={e => up("soundFileOnHide", e)} />
     <Input.Range label={`Volume (${data.soundVolume})`} step="0.01" min="0" max="1" value={data.soundVolume} onChange={e => up("soundVolume", parseFloat(e.target.value) || 0)} />
     <Input.DoubleCountainer label="Params">
       <div className="flex-grow font-semibold text-xs text-center opacity-50">min</div>

@@ -22,6 +22,7 @@ import styles from "./style.module.css";
 import produce from "immer";
 import { BackendState } from "../../backend-services/schema";
 import Tooltip from "../dropdown/Tooltip";
+import { invoke } from "@tauri-apps/api/tauri";
 const cx = classNames.bind(styles);
 
 interface InputBaseProps {
@@ -541,4 +542,29 @@ const Shortcut: FC<ShortuctProps> = ({shortcut, label, onChange, ...rest}) => {
   </Container>
 }
 
-export default { BaseText, Text, Chips, Object: MapObject, Range, Color, Font, Select: NewSelect, MappedGroupSelect, Checkbox, File, Event, Code, TextSource, Container, DoubleCountainer, NetworkStatus, Shortcut };
+type WindowsToken = {
+  id: string;
+  label: string;
+}
+type WindowsConfig = { devices: WindowsToken[], voices: WindowsToken[] };
+interface AudioOutputProps extends InputBaseProps {
+  value: string,
+  onChange: (value: string) => void
+}
+const NativeAudioOutput: FC<AudioOutputProps> = memo(({label, value, onChange}) => {
+  const [config, setConfig] = useState<WindowsConfig>();
+
+  useEffect(() => {
+    invoke<WindowsConfig>("plugin:windows_tts|get_voices").then(setConfig);
+  }, []);
+
+  return <NewSelect
+      value={{ value: value, label: value }}
+      onChange={(e: any) => onChange(e.value)}
+      getOptionLabel={({ value }: any) => config?.devices.find(d => d.label === value)?.label || value}
+      options={config?.devices.map(d => ({ ...d, value: d.label }))}
+      placeholder="Device"
+      label={label} />
+})
+
+export default { BaseText, Text, Chips, Object: MapObject, Range, Color, Font, Select: NewSelect, MappedGroupSelect, Checkbox, File, Event, Code, TextSource, Container, DoubleCountainer, NetworkStatus, Shortcut, NativeAudioOutput };

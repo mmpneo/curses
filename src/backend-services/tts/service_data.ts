@@ -323,3 +323,58 @@ export const azureVoices: MappedGroupDictionary<{
     ["cy-GB-AledNeural", "AledNeural"]
   ],
 };
+
+
+export const tiktokVoices = [
+  {value: "en_us_001", label: "En US Female"},
+  {value: "en_us_006", label: "En US Male 1"},
+  {value: "en_us_007", label: "En US Male 2"},
+  {value: "en_us_009", label: "En US Male 3"},
+  {value: "en_us_010", label: "En US Male 4"},
+
+  {value: "en_uk_001", label: "En UK Male 1"},
+  {value: "en_uk_003", label: "En UK Male 2"},
+
+  {value: "en_au_001", label: "En AU Female"},
+  {value: "en_au_002", label: "En AU Male"},
+
+  {value: "fr_001", label: "Fr Male 1"},
+  {value: "fr_002", label: "Fr Male 2"},
+
+  {value: "de_001", label: "De Female"},
+  {value: "de_002", label: "De Male"},
+
+  {value: "es_002", label: "Es Male"},
+  {value: "es_mx_002", label: "Es MX Male"},
+
+  {value: "br_003", label: "Br Female 2"},
+  {value: "br_004", label: "Br Female 3"},
+  {value: "br_005", label: "Br Male"},
+
+  {value: "id_001", label: "Id Female"},
+
+  {value: "jp_001", label: "Jp Female 1"},
+  {value: "jp_003", label: "Jp Female 2"},
+  {value: "jp_005", label: "Jp Female 3"},
+  {value: "jp_006", label: "Jp Male"},
+
+  {value: "kr_002", label: "Kr Male 1"},
+  {value: "kr_004", label: "Kr Male 2"},
+  {value: "kr_003", label: "Kr Female"},
+
+  {value: "en_us_ghostface", label: "Ghostface"},
+  {value: "en_us_chewbacca", label: "Chewbacca"},
+  {value: "en_us_c3po", label: "C3PO"},
+  {value: "en_us_stitch", label: "Stitch"},
+  {value: "en_us_stormtrooper", label: "Stormtrooper"},
+  {value: "en_us_rocket", label: "Rocket"},
+
+  {value: "en_female_f08_salut_damour", label: "Alto"},
+  {value: "en_male_m03_lobby", label: "Tenor"},
+  {value: "en_male_m03_sunshine_soon", label: "Sunshine Soon"},
+  {value: "en_female_f08_warmy_breeze", label: "Warmy Breeze"},
+  {value: "en_female_ht_f08_glorious", label: "Glorious"},
+  {value: "en_male_sing_funny_it_goes_up", label: "It Goes Up"},
+  {value: "en_male_m2_xhxs_m03_silly", label: "Chipmunk"},
+  {value: "en_female_ht_f08_wonderful_world", label: "Dramatic"},
+]

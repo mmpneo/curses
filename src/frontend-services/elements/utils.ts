@@ -1,7 +1,4 @@
-import { useEffect, useState } from "react";
-import produce from "immer";
 import template from "lodash/template";
-import { object } from "lib0";
 
 export type StyleEvent = {
   event: string;

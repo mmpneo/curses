@@ -1,6 +1,6 @@
-import { createContext, FC, memo, useCallback, useContext, useEffect, useLayoutEffect, useRef } from "react";
-import { TextEvent } from "../../../types";
+import { FC, memo, useCallback, useContext, useEffect, useLayoutEffect, useRef } from "react";
 import { Element_TextState } from "./schema";
+import { sentenceCtx, TextSentenceData } from "./shared";
 
 declare module 'csstype' {
   interface Properties {
@@ -8,15 +8,6 @@ declare module 'csstype' {
     '--index'?: string | number
     '--wordindex'?: string | number
   }
-}
-
-export type TextSentenceData = {
-  id: string;
-  value: string;
-  interim: boolean;
-  emitEvent?: string;
-  emotes: TextEvent["emotes"]
-  state: Element_TextState
 }
 
 const enum TextSymbolType {
@@ -31,16 +22,6 @@ const enum TextWordType {
   img,
   profanity
 }
-
-export const sentenceCtx = createContext<{
-  data: TextSentenceData,
-  onActivity: (rect?: DOMRect) => void,
-  onComplete: () => void
-}>({
-  data: {} as unknown as any,
-  onActivity: () => {},
-  onComplete: () => {},
-});
 
 //todo do actual masking with r2r list
 const checkProfanity = (word: string, mask?: string) => {
@@ -197,6 +178,7 @@ const TextSentenceRenderAnimated: FC = memo(() => {
 
 const TextSentence: FC = memo(() => {
   const {data} = useContext(sentenceCtx);
+  // const box = useContext(boxCtx);
   if (data.state.animateEnable)
     return <TextSentenceRenderAnimated/>
   return <TextSentenceRenderSimple/>

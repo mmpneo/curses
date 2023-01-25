@@ -2,7 +2,7 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { listen } from '@tauri-apps/api/event'
 import PubSub from "pubsub-js";
 import { proxyMap } from "valtio/utils";
-import { BaseEvent, IServiceInterface, PartialWithRequired, ServiceNetworkState, TextEvent, TextEventSource, TextEvent_Schema } from "../../types";
+import { BaseEvent, IServiceInterface, PartialWithRequired, ServiceNetworkState, TextEvent, TextEventSource, TextEventType, TextEvent_Schema } from "../../types";
 import Ajv, { ValidateFunction } from "ajv";
 import { proxy } from "valtio";
 import { toast } from "react-toastify";
@@ -43,6 +43,11 @@ class Service_PubSub implements IServiceInterface {
       const validated = data;
       this.textEventValidator(validated);
       const textEvent = this.applyEmotes(validated as TextEvent);
+
+      // mute external sources of stt
+      if (window.API.stt.serviceState.muted && topic === "text.stt")
+        return;
+
       this.receivePubSub({topic, data: textEvent});
     } catch (error) {
       // just ignore invalid messages

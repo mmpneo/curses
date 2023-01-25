@@ -1,12 +1,13 @@
 import classNames from "classnames";
 import produce from "immer";
 import { nanoid } from "nanoid";
-import { FC, memo, PropsWithChildren, useCallback, useEffect, useRef, useState } from "react";
+import { createContext, FC, memo, PropsWithChildren, useCallback, useEffect, useRef, useState } from "react";
 import { useMeasure, useTimeoutFn } from "react-use";
 import { useGetState } from "../..";
 import { TextEvent, TextEventSource, TextEventType } from "../../../types";
 import { Element_TextState } from "./schema";
-import TextSentence, { sentenceCtx, TextSentenceData, TextSentenceTest } from "./sentence";
+import TextSentence, { TextSentenceTest } from "./sentence";
+import { boxCtx, sentenceCtx, TextSentenceData } from "./shared";
 import { elementStyle } from "./style";
 
 const Element_Text: FC<{ id: string }> = memo(({ id }) => {
@@ -26,7 +27,15 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
   const [active, setActive] = useState(false);
 
   const [_clearTimeoutReady, cancelClearTimer, startClearTimer] = useTimeoutFn(() => {
+    if (!active)
+      return;
     setActive(false);
+
+    // play hide sound
+    if (stateRef.current.soundFileOnHide) {
+      window.APIFrontend.sound.playFile(stateRef.current.soundFileOnHide);
+    }
+
     if (sentenceQueue.current.length === 0)
       behaviorClearDelayCancelToken.current = setTimeout(() => {
         setSentences([]);
@@ -39,11 +48,24 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
     const nextSentence = sentenceQueue.current.shift();
     if (!nextSentence)
       return;
+
+    // console.log(sentencesRef.current.length);
     if (stateRef.current.behaviorLastSentence)
       setSentences([nextSentence]);
-    else
+    else {
       setSentences(v => [...v, nextSentence]);
+    }
+
+    if (stateRef.current.soundFileNewSentence && sentencesRef.current.length) {
+      window.APIFrontend.sound.playFile(stateRef.current.soundFileNewSentence);
+    }
+
     setActive(true);
+
+    // play show sound
+    if (stateRef.current.soundFileOnShow)
+      window.APIFrontend.sound.playFile(stateRef.current.soundFileOnShow);
+
     isRunning.current = true;
   }
 
@@ -268,7 +290,7 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
   </>
 
 });
-
+// todo path box ref to sentences
 const BoxElement: FC<PropsWithChildren<any>> = memo(({ children, ...boxProps }) => {
   const boxRef = useRef<HTMLDivElement>(null)
   const [scrollRef, scrollRect] = useMeasure<HTMLDivElement>();
@@ -285,9 +307,11 @@ const BoxElement: FC<PropsWithChildren<any>> = memo(({ children, ...boxProps }) 
     (boxRef.current as any) = element;
 
   }}>
-    <span ref={textRef} className="scrollbox">
-      {children}
-    </span>
+    <boxCtx.Provider value={{}}>
+      <span ref={textRef} className="scrollbox">
+        {children}
+      </span>
+    </boxCtx.Provider>
   </div>
 })
 export default Element_Text;
