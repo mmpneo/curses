@@ -206,13 +206,16 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
       justify-content: ${state.boxAlignV};
     }
     .box{
+      transform: translate3d(0,0,0);
       overflow-y: scroll;
       justify-content: start;
       width: ${state.boxAutoWidth ? 'auto' : '100%'};
       height: ${state.boxAutoHeight ? 'auto' : '100%'};
       
-      ${state.boxBackgroundType == "solid" ? 
-      `
+      padding: ${state.boxScrollPaddingTop}px ${state.boxScrollPaddingRight}px ${state.boxScrollPaddingBottom}px ${state.boxScrollPaddingLeft}px;
+      
+      ${state.boxBackgroundType == "solid" ?
+        `
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -222,8 +225,8 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
       border-radius: ${state.boxBorderRadius}px;
       border-width: ${state.boxBorderWidth}px;
       border-color: ${state.boxBorderColor};
-      ` : 
-      `
+      ` :
+        `
       border-image: url(${window.APIFrontend.files.getFileUrl(state.boxImageFileId)}) ${state.boxSliceTileSize} round;
       border-image-slice: ${state.boxSliceTop} ${state.boxSliceRight} ${state.boxSliceBottom} ${state.boxSliceBottom} fill;
       border-image-width: ${state.boxSliceTop}px ${state.boxSliceRight}px ${state.boxSliceBottom}px ${state.boxSliceBottom}px;
@@ -233,7 +236,7 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
       display: none;
     }
 
-    .scrollbox{
+    .text-container{
       align-items: ${state.textAlignH};
       justify-content: ${state.textAlignV};
       display: flex;
@@ -269,11 +272,19 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
     .interim.profanity {
       color: ${state.textProfanityInterimColor}
     }
-    .scroll-container {
-      min-height: calc((${state.textFontSize}px + (${state.boxPadding}px * 2)) * ${state.textLineHeight});
-    }
+    
     .char.animate {
       animation: charAppear ${state.animateDelayChar || 20}ms ease-in-out;
+    }
+    .scroll-container {
+      transform: translate3d(0,0,0);
+      min-height: 100%;
+      min-width: 100%;
+      max-height: 100%;
+      overflow-y: scroll;
+    }
+    .scroll-container::-webkit-scrollbar {
+      display: none;
     }
     `}</style>
     <style>{state.css}</style>
@@ -302,16 +313,17 @@ const BoxElement: FC<PropsWithChildren<any>> = memo(({ children, ...boxProps }) 
     boxRef.current?.scrollTo({ top: boxRef.current.scrollHeight, behavior: "smooth" });
   }, [textRect.height, scrollRect.height]);
 
-  return <div {...boxProps} ref={element => {
-    element && scrollRef(element);
-    (boxRef.current as any) = element;
-
-  }}>
-    <boxCtx.Provider value={{}}>
-      <span ref={textRef} className="scrollbox">
-        {children}
-      </span>
-    </boxCtx.Provider>
+  return <div {...boxProps}>
+    <div className="scroll-container" ref={element => {
+      element && scrollRef(element);
+      (boxRef.current as any) = element;
+    }}>
+      <boxCtx.Provider value={{}}>
+        <span ref={textRef} className="text-container">
+          {children}
+        </span>
+      </boxCtx.Provider>
+    </div>
   </div>
 })
 export default Element_Text;

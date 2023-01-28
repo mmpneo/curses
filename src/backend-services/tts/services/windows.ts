@@ -8,23 +8,20 @@ export class TTS_WindowsService implements ITTSService {
 
   dispose(): void {}
 
-  private config = {
-    voice: "",
-    device: "",
-  };
-
+  get state() {
+    return window.API.state.services.tts.data.windows;
+  }
   start(state: TTS_State): void {
-    if (Object.values(state.windows).some(isEmptyValue)) return this.bindings.onStop("Options missing");
-    this.config = {
-      device: state.windows.device,
-      voice: state.windows.voice,
-    };
+    if (Object.values(this.state).some(isEmptyValue)) return this.bindings.onStop("Options missing");
     this.bindings.onStart();
   }
   play(value: string): void {
     invoke("plugin:windows_tts|speak", {
       data: {
-        ...this.config,
+        voice: this.state.voice,
+        device: this.state.device,
+        volume: parseFloat(this.state.volume) ?? 1,
+        rate: parseFloat(this.state.rate) ?? 1,
         value,
       },
     });

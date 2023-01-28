@@ -51,6 +51,10 @@ export type Element_TextState = {
 
   //box
   boxPadding: string;
+  boxScrollPaddingTop: string;
+  boxScrollPaddingRight: string;
+  boxScrollPaddingBottom: string;
+  boxScrollPaddingLeft: string;
   boxAutoWidth: boolean;
   boxAutoHeight: boolean;
   boxAlignH: FlexAlign;
@@ -145,6 +149,10 @@ export const Element_TextStateSchema: JSONSchemaType<Element_TextState> = {
     boxSliceBottom: { type: "string", default: "10" },
     boxSliceLeft: { type: "string", default: "10" },
     boxPadding: { type: "string", default: "10" },
+    boxScrollPaddingTop: { type: "string", default: "0" },
+    boxScrollPaddingRight: { type: "string", default: "0" },
+    boxScrollPaddingBottom: { type: "string", default: "0" },
+    boxScrollPaddingLeft: { type: "string", default: "0" },
     boxAutoWidth: { type: "boolean", default: false },
     boxAutoHeight: { type: "boolean", default: true },
     boxAlignH: { type: "string", default: FlexAlign.center },
@@ -228,6 +236,10 @@ export const Element_TextStateSchema: JSONSchemaType<Element_TextState> = {
     "boxSliceBottom",
     "boxSliceLeft",
     "boxPadding",
+    "boxScrollPaddingTop",
+    "boxScrollPaddingRight",
+    "boxScrollPaddingBottom",
+    "boxScrollPaddingLeft",
     "boxAutoWidth",
     "boxAutoHeight",
     "boxAlignH",

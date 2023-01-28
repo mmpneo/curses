@@ -104,7 +104,18 @@ const BoxInspector: FC<{ id: string }> = ({ id }) => {
       { label: <RiAlignVertically />, value: FlexAlign.center },
       { label: <RiAlignBottom />, value: FlexAlign.end },
     ]} label="Vertical" value={data.boxAlignV} onChange={e => up("boxAlignV", e as FlexAlign)} />
+
     <Input.Text label="Text padding" min="0" step="1" type="number" value={data.boxPadding} onChange={e => up("boxPadding", e.target.value)} />
+
+    <Input.DoubleCountainer label="Content offset T/B">
+      <Input.BaseText value={data.boxScrollPaddingTop} onChange={e => up("boxScrollPaddingTop", e.target.value)} type="number" />
+      <Input.BaseText value={data.boxScrollPaddingBottom} onChange={e => up("boxScrollPaddingBottom", e.target.value)} type="number" />
+    </Input.DoubleCountainer>
+
+    <Input.DoubleCountainer label="Content offset L/R">
+      <Input.BaseText value={data.boxScrollPaddingLeft} onChange={e => up("boxScrollPaddingLeft", e.target.value)} type="number" />
+      <Input.BaseText value={data.boxScrollPaddingRight} onChange={e => up("boxScrollPaddingRight", e.target.value)} type="number" />
+    </Input.DoubleCountainer>
 
     <Inspector.SubHeader>Background</Inspector.SubHeader>
     <Input.Select options={[

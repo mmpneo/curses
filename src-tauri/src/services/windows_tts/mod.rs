@@ -72,13 +72,6 @@ impl WindowsTTSPlugin {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct RpcWindowsTTSSpeak {
-    device: String,
-    voice: String,
-    value: String,
-}
-
 fn into_speech_tokens(tokens: ISpeechObjectTokens) -> Option<Vec<ISpeechToken>> {
     let i_m = unsafe { tokens.Count() }.unwrap();
     let ll = (0..i_m)
@@ -121,6 +114,15 @@ fn get_voices(state: State<WindowsTTSPlugin>) -> Result<RpcWindowsTTSConfig, &st
     Ok(RpcWindowsTTSConfig { voices, devices })
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct RpcWindowsTTSSpeak {
+    device: String,
+    voice: String,
+    value: String,
+    volume: f32, // 0 - 1
+    rate: f32 // 0 - 1 - 5
+}
+
 #[command]
 fn speak(data: RpcWindowsTTSSpeak, state: State<WindowsTTSPlugin>) -> Result<(), &str> {
     if data.value == "" {
@@ -129,6 +131,20 @@ fn speak(data: RpcWindowsTTSSpeak, state: State<WindowsTTSPlugin>) -> Result<(),
     let Some(sp_voice) = &state.intf else {
         return Err("Plugin is not initialized");
     };
+    
+    if unsafe {sp_voice.0.SetVolume((data.volume * 100.0) as i32)}.is_err() {
+        return Err("Unable to update volume");
+    }
+
+    // convert multiply based [0 - 1 - 5] to range [-10 - 10]
+    let rate = if data.rate >= 1.0 {
+        ((data.rate - 1.0) / 4.0 * 10.0) as i32
+    } else {
+        (-data.rate * 100.0) as i32
+    };
+    if unsafe {sp_voice.0.SetRate(rate)}.is_err() {
+        return Err("Unable to update rate");
+    }
 
     let Some(_apply_res_device) = state
         .list_devices()

@@ -13,8 +13,6 @@ export class TTS_AzureService implements ITTSService {
   dispose(): void {}
 
   #instance?: SpeechSynthesizer;
-  #audioQueue: ArrayBuffer[] = [];
-  #isPlaying = false;
 
   start(state: TTS_State): void {
     // exclude optional
@@ -38,18 +36,6 @@ export class TTS_AzureService implements ITTSService {
     }
   }
 
-  async #tryDequeueAndPlay() {
-    if (this.#isPlaying) return;
-
-    const clip = this.#audioQueue.shift();
-    if (!clip) return;
-
-    this.#isPlaying = true;
-    await window.APIFrontend.sound.playSoundAsync(clip, this.state.device);
-    this.#isPlaying = false;
-    this.#tryDequeueAndPlay();
-  }
-
   get state() {
     return window.API.state.services.tts.data.azure;
   }
@@ -66,24 +52,16 @@ export class TTS_AzureService implements ITTSService {
     `
     value &&
     this.#instance?.speakSsmlAsync(ssml, result => {
-      this.#audioQueue.push(result.audioData);
-      this.#tryDequeueAndPlay();
+      window.APIFrontend.sound.enqueueVoiceClip(result.audioData, {
+        volume: parseFloat(this.state.volume) ?? 1,
+        rate: parseFloat(this.state.rate) ?? 1,
+        device_name: this.state.device
+      });
     },
     (e) => {
       this.#instance?.close();
       this.bindings.onStop(e);
     })
-      // this.#instance?.speakTextAsync(
-      //   value,
-      //   result => {
-      //     this.#audioQueue.push(result.audioData);
-      //     this.#tryDequeueAndPlay();
-      //   },
-      //   (e) => {
-      //     this.#instance?.close();
-      //     this.bindings.onStop(e);
-      //   }
-      // );
   }
   stop(): void {
     this.#instance?.close();

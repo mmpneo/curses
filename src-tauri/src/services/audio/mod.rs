@@ -24,7 +24,9 @@ fn get_output_stream(device_name: &str) -> Option<(OutputStream, OutputStreamHan
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RpcAudioPlayAsync {
     device_name: String,
-    data: Vec<u8>
+    data: Vec<u8>,
+    volume: f32, // 1 - base
+    rate: f32, // 1 - base
 }
 
 #[command]
@@ -32,6 +34,8 @@ async fn play_async(data: RpcAudioPlayAsync) -> Result<(), String> {
     if let Some((_stream, stream_handle)) = get_output_stream(data.device_name.as_str()) {
         // let (_stream, stream_handle) = OutputStream::try_default().unwrap();
         let sink = Sink::try_new(&stream_handle).unwrap();
+        sink.set_volume(data.volume);
+        sink.set_speed(data.rate);
         let source = Decoder::new(Cursor::new(data.data)).unwrap();
         sink.append(source);
         sink.sleep_until_end();

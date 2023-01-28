@@ -23,10 +23,14 @@ export type TTS_State = {
   tiktok: {
     device: string;
     voice: string;
+    volume: string;
+    rate: string;
   };
   windows: {
     device: string;
     voice: string;
+    volume: string;
+    rate: string;
   };
   azure: {
     device: string;
@@ -34,11 +38,13 @@ export type TTS_State = {
     voice: string;
     voiceStyle: string;
     voiceRole: string;
-
+    
     voiceVolume: string;
     voiceRate: string;
     voicePitch: string;
     voiceRange: string;
+    volume: string;
+    rate: string;
 
     key: string;
     location: string;
@@ -70,8 +76,10 @@ const Schema_STT: JSONSchemaType<TTS_State> = {
       properties: {
         device: { type: "string", default: "" },
         voice: { type: "string", default: "" },
+        volume: { type: "string", default: "1" },
+        rate: { type: "string", default: "1" },
       },
-      required: ["device", "voice"],
+      required: ["device", "voice", "volume", "rate"],
       default: {} as any,
       additionalProperties: false,
     },
@@ -80,8 +88,10 @@ const Schema_STT: JSONSchemaType<TTS_State> = {
       properties: {
         device: { type: "string", default: "" },
         voice: { type: "string", default: "" },
+        volume: { type: "string", default: "1" },
+        rate: { type: "string", default: "1" },
       },
-      required: ["device", "voice"],
+      required: ["device", "voice", "volume", "rate"],
       default: {} as any,
       additionalProperties: false,
     },
@@ -89,6 +99,8 @@ const Schema_STT: JSONSchemaType<TTS_State> = {
       type: "object",
       properties: {
         device: { type: "string", default: "" },
+        volume: { type: "string", default: "1" },
+        rate: { type: "string", default: "1" },
         language: { type: "string", default: "" },
         voice: { type: "string", default: "" },
         voiceStyle: { type: "string", default: "" },
@@ -104,6 +116,8 @@ const Schema_STT: JSONSchemaType<TTS_State> = {
       },
       required: [
         "device",
+        "volume",
+        "rate",
         "voiceStyle",
         "voiceRole",
         "voiceVolume",

@@ -58,6 +58,7 @@
     "yjs": "^13.5.44"
   },
   "devDependencies": {
+    "@playwright/test": "^1.30.0",
     "@tauri-apps/cli": "^1.1.0",
     "@types/animejs": "^3.1.6",
     "@types/lodash": "^4.14.189",

@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { FC, memo, useEffect, useState } from "react";
 import { RiFileCopyLine, RiSettings2Fill } from "react-icons/ri";
-import { SiDiscord, SiKofi, SiObsstudio, SiTwitch, SiTwitter } from "react-icons/si";
+import { SiDiscord, SiKofi, SiObsstudio, SiPatreon, SiTwitch, SiTwitter } from "react-icons/si";
 import { toast } from "react-toastify";
 import { useSnapshot } from "valtio";
 import Inspector from ".";
@@ -133,8 +133,8 @@ const Inspector_Settings: FC = memo(() => {
           <Tooltip content="Code and Curses" body={<span>App updates and help</span>}>
             <a target="_blank" href="https://discord.gg/SMKjA2yGf7" className="btn text-primary btn-ghost btn-circle text-2xl"><SiDiscord /></a>
           </Tooltip>
-          <Tooltip content="Donate" body={<span>😊 Donations will greatly help development</span>}>
-            <a target="_blank" href="https://ko-fi.com/mmpcode" className="btn text-primary btn-ghost btn-circle text-2xl"><SiKofi /></a>
+          <Tooltip content="Support development" body={<span>😊 Donations will greatly help development</span>}>
+            <a target="_blank" href="https://www.patreon.com/mmpcode" className="btn text-primary btn-ghost btn-circle text-2xl"><SiPatreon /></a>
           </Tooltip>
         </div>
         <div className="self-center text-sm opacity-50">Made with 💗 by Mmp</div>
@@ -178,13 +178,15 @@ const Inspector_Settings: FC = memo(() => {
         <button onClick={() => window.APIFrontend.document.exportDocument()} className="flex-grow btn btn-sm gap-2"><RiFileCopyLine /> Export</button>
       </div>
 
-      {/* <Inspector.SubHeader>Background Input</Inspector.SubHeader> */}
-      {/* <Input.Shortcut label="Shortcut" shortcut="bgInput" /> */}
-      {/* <Input.Shortcut label="Shortcut" shortcut="muteMic" /> */}
-      {/* <Input.Text label="Timer" value={backgroundInputTimer} onChange={e => window.API.state.backgroundInputTimer = e.target.value} type="number"/> */}
-      {/* <div className="text-sm border-1 border-neutral"> */}
-        {/* Use <kbd className="kbd kbd-sm font-semibold text-primary">Esc</kbd> to cancel input, <kbd className="kbd kbd-sm font-semibold text-primary">Enter</kbd> to submit and <kbd className="kbd kbd-sm font-semibold text-primary">Backspace</kbd> to delete */}
-      {/* </div> */}
+      {window.nativeFeatures.background_input && <>
+        <Inspector.SubHeader>Background Input</Inspector.SubHeader>
+        <Input.Shortcut label="Shortcut" shortcut="bgInput" />
+        <Input.Text label="Timer" value={backgroundInputTimer} onChange={e => window.API.state.backgroundInputTimer = e.target.value} type="number"/>
+        <div className="text-xs opacity-70">
+          Use <kbd className="kbd kbd-sm font-semibold text-primary">Esc</kbd> to cancel input, <kbd className="kbd kbd-sm font-semibold text-primary">Enter</kbd> to submit and <kbd className="kbd kbd-sm font-semibold text-primary">Backspace</kbd> to delete
+        </div>
+      </>}
+
 
       <Inspector.SubHeader>Link apps</Inspector.SubHeader>
       <Inspector.Description>Sync text events with remote app instance</Inspector.Description>

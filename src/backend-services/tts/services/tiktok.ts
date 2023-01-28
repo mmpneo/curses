@@ -5,26 +5,10 @@ import { ITTSService, TTSServiceEventBindings } from "../types";
 export class TTS_TikTokService implements ITTSService {
   constructor(private bindings: TTSServiceEventBindings) {}
 
-  #audioQueue: ArrayBuffer[] = [];
-  #isPlaying = false;
-
   dispose(): void {}
 
   get state() {
     return window.API.state.services.tts.data.tiktok;
-  }
-
-  async #tryDequeueAndPlay() {
-    if (this.#isPlaying) return;
-
-    const clip = this.#audioQueue.shift();
-    if (!clip) return;
-
-    this.#isPlaying = true;
-
-    await window.APIFrontend.sound.playSoundAsync(clip, this.state.device);
-    this.#isPlaying = false;
-    this.#tryDequeueAndPlay();
   }
 
   start(state: TTS_State): void {
@@ -50,8 +34,11 @@ export class TTS_TikTokService implements ITTSService {
 
     let data = await response.json();
     if (data?.success === true) {
-      this.#audioQueue.push(decodeB64toArrayBuffer(data.data));
-      this.#tryDequeueAndPlay();
+      window.APIFrontend.sound.enqueueVoiceClip(decodeB64toArrayBuffer(data.data), {
+        volume: parseFloat(this.state.volume) ?? 1,
+        rate: parseFloat(this.state.rate) ?? 1,
+        device_name: this.state.device
+      });
     }
   }
   stop(): void {

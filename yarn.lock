@@ -1037,6 +1037,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@playwright/test@npm:^1.30.0":
+  version: 1.30.0
+  resolution: "@playwright/test@npm:1.30.0"
+  dependencies:
+    "@types/node": "*"
+    playwright-core: 1.30.0
+  bin:
+    playwright: cli.js
+  checksum: 777432ac9cf3d0341fcd8dd265cb4c0775619d0ef48252b32a7c4d632d8038449756ec34bec873828cadbc08ba634e81176cb193304d34e699472771b7fb4d1e
+  languageName: node
+  linkType: hard
+
 "@speechly/browser-client@npm:^2.6.2":
   version: 2.6.2
   resolution: "@speechly/browser-client@npm:2.6.2"
@@ -2229,6 +2241,7 @@ __metadata:
     "@ebay/nice-modal-react": ^1.2.8
     "@floating-ui/react-dom": ^1.2.0
     "@floating-ui/react-dom-interactions": ^0.13.3
+    "@playwright/test": ^1.30.0
     "@speechly/browser-client": ^2.6.2
     "@tauri-apps/api": ^1.2.0
     "@tauri-apps/cli": ^1.1.0
@@ -4161,6 +4174,15 @@ __metadata:
   version: 2.3.0
   resolution: "pify@npm:2.3.0"
   checksum: 9503aaeaf4577acc58642ad1d25c45c6d90288596238fb68f82811c08104c800e5a7870398e9f015d82b44ecbcbef3dc3d4251a1cbb582f6e5959fe09884b2ba
+  languageName: node
+  linkType: hard
+
+"playwright-core@npm:1.30.0":
+  version: 1.30.0
+  resolution: "playwright-core@npm:1.30.0"
+  bin:
+    playwright: cli.js
+  checksum: 4c5693f27245a1168f94708ecd8e1eb0d200de435b25cc07cfa25b97a094633818954dc00baf24e0ff551825f672050b83d1309362c1f97213fe8ebd2a147ed9
   languageName: node
   linkType: hard
 

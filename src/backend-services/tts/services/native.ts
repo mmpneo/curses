@@ -10,7 +10,7 @@ export class TTS_NativeService implements ITTSService {
 
   async start(state: TTS_State) {
     try {
-      if (!state.native.voice)
+      if (!this.state.voice)
         return this.bindings.onStop("Options missing");
         
       let voices = window.speechSynthesis.getVoices();
@@ -20,7 +20,7 @@ export class TTS_NativeService implements ITTSService {
       }
 
       voices = window.speechSynthesis.getVoices();
-      let voice = voices.find(voice => voice.voiceURI === state.native.voice);
+      let voice = voices.find(voice => voice.voiceURI === this.state.voice);
 
       if (!voice) {
         this.bindings.onStop("Invalid voice");
@@ -43,9 +43,9 @@ export class TTS_NativeService implements ITTSService {
     if (!this.#instance)
       return;
     this.#instance.text = value;
-    this.#instance.pitch = parseFloat(this.state.pitch) || 1;
-    this.#instance.rate = parseFloat(this.state.rate) || 1;
-    this.#instance.volume = parseFloat(this.state.volume) || 1;
+    this.#instance.pitch = parseFloat(this.state.pitch) ?? 1;
+    this.#instance.rate = parseFloat(this.state.rate) ?? 1;
+    this.#instance.volume = parseFloat(this.state.volume) ?? 1;
     window.speechSynthesis.speak(this.#instance);
   }
   stop(): void {

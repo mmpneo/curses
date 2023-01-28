@@ -16,7 +16,7 @@ type WindowsToken = {
 }
 type WindowsConfig = { devices: WindowsToken[], voices: WindowsToken[] };
 const Windows: FC = () => {
-  const pr = useSnapshot(window.API.state.services.tts.data.windows);
+  const data = useSnapshot(window.API.state.services.tts.data.windows);
   const handleUpdate = <K extends keyof TTS_State["windows"]>(key: K, v: TTS_State["windows"][K]) => window.API.patchService("tts", s => s.data.windows[key] = v);
 
   const [config, setConfig] = useState<WindowsConfig>();
@@ -27,48 +27,59 @@ const Windows: FC = () => {
 
   return <>
     <Inspector.SubHeader>WindowsTTS options</Inspector.SubHeader>
-    <Input.NativeAudioOutput label="Audio Output" value={pr.device} onChange={e => handleUpdate("device", e)} />
     <Input.Select
-      value={{ value: pr.voice, label: pr.voice }}
+      value={{ value: data.device, label: data.device }}
+      onChange={(e: any) => handleUpdate("device", e.value)}
+      getOptionLabel={({ value }: any) => config?.devices.find(d => d.id === value)?.label || value}
+      options={config?.devices.map(d => ({ ...d, value: d.id }))}
+      placeholder="Device"
+      label="Audio output" />
+    {/* <Input.NativeAudioOutput label="Audio Output" value={pr.device} onChange={e => handleUpdate("device", e)} /> */}
+    <Input.Select
+      value={{ value: data.voice, label: data.voice }}
       onChange={(e: any) => handleUpdate("voice", e.value)}
       getOptionLabel={({ value }: any) => config?.voices.find(d => d.id === value)?.label || value}
       options={config?.voices.map(d => ({ ...d, value: d.id }))}
       placeholder="Select voice"
       label="Voice" />
+    <Input.Range value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} label={`Volume (${data.volume})`} step="0.05" min="0" max="1" />
+    <Input.Range value={data.rate} onChange={e => handleUpdate("rate", e.target.value)} label={`Rate (${data.rate})`} step="0.05" min="0.1" max="5" />
   </>
 }
 
 const TikTok: FC = () => {
-  const pr = useSnapshot(window.API.state.services.tts.data.tiktok);
+  const data = useSnapshot(window.API.state.services.tts.data.tiktok);
   const handleUpdate = <K extends keyof TTS_State["tiktok"]>(key: K, v: TTS_State["tiktok"][K]) => window.API.patchService("tts", s => s.data.tiktok[key] = v);
   return <>
-    <Inspector.SubHeader>WindowsTTS options</Inspector.SubHeader>
-    <Input.NativeAudioOutput label="Audio Output" value={pr.device} onChange={e => handleUpdate("device", e)} />
+    <Inspector.SubHeader>TikTok options</Inspector.SubHeader>
+    <Input.NativeAudioOutput label="Audio Output" value={data.device} onChange={e => handleUpdate("device", e)} />
     <Input.Select
-      value={tiktokVoices.find(d => pr.voice === d.value)}
+      value={tiktokVoices.find(d => data.voice === d.value)}
       onChange={(e: any) => handleUpdate("voice", e.value)}
       getOptionLabel={({ value }: any) => tiktokVoices.find(d => value === d.value)?.label || value}
       options={tiktokVoices}
       placeholder="Select voice"
       label="Voice" />
+    <Input.Range value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} label={`Volume (${data.volume})`} step="0.05" min="0" max="1" />
+    {/* <Input.Range value={data.rate} onChange={e => handleUpdate("rate", e.target.value)} label={`Rate (${data.rate})`} step="0.05" min="0.1" max="5" /> */}
   </>
 }
 
 const Native: FC = () => {
-  const pr = useSnapshot(window.API.state.services.tts.data.native);
+  const data = useSnapshot(window.API.state.services.tts.data.native);
   const handleUpdate = <K extends keyof TTS_State["native"]>(key: K, v: TTS_State["native"][K]) => window.API.patchService("tts", s => s.data.native[key] = v);
   const state = useSnapshot(window.API.tts.serviceState);
-  const [voices, setVoices] = useState<{label: string, value: string}[]>([]);
+  const [voices, setVoices] = useState<{ label: string, value: string }[]>([]);
 
   useEffect(() => {
     let voices = window.speechSynthesis.getVoices();
 
     if (voices.length) {
-      setVoices(voices.map(v => ({label: v.name,value: v.voiceURI})));
+      setVoices(voices.map(v => ({ label: v.name, value: v.voiceURI })));
     }
     else {
       window.speechSynthesis.onvoiceschanged = () => {
-        let options = window.speechSynthesis.getVoices().map(v => ({label: v.name,value: v.voiceURI}))
+        let options = window.speechSynthesis.getVoices().map(v => ({ label: v.name, value: v.voiceURI }))
         setVoices(options);
       }
     }
@@ -79,7 +90,7 @@ const Native: FC = () => {
     <Inspector.SubHeader>Native options</Inspector.SubHeader>
     <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
       <Input.Select
-        value={voices.find(voice => voice.value === pr.voice)}
+        value={voices.find(voice => voice.value === data.voice)}
         onChange={(e: any) => handleUpdate("voice", e.value)}
         getOptionLabel={({ value }: any) => voices.find(voice => voice.value === value)?.label || value}
         options={voices}
@@ -87,23 +98,18 @@ const Native: FC = () => {
         label="Audio output" />
     </Inspector.Deactivatable>
 
-    <Input.Range value={pr.pitch} onChange={e => handleUpdate("pitch", e.target.value) } label={`Pitch (${pr.pitch})`} step="0.1" min="0" max="2"/>
-    <Input.Range value={pr.rate} onChange={e => handleUpdate("rate", e.target.value) } label={`Rate (${pr.rate})`} step="0.1" min="0.1" max="10"/>
-    <Input.Range value={pr.volume} onChange={e => handleUpdate("volume", e.target.value) } label={`Volume (${pr.volume})`} step="0.05" min="0" max="1"/>
+    <Input.Range value={data.pitch} onChange={e => handleUpdate("pitch", e.target.value)} label={`Pitch (${data.pitch})`} step="0.1" min="0" max="2" />
+    <Input.Range value={data.rate} onChange={e => handleUpdate("rate", e.target.value)} label={`Rate (${data.rate})`} step="0.1" min="0.1" max="10" />
+    <Input.Range value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} label={`Volume (${data.volume})`} step="0.05" min="0" max="1" />
   </>
 }
 
 const Azure: FC = () => {
-  const pr = useSnapshot(window.API.state.services.tts.data.azure);
+  const data = useSnapshot(window.API.state.services.tts.data.azure);
   const handleUpdate = <K extends keyof TTS_State["azure"]>(key: K, v: TTS_State["azure"][K]) => window.API.state.services.tts.data.azure[key] = v;
   const state = useSnapshot(window.API.tts.serviceState);
-  const [config, setConfig] = useState<WindowsConfig>();
   const [voiceStyles, setVoiceStyles] = useState<{ label: string, value: string }[]>([]);
   const [voiceRoles, setVoiceRoles] = useState<{ label: string, value: string }[]>([]);
-
-  useEffect(() => {
-    invoke<WindowsConfig>("plugin:windows_tts|get_voices").then(setConfig);
-  }, []);
 
   const updateVoice = (value: { group: string, option: string }) => {
     window.API.state.services.tts.data.azure.language = value.group;
@@ -116,66 +122,68 @@ const Azure: FC = () => {
   useEffect(() => {
     // find voice
     // set styles and roles
-    if (!pr.language || !pr.voice)
+    if (!data.language || !data.voice)
       return;
 
-    const voice = azureVoices[pr.language].find(voice => voice[0] === pr.voice)
+    const voice = azureVoices[data.language].find(voice => voice[0] === data.voice)
     const voiceParams = voice?.[2];
     setVoiceStyles(voiceParams?.styles ? [{ label: "None", value: "" }, ...voiceParams.styles.map(style => ({ label: style, value: style }))] : []);
     setVoiceRoles(voiceParams?.roles ? [{ label: "None", value: "" }, ...voiceParams.roles.map(roles => ({ label: roles, value: roles }))] : []);
 
-  }, [pr.language, pr.voice]);
+  }, [data.language, data.voice]);
 
   return <>
     <Inspector.SubHeader>Azure options</Inspector.SubHeader>
     <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
-      <Input.NativeAudioOutput label="Audio Output" value={pr.device} onChange={e => handleUpdate("device", e)} />
-      <Input.Text type="password" label="Key" value={pr.key} onChange={e => handleUpdate("key", e.target.value)} />
-      <Input.Text type="password" label="Location" value={pr.location} onChange={e => handleUpdate("location", e.target.value)} />
+      <Input.NativeAudioOutput label="Audio Output" value={data.device} onChange={e => handleUpdate("device", e)} />
+      <Input.Text type="password" label="Key" value={data.key} onChange={e => handleUpdate("key", e.target.value)} />
+      <Input.Text type="password" label="Location" value={data.location} onChange={e => handleUpdate("location", e.target.value)} />
     </Inspector.Deactivatable>
 
     <Input.MappedGroupSelect
       labelGroup="Language"
       labelOption="Voice"
-      value={{ group: pr.language, option: pr.voice }}
+      value={{ group: data.language, option: data.voice }}
       onChange={updateVoice}
       library={azureVoices} />
 
-    {voiceStyles.length > 0 && <Input.Select value={{ value: pr.voiceStyle, label: pr.voiceStyle }} options={voiceStyles} label="Voice Style" onChange={(e: any) => handleUpdate("voiceStyle", e.value)} />}
-    {voiceRoles.length > 0 && <Input.Select value={{ value: pr.voiceRole, label: pr.voiceRole }} options={voiceRoles} label="Voice Role" onChange={(e: any) => handleUpdate("voiceRole", e.value)} />}
+    {voiceStyles.length > 0 && <Input.Select value={{ value: data.voiceStyle, label: data.voiceStyle }} options={voiceStyles} label="Voice Style" onChange={(e: any) => handleUpdate("voiceStyle", e.value)} />}
+    {voiceRoles.length > 0 && <Input.Select value={{ value: data.voiceRole, label: data.voiceRole }} options={voiceRoles} label="Voice Role" onChange={(e: any) => handleUpdate("voiceRole", e.value)} />}
     <Input.Select options={[
-      {label: "silent", value: "silent"},
-      {label: "x-soft", value: "x-soft"},
-      {label: "soft", value: "soft"},
-      {label: "medium", value: "medium"},
-      {label: "loud", value: "loud"},
-      {label: "x-loud", value: "x-loud"},
-      {label: "default", value: "default"}
-    ]} label="Voice volume" value={{label: pr.voiceVolume, value: pr.voiceVolume}} onChange={(e: any) => handleUpdate("voiceVolume", e.value)} />
+      { label: "silent", value: "silent" },
+      { label: "x-soft", value: "x-soft" },
+      { label: "soft", value: "soft" },
+      { label: "medium", value: "medium" },
+      { label: "loud", value: "loud" },
+      { label: "x-loud", value: "x-loud" },
+      { label: "default", value: "default" }
+    ]} label="Voice volume" value={{ label: data.voiceVolume, value: data.voiceVolume }} onChange={(e: any) => handleUpdate("voiceVolume", e.value)} />
     <Input.Select options={[
-      {label: "x-slow", value: "x-slow"},
-      {label: "slow", value: "slow"},
-      {label: "medium", value: "medium"},
-      {label: "fast", value: "fast"},
-      {label: "x-fast", value: "x-fast"},
-      {label: "default", value: "default"},
-    ]} label="Voice rate" value={{label: pr.voiceRate, value: pr.voiceRate}} onChange={(e: any) => handleUpdate("voiceRate", e.value)} />
+      { label: "x-slow", value: "x-slow" },
+      { label: "slow", value: "slow" },
+      { label: "medium", value: "medium" },
+      { label: "fast", value: "fast" },
+      { label: "x-fast", value: "x-fast" },
+      { label: "default", value: "default" },
+    ]} label="Voice rate" value={{ label: data.voiceRate, value: data.voiceRate }} onChange={(e: any) => handleUpdate("voiceRate", e.value)} />
     <Input.Select options={[
-      {label: "x-low", value: "x-low"},
-      {label: "low", value: "low"},
-      {label: "medium", value: "medium"},
-      {label: "high", value: "high"},
-      {label: "x-high", value: "x-high"},
-      {label: "default", value: "default"},
-    ]} label="Voice pitch" value={{label: pr.voicePitch, value: pr.voicePitch}} onChange={(e: any) => handleUpdate("voicePitch", e.value)} />
+      { label: "x-low", value: "x-low" },
+      { label: "low", value: "low" },
+      { label: "medium", value: "medium" },
+      { label: "high", value: "high" },
+      { label: "x-high", value: "x-high" },
+      { label: "default", value: "default" },
+    ]} label="Voice pitch" value={{ label: data.voicePitch, value: data.voicePitch }} onChange={(e: any) => handleUpdate("voicePitch", e.value)} />
     <Input.Select options={[
-      {label: "x-low", value: "x-low"},
-      {label: "low", value: "low"},
-      {label: "medium", value: "medium"},
-      {label: "high", value: "high"},
-      {label: "x-high", value: "x-high"},
-      {label: "default", value: "default"},
-    ]} label="Voice range" value={{label: pr.voiceRange, value: pr.voiceRange}} onChange={(e: any) => handleUpdate("voiceRange", e.value)} />
+      { label: "x-low", value: "x-low" },
+      { label: "low", value: "low" },
+      { label: "medium", value: "medium" },
+      { label: "high", value: "high" },
+      { label: "x-high", value: "x-high" },
+      { label: "default", value: "default" },
+    ]} label="Voice range" value={{ label: data.voiceRange, value: data.voiceRange }} onChange={(e: any) => handleUpdate("voiceRange", e.value)} />
+    <Input.Range value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} label={`Volume (${data.volume})`} step="0.05" min="0" max="1" />
+    {/* <Input.Range value={data.rate} onChange={e => handleUpdate("rate", e.target.value)} label={`Rate (${data.rate})`} step="0.05" min="0.1" max="5" /> */}
   </>
 }
 
@@ -220,7 +228,7 @@ const Inspector_TTS: FC = () => {
   const up = <K extends keyof TTS_State>(key: K, v: TTS_State[K]) => window.API.patchService("tts", s => s.data[key] = v);
   const handleStart = (v: boolean) => window.API.state.services.tts.showActionButton = v;
   const [[tab, direction], handleTab] = useInspectorTabs();
-  
+
 
 
   return <Inspector.Body>
