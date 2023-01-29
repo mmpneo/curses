@@ -57,8 +57,9 @@ const stringToRgba = (value: string): RgbaColor => {
 }
 
 const clampRGB = (v: number) => v ? Math.max(0, Math.min(255, v)) : 0;
+const clampAlpha = (v: number) => v ? Math.max(0, Math.min(1, v)) : 0;
 const rgbaToString = (e: RgbaColor) => {
-  return `rgba(${clampRGB(e.r)},${clampRGB(e.g)},${clampRGB(e.b)},${e.a || 0})`
+  return `rgba(${clampRGB(e.r)},${clampRGB(e.g)},${clampRGB(e.b)},${clampAlpha(e.a) || 0})`
 }
 
 const Text: FC<InputTextProps> = memo(({ label, ...rest }) => {
@@ -78,13 +79,13 @@ const ColorSelectDropdown: FC<any> = ({ onChange, value }) => {
     onChange(rgbaToString({ ...rgba, [k]: parseFloat(e) }))
   }
 
-  return <div className="flex flex-col space-y-2 dropdown p-2">
-    <RgbaColorPicker onChange={handleChange} color={stringToRgba(value)} />
-    <div className="flex space-x-1">
+  return <div className="colorPicker flex flex-col dropdown p-4 space-y-4">
+    <RgbaColorPicker className={cx(styles.colorPicker)} onChange={handleChange} color={stringToRgba(value)} />
+    <div className="input-group">
       <input type="number" value={rgba.r} onChange={e => handlePartialChange("r", e.target.value)} className={cx(styles.clearAppearance, "w-full input input-xs input-bordered font-semibold leading-none")} />
       <input type="number" value={rgba.g} onChange={e => handlePartialChange("g", e.target.value)} className={cx(styles.clearAppearance, "w-full input input-xs input-bordered font-semibold leading-none")} />
       <input type="number" value={rgba.b} onChange={e => handlePartialChange("b", e.target.value)} className={cx(styles.clearAppearance, "w-full input input-xs input-bordered font-semibold leading-none")} />
-      <input type="number" value={rgba.a} step="0.05" onChange={e => handlePartialChange("a", e.target.value)} className={cx(styles.clearAppearance, "w-full input input-xs input-bordered font-semibold leading-none")} />
+      <input type="number" value={rgba.a} min="0" max="1" step="0.05" onChange={e => handlePartialChange("a", e.target.value)} className={cx(styles.clearAppearance, "w-full input input-xs input-bordered font-semibold leading-none")} />
     </div>
   </div>
 }
@@ -97,7 +98,7 @@ const Color: FC<InputColorProps> = memo(({ label, ...rest }) => {
     <Container label={label} id={label}>
       <div className="field-width grid grid-cols-2 gap-2">
         <div></div>
-        <div className="btn btn-sm" style={{ backgroundColor: rest.value as string }}></div>
+        <div className="cursor-pointer hover:bg-base-300 input input-bordered input-sm" style={{ backgroundColor: rest.value as string }}></div>
       </div>
     </Container>
   </Dropdown>
@@ -271,8 +272,8 @@ const File: FC<FileProps> = ({ label, type, onChange, value }) => {
   }
 
   const handleSelect = async () => {
-    const resp = await NiceModal.show('files', { select: type });
-    if (resp && typeof resp === "string") onChange(resp);
+    const fileId = await NiceModal.show('files', { select: type });
+    if (fileId && typeof fileId === "string") onChange(fileId);
   }
 
   return <Container label={label} vertical>
@@ -285,7 +286,7 @@ const File: FC<FileProps> = ({ label, type, onChange, value }) => {
         <RiUpload2Fill className="text-xl" />
       </div>
       <div className="flex flex-col items-start text-sm">
-        <span className="font-medium link link-accent link-hover">Add new file</span>
+        <span className="font-medium link link-accent link-hover" onClick={handleAdd}>Add new file</span>
         <span className="font-medium">or select from <span onClick={handleSelect} className="link link-accent link-hover">library</span></span>
         {/* <button onClick={handleSelect} className="flex-grow btn btn-sm btn-primary">Select existing file</button> */}
       </div>
@@ -446,7 +447,9 @@ const FontSelectDropdown: FC<any> = memo(({ onChange, value }) => {
 const Font: FC<FontProps> = memo(({ label, ...rest }) => {
   return <Dropdown targetOffset={24} placement="right" content={<FontSelectDropdown {...rest} />}>
     <Container label={label}>
-      <div style={{ fontFamily: rest.value || "inherit" }} className="cursor-pointer hover:bg-base-300 leading-none flex items-center input input-bordered input-sm field-width">{rest.value || "Select font"}</div>
+      <div style={{ fontFamily: rest.value || "inherit" }} className="cursor-pointer hover:bg-base-300 flex items-center input input-bordered input-sm field-width overflow-hidden" title={rest.value}>
+        <span className="truncate block w-full">{rest.value || "Select font"}</span>
+      </div>
     </Container>
   </Dropdown>
 })
@@ -494,7 +497,7 @@ const MapObject: FC<ObjectProps> = memo(({ label, onChange, ...rest }) => {
     <div className="flex flex-col space-y-2">
       {!Object.keys(value).length && <div className="h-20 px-4 flex justify-center items-center rounded-md border-2 border-primary/10 border-dashed ">
         <span className="text-sm font-medium text-center">
-          Nothing here <br/> <span className="text-primary cursor-pointer font-semibold" onClick={handleAdd}>{rest.addLabel || "Add pair"}</span>
+          Nothing here <br /> <span className="text-primary cursor-pointer font-semibold" onClick={handleAdd}>{rest.addLabel || "Add pair"}</span>
         </span>
       </div>}
       {Object.entries(value).map(([key,], i) => <div key={i} className="flex space-x-2">
@@ -512,14 +515,14 @@ interface ShortuctProps extends InputBaseProps {
   value?: string,
   onChange?: (value: string) => void
 }
-const Shortcut: FC<ShortuctProps> = ({shortcut, label, onChange, ...rest}) => {
+const Shortcut: FC<ShortuctProps> = ({ shortcut, label, onChange, ...rest }) => {
   const id = useId();
-  const {shortcuts} = useSnapshot(window.API.state);
+  const { shortcuts } = useSnapshot(window.API.state);
 
   const startRecord = () => {
     window.API.keyboard.startShortcutRecord(shortcut);
   }
-  
+
   const clear = () => {
     window.API.keyboard.clearShortcut(shortcut);
   }
@@ -532,10 +535,10 @@ const Shortcut: FC<ShortuctProps> = ({shortcut, label, onChange, ...rest}) => {
     <div className="input-group w-full">
       <input type="text" value={shortcuts[shortcut]} id={id} disabled className="w-full input input-sm input-bordered" />
       <Tooltip content="Listen" className="btn btn-sm btn-primary btn-square">
-        <button className="w-full h-full flex items-center justify-center" onClick={startRecord}><RiKeyboardBoxFill/></button>
+        <button className="w-full h-full flex items-center justify-center" onClick={startRecord}><RiKeyboardBoxFill /></button>
       </Tooltip>
       <Tooltip content="Clear" className="btn btn-sm btn-neutral btn-square">
-        <button className="w-full h-full flex items-center justify-center" onClick={clear}><RiDeleteBin3Fill/></button>
+        <button className="w-full h-full flex items-center justify-center" onClick={clear}><RiDeleteBin3Fill /></button>
       </Tooltip>
     </div>
     {/* <BaseText disabled type="text" /> */}
@@ -551,7 +554,7 @@ interface AudioOutputProps extends InputBaseProps {
   value: string,
   onChange: (value: string) => void
 }
-const NativeAudioOutput: FC<AudioOutputProps> = memo(({label, value, onChange}) => {
+const NativeAudioOutput: FC<AudioOutputProps> = memo(({ label, value, onChange }) => {
   const [config, setConfig] = useState<WindowsConfig>();
 
   useEffect(() => {
@@ -559,12 +562,12 @@ const NativeAudioOutput: FC<AudioOutputProps> = memo(({label, value, onChange}) 
   }, []);
 
   return <NewSelect
-      value={{ value: value, label: value }}
-      onChange={(e: any) => onChange(e.value)}
-      getOptionLabel={({ value }: any) => config?.devices.find(d => d.label === value)?.label || value}
-      options={config?.devices.map(d => ({ ...d, value: d.label }))}
-      placeholder="Device"
-      label={label} />
+    value={{ value: value, label: value }}
+    onChange={(e: any) => onChange(e.value)}
+    getOptionLabel={({ value }: any) => config?.devices.find(d => d.label === value)?.label || value}
+    options={config?.devices.map(d => ({ ...d, value: d.label }))}
+    placeholder="Device"
+    label={label} />
 })
 
 export default { BaseText, Text, Chips, Object: MapObject, Range, Color, Font, Select: NewSelect, MappedGroupSelect, Checkbox, File, Event, Code, TextSource, Container, DoubleCountainer, NetworkStatus, Shortcut, NativeAudioOutput };

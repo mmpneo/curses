@@ -178,26 +178,32 @@ fieldset > input[type="color"]::-webkit-color-swatch {
   color: rgb(255, 234, 234);
 }
 
-.dropdown .react-colorful {
-  @apply w-full;
+.colorPicker .react-colorful {
+  @apply w-full space-y-4;
 }
-.dropdown .react-colorful__saturation {
-  @apply rounded-t-xl;
+.colorPicker .react-colorful__saturation {
+  @apply rounded-xl;
 }
 
-.dropdown .react-colorful__pointer {
-  height: 20px;
-  width: 20px;
+.colorPicker .react-colorful__pointer {
+  height: 10px;
+  width: 10px;
 }
-.dropdown .react-colorful__pointer {
+.colorPicker .react-colorful__pointer {
   border: none;
 }
-.dropdown .react-colorful__pointer-fill {
+
+.colorPicker .react-colorful__last-control{
+  border-radius: inherit;
+}
+
+.colorPicker .react-colorful__pointer-fill {
   border: 2px solid white;
 }
 
-.dropdown .react-colorful__alpha, .dropdown .react-colorful__hue {
-  height: 1rem;
+.colorPicker .react-colorful__alpha, .dropdown .react-colorful__hue {
+  border-radius: 1rem;
+  height: .5rem;
 }
 /*
 .react-colorful__saturation {

@@ -51,6 +51,19 @@ const TextInspector: FC<{ id: string }> = ({ id }) => {
       { label: "AA", value: FontCase.uppercase },
       { label: "-", value: FontCase.inherit },
     ]} label="Case" value={data.textCase} onChange={e => up("textCase", e as FontCase)} />
+
+    {/* <Inspector.SubHeader>Align</Inspector.SubHeader> */}
+    <Input.Chips options={[
+      { label: <GrTextAlignLeft />, value: FlexAlign.start },
+      { label: <GrTextAlignCenter />, value: FlexAlign.center },
+      { label: <GrTextAlignRight />, value: FlexAlign.end },
+    ]} label="Horizontal" value={data.textAlignH} onChange={e => up("textAlignH", e as FlexAlign)} />
+    <Input.Chips options={[
+      { label: <RiAlignTop />, value: FlexAlign.start },
+      { label: <RiAlignVertically />, value: FlexAlign.center },
+      { label: <RiAlignBottom />, value: FlexAlign.end },
+    ]} label="Vertical" value={data.textAlignV} onChange={e => up("textAlignV", e as FlexAlign)} />
+
     <Input.Text label="Line Height" step="0.1" type="number" value={data.textLineHeight} onChange={e => up("textLineHeight", e.target.value)} />
 
     {/* <Inspector.SubHeader>Font Color</Inspector.SubHeader> */}
@@ -66,18 +79,6 @@ const TextInspector: FC<{ id: string }> = ({ id }) => {
     <Inspector.SubHeader>Outline</Inspector.SubHeader>
     <Input.Text label="Size" min="0" step="1" type="number" value={data.textStroke} onChange={e => up("textStroke", e.target.value)} />
     <Input.Color label="Color" value={data.textStrokeColor} onChange={e => up("textStrokeColor", e)} />
-
-    <Inspector.SubHeader>Align</Inspector.SubHeader>
-    <Input.Chips options={[
-      { label: <GrTextAlignLeft />, value: FlexAlign.start },
-      { label: <GrTextAlignCenter />, value: FlexAlign.center },
-      { label: <GrTextAlignRight />, value: FlexAlign.end },
-    ]} label="Horizontal" value={data.textAlignH} onChange={e => up("textAlignH", e as FlexAlign)} />
-    <Input.Chips options={[
-      { label: <RiAlignTop />, value: FlexAlign.start },
-      { label: <RiAlignVertically />, value: FlexAlign.center },
-      { label: <RiAlignBottom />, value: FlexAlign.end },
-    ]} label="Vertical" value={data.textAlignV} onChange={e => up("textAlignV", e as FlexAlign)} />
   </>
 }
 

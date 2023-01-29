@@ -51,7 +51,7 @@ fn main() {
     };
 
     
-    let mut app = tauri::Builder::default()
+    tauri::Builder::default()
         .setup(|app| {
             let window = app.get_window("main").unwrap();
             set_shadow(&window, true).expect("Unsupported platform!");

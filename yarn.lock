@@ -2282,6 +2282,7 @@ __metadata:
     react-ace: ^10.1.0
     react-colorful: ^5.6.1
     react-dom: ^18.2.0
+    react-error-boundary: ^3.1.4
     react-icons: ^4.7.1
     react-reverse-portal: ^2.1.1
     react-rnd: ^10.4.1
@@ -4419,6 +4420,17 @@ __metadata:
     react: ">= 16.3.0"
     react-dom: ">= 16.3.0"
   checksum: 21c3775db086e13020967627c20acd41d1ddbc7c7d7fca51491a5bbb54a0aa7e1730a4bc9af17141eb50a4954e547a5e25b2368f5f54b70db6f2686a897bacf2
+  languageName: node
+  linkType: hard
+
+"react-error-boundary@npm:^3.1.4":
+  version: 3.1.4
+  resolution: "react-error-boundary@npm:3.1.4"
+  dependencies:
+    "@babel/runtime": ^7.12.5
+  peerDependencies:
+    react: ">=16.13.1"
+  checksum: f36270a5d775a25c8920f854c0d91649ceea417b15b5bc51e270a959b0476647bb79abb4da3be7dd9a4597b029214e8fe43ea914a7f16fa7543c91f784977f1b
   languageName: node
   linkType: hard
 

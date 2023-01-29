@@ -1,6 +1,8 @@
 import classNames from "classnames";
 import { AnimatePresence, motion } from "framer-motion";
 import { ButtonHTMLAttributes, FC, forwardRef, memo, PropsWithChildren, useState } from "react";
+import { ErrorBoundary } from "react-error-boundary";
+import { toast } from "react-toastify";
 import SimpleBar from "simplebar-react";
 import { Services } from "../../backend-services";
 import Inspector_STT from "../../backend-services/stt/inspector";
@@ -19,19 +21,44 @@ import Inspector_Scenes from "./inspector_scenes";
 import Inspector_Settings from "./inspector_settings";
 
 const Base: FC<{ path?: InspectorTabPath }> = ({ path }) => {
+  const handleCopyError = (err: string) => {
+    navigator.clipboard.writeText(err);
+    toast.success("Copied!");
+  }
   return <div style={{ width: '19rem' }} className="relative h-full flex-none bg-base-100 rounded-t-box flex flex-col overflow-hidden">
-    <AnimatePresence initial={false}>
-      {path?.tab === Services.stt && <Inspector_STT key="stt" />}
-      {path?.tab === Services.tts && <Inspector_TTS key="tts" />}
-      {path?.tab === Services.translation && <Inspector_Translation key="translation" />}
-      {path?.tab === Services.twitch && <Inspector_Twitch key="twitch" />}
-      {path?.tab === Services.vrc && <Inspector_VRC key="vrc" />}
-      {path?.tab === "settings" && <Inspector_Settings key="settings" />}
-      {path?.tab === "scenes" && <Inspector_Scenes key="scenes" />}
-      {path?.tab === "files" && <Inspector_Files key="files" />}
-      {path?.tab === ElementType.text && path?.value && <Inspector_ElementText id={path.value} key={`${path.tab}-${path.value}`} />}
-      {path?.tab === ElementType.image && path?.value && <Inspector_ElementImage id={path.value} key={`${path.tab}-${path.value}`} />}
-    </AnimatePresence>
+    <ErrorBoundary fallbackRender={({ error, resetErrorBoundary }) => (
+      <div className="w-full h-full flex flex-col items-center justify-center p-4 space-y-2">
+        <div className="flex flex-col items-center">
+          <img className="w-16 grayscale" src="/images/ui-noo.gif" />
+          <div className="text-primary font-semibold font-header inline-block">Inspector crashed!</div>
+          <pre className="text-xs text-base-content/50 whitespace-pre-wrap text-center">
+            Try to close and open it again.
+            If this doesn't work, you can ask for help in the <a className="link text-secondary ink-primary link-hover" href="discord://-/channels/856500849815060500/1058343274991058945">Discord #help</a>
+          </pre>
+        </div>
+        {error.stack && <pre style={{ fontSize: 9 }} className="relative w-full text-xs rounded-box bg-base-200 h-24">
+          <SimpleBar className="w-full h-full">
+            <pre className="px-2 truncate break-words whitespace-pre-wrap">{error.stack}</pre>
+          </SimpleBar>
+          <button className="absolute right-2 top-0 btn btn-link btn-xs self-start" onClick={() => error.stack && handleCopyError(error.stack)}>
+            Copy
+          </button>
+        </pre>}
+      </div>
+    )}>
+      <AnimatePresence initial={false}>
+        {path?.tab === Services.stt && <Inspector_STT key="stt" />}
+        {path?.tab === Services.tts && <Inspector_TTS key="tts" />}
+        {path?.tab === Services.translation && <Inspector_Translation key="translation" />}
+        {path?.tab === Services.twitch && <Inspector_Twitch key="twitch" />}
+        {path?.tab === Services.vrc && <Inspector_VRC key="vrc" />}
+        {path?.tab === "settings" && <Inspector_Settings key="settings" />}
+        {path?.tab === "scenes" && <Inspector_Scenes key="scenes" />}
+        {path?.tab === "files" && <Inspector_Files key="files" />}
+        {path?.tab === ElementType.text && path?.value && <Inspector_ElementText id={path.value} key={`${path.tab}-${path.value}`} />}
+        {path?.tab === ElementType.image && path?.value && <Inspector_ElementImage id={path.value} key={`${path.tab}-${path.value}`} />}
+      </AnimatePresence>
+    </ErrorBoundary>
   </div>
 }
 
@@ -67,19 +94,19 @@ const Content: FC<PropsWithChildren> = ({ children }) => {
 const Switchable: FC<PropsWithChildren<{ visible: boolean }>> = ({ visible, children }) => {
   return <AnimatePresence initial={false}>
     {visible && <motion.div
-    key="switchable"
-    initial={{marginTop: 0, height: 0, opacity: 0 }}
-    transition={{ ease: "anticipate", duration: 0.3 }}
-    exit={{ marginTop: 0, height: 0, opacity: 0 }}
-    animate={{ marginTop: ".5rem", height: "auto", opacity: 1 }}
-    className="flex flex-col w-full space-y-2">
+      key="switchable"
+      initial={{ marginTop: 0, height: 0, opacity: 0 }}
+      transition={{ ease: "anticipate", duration: 0.3 }}
+      exit={{ marginTop: 0, height: 0, opacity: 0 }}
+      animate={{ marginTop: ".5rem", height: "auto", opacity: 1 }}
+      className="flex flex-col w-full space-y-2">
       <span></span>
       {children}
-  </motion.div>}
+    </motion.div>}
   </AnimatePresence>
 }
 
-const Deactivatable: FC<PropsWithChildren<{ active: boolean }>> = ({active, children}) => {
+const Deactivatable: FC<PropsWithChildren<{ active: boolean }>> = ({ active, children }) => {
   return <div className={classNames("flex flex-col w-full space-y-2 transition-opacity", !active ? "opacity-50 pointer-events-none" : "")}>
     <span></span>
     {children}

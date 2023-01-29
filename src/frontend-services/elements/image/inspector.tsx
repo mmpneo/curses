@@ -60,6 +60,10 @@ const CssInspector: FC<{ id: string }> = ({ id }) => {
 
 const Inspector_ElementImage: FC<{ id: string }> = ({ id }) => {
   const [[tab, direction], handleTab] = useInspectorTabs();
+  const data: Element_ImageState = useGetState(state => state.elements[id]?.scenes["main"].data);
+
+  if (!data)
+    return <Inspector.Body>Deleted</Inspector.Body>
 
   return <Inspector.Body>
     <Inspector.Header><RiImageFill /> <NameInput id={id} /></Inspector.Header>

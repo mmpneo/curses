@@ -101,10 +101,20 @@ const AddrInput = () => {
   return <Input.Text value={v} onChange={e => upd(e.target.value)} label="Address" placeholder="192.168..smth" />
 }
 
+const ExportMenu: FC = () => {
+  const [name, setName] = useState("");
+  return <div className="menu bg-base-100 p-4 w-72 rounded-box flex flex-col space-y-2">
+    <span className="menu-title"><span>Export template</span></span>
+    <Input.Text label="Author" value={name} onChange={e => setName(e.target.value)} />
+    <button className="btn btn-sm btn-primary" onClick={() => name && window.APIFrontend.document.exportDocument(name)}>Export</button>
+  </div>;
+}
+
 const Inspector_Settings: FC = memo(() => {
   const { clientTheme, uiScale, backgroundInputTimer } = useSnapshot(window.API.state);
   const { state: linkStatus } = useSnapshot(window.API.pubsub.serviceState);
   const canvas = useGetState(state => state.canvas);
+  const author = useGetState(state => state.author);
   const updateState = useUpdateState();
 
   const [version, setVersion] = useState("")
@@ -143,10 +153,6 @@ const Inspector_Settings: FC = memo(() => {
       </div>
       <div className="divider"></div>
 
-      {/* <button className="btn btn-sm" onClick={() => shortuctsOn()}>Start</button>
-      <button className="btn btn-sm" onClick={() => shortuctsOff()}>Stop</button> */}
-
-      {/* <Inspector.SubHeader>Canvas</Inspector.SubHeader> */}
       {/* <Inspector.SubHeader>UI</Inspector.SubHeader> */}
       <Input.Select label="Theme" options={options} value={{ value: clientTheme, label: clientTheme }} onChange={(e: any) => handleChangeTheme(e.value)} />
       <Input.Chips label="UI scale" value={uiScale} onChange={e => handleChangeScale(e)} options={[
@@ -169,13 +175,16 @@ const Inspector_Settings: FC = memo(() => {
       </div>
 
       <Inspector.SubHeader>Template</Inspector.SubHeader>
+      {author && <span className="text-sm text-secondary font-semibold">Created by {author}</span>}
       <Input.DoubleCountainer label="Canvas Size">
         <Input.BaseText value={canvas?.w} onChange={e => updateState(state => { state.canvas.w = parseFloat(e.target.value) })} type="number" />
         <Input.BaseText value={canvas?.h} onChange={e => updateState(state => { state.canvas.h = parseFloat(e.target.value) })} type="number" />
       </Input.DoubleCountainer>
       <div className="flex items-center space-x-2">
         <button onClick={() => window.APIFrontend.document.importDocument()} className="flex-grow btn btn-sm gap-2"><RiFileCopyLine /> Import</button>
-        <button onClick={() => window.APIFrontend.document.exportDocument()} className="flex-grow btn btn-sm gap-2"><RiFileCopyLine /> Export</button>
+        <Dropdown className="flex-grow btn btn-sm gap-2" targetOffset={24} placement="right" content={<ExportMenu />}>
+          <RiFileCopyLine /> Export
+        </Dropdown>
       </div>
 
       {window.nativeFeatures.background_input && <>

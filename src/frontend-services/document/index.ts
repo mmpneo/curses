@@ -88,7 +88,7 @@ class Service_Document implements IServiceInterface {
       filters: [
         {
           name: "Curses template",
-          extensions: ["cursestemplate"],
+          extensions: ["cursestmp"],
         },
       ],
     });
@@ -111,18 +111,30 @@ class Service_Document implements IServiceInterface {
       toast.error("The template wasn't imported because it's invalid");
     }
   }
-  async exportDocument() {
-    const data = Y.encodeStateAsUpdate(this.#file);
+  async exportDocument(authorName: string) {
+    // clone doc
+    const tempDoc = new Y.Doc();
+    const encodedUpdate = Y.encodeStateAsUpdate(this.#file);
+    Y.applyUpdate(tempDoc, encodedUpdate);
+    // apply author name to temp
+    tempDoc.getMap("template").set("author", authorName);
+
+    const tempEncodedUpdate = Y.encodeStateAsUpdate(tempDoc);
     const path = await save({
       filters: [
         {
           name: "Curses template",
-          extensions: ["cursestemplate"],
+          extensions: ["cursestmp"],
         },
       ],
     });
-    if (!path) return;
-    await writeBinaryFile(path, data);
+    if (path) try {
+      await writeBinaryFile(path, tempEncodedUpdate);
+      // write author to original doc on success
+      this.fileBinder.update(a => {a.author = authorName});
+    } catch (error) {
+      
+    }
   }
 
   async loadDocument(): Promise<Uint8Array | undefined> {

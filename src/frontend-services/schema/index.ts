@@ -9,6 +9,7 @@ type SceneId = string;
 type ElementId = string;
 
 export type DocumentState = {
+  author: string;
   canvas: TransformRect;
   activeScene: string;
   scenes: Record<SceneId, SceneState>;
@@ -33,8 +34,9 @@ export function createDocumentState(template: Y.Map<any>) {
 export const documentSchema: JSONSchemaType<DocumentState> = {
   type:       "object",
   properties: {
+    author: {type: "string", default: ""},
     canvas: transformRectSchema,
-    activeScene: {type: "string", default: "night"},
+    activeScene: {type: "string", default: "main"},
     elementsIds: {type: "array", items: {type: "string"}, default: []},
     filesMeta: {type: "array", items: fileStateSchema, default: []},
     scenes: {
@@ -51,5 +53,5 @@ export const documentSchema: JSONSchemaType<DocumentState> = {
     }
   },
   additionalProperties: false,
-  required:   ["canvas", "activeScene", "filesMeta", "elements", "elementsIds", "scenes"]
+  required:   ["author", "canvas", "activeScene", "filesMeta", "elements", "elementsIds", "scenes"]
 }
