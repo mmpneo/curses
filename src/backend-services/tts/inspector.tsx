@@ -187,11 +187,77 @@ const Azure: FC = () => {
   </>
 }
 
+const VoiceVox: FC = () => {
+  const handleQuery = async () => {
+    let resp = await fetch("http://127.0.0.1:50021/audio_query?text=text&speaker=1", {
+      method: "POST",
+      body: JSON.stringify({
+        query: {
+          text: "text",
+          speaker: 1,
+        }
+      })
+    });
+    const jsn = await resp.json();
+    console.log(jsn);
+  };
+
+  const handleQueryVoices = async () => {
+    let resp = await fetch("http://127.0.0.1:50021/speakers");
+    const jsn = await resp.json();
+    console.log(jsn);
+  };
+
+  const handleSynth = async () => {
+    let resp = await fetch("http://127.0.0.1:50021/synthesis?speaker=0", {
+      headers: {
+        // 'Accept': 'audio/wav',
+        'Content-type': 'application/json'
+      },
+      method: "POST",
+      body: JSON.stringify({
+        accent_phrases: [
+          {
+            accent: 1,
+            is_interrogative: false,
+            moras: [{
+              consonant: "t",
+              consonant_length: 0.0727369412779808,
+              pitch: 5.911419868469238,
+              text: "テ",
+              vowel: "e",
+              vowel_length: 0.1318332552909851,
+            }],
+            pause_mora: null
+          }],
+        speedScale: 1,
+        pitchScale: 1,
+        intonationScale: 1,
+        volumeScale: 1,
+        prePhonemeLength: 1,
+        postPhonemeLength: 1,
+        outputSamplingRate: 1,
+        outputStereo: true,
+      })
+    });
+    const jsn = await resp.arrayBuffer();
+    console.log(jsn);
+  };
+
+  return <>
+    voicevox
+    <button onClick={handleQuery}>Query</button>
+    <button onClick={handleSynth}>Synth</button>
+    <button onClick={handleQueryVoices}>Voices</button>
+  </>
+}
+
 const serviceOptions = [
   { label: "Native", value: TTS_Backends.native },
   { label: "Windows", value: TTS_Backends.windows },
   { label: "Azure", value: TTS_Backends.azure },
   { label: "TikTok", value: TTS_Backends.tiktok },
+  { label: "VoiceVox", value: TTS_Backends.voicevox },
 ]
 
 const TTSInspector: FC = () => {
@@ -210,6 +276,7 @@ const TTSInspector: FC = () => {
     {data.data.backend === TTS_Backends.azure && <Azure />}
     {data.data.backend === TTS_Backends.native && <Native />}
     {data.data.backend === TTS_Backends.tiktok && <TikTok />}
+    {data.data.backend === TTS_Backends.voicevox && <VoiceVox />}
 
     <ServiceButton status={state.status} onStart={() => window.API.tts.start()} onStop={() => window.API.tts.stop()} />
   </>

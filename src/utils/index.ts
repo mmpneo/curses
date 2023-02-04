@@ -1,7 +1,7 @@
 import difference from "lodash/difference";
 import { subscribeKey } from "valtio/utils";
 import { BackendState } from "../backend-services/schema";
-import { TextEvent, TextEventSource, TextEventType } from "../types";
+import { TextEvent, TextEventSource } from "../types";
 
 export function GetArrayDiff(source: string[], target: string[]) {
   const add      = difference(target, source);

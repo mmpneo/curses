@@ -37,7 +37,7 @@ const Container: FC<PropsWithChildren<{ id?: string, vertical?: boolean, label: 
   </div>
 });
 
-const BaseText: FC<InputHTMLAttributes<HTMLInputElement>> = memo((props: any) => <input {...props} className={cx(styles.clearAppearance, "field-width input input-bordered overflow-hidden input-sm font-semibold leading-none")} />);
+const BaseText: FC<InputHTMLAttributes<HTMLInputElement>> = memo((props: any) => <input {...props} className={cx(styles.clearAppearance, props.className, "field-width input input-bordered overflow-hidden input-sm font-semibold leading-none")} />);
 
 interface InputTextProps extends InputBaseProps, InputHTMLAttributes<HTMLInputElement> { }
 
@@ -64,7 +64,7 @@ const rgbaToString = (e: RgbaColor) => {
 
 const Text: FC<InputTextProps> = memo(({ label, ...rest }) => {
   const id = useId();
-  return <Container label={label} id={id}><BaseText id={id} type="text" {...rest} /></Container>
+  return <Container label={label} id={id}><BaseText id={id} className="flex-none" type="text" {...rest} /></Container>
 });
 
 const ColorSelectDropdown: FC<any> = ({ onChange, value }) => {

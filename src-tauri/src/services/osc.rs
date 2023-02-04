@@ -34,21 +34,30 @@ impl OscPlugin {
             .args
             .iter()
             .map(|arg| {
-                let t = match arg {
-                    Value::Null => OscType::Nil,
-                    Value::Bool(v) => OscType::from(*v),
-                    Value::Number(v) => {
-                        if v.is_f64() {
-                            OscType::Float(v.as_f64().unwrap() as f32)
-                        } else {
-                            OscType::Int(v.as_i64().unwrap() as i32)
-                        }
-                    }
-                    Value::String(v) => OscType::from(v.to_string()),
-                    Value::Array(_) => OscType::Nil,
-                    Value::Object(_) => OscType::Nil,
+                let tt = match arg {
+                    OscValue::Bool(v) => OscType::from(*v),
+                    OscValue::Float(v) => OscType::Float(*v as f32),
+                    OscValue::Int(v) => OscType::Int(*v as i32),
+                    OscValue::String(v) => OscType::from(v.to_string()),
+                    _ => OscType::Nil,
                 };
-                t
+                tt
+                // let t = match arg {
+                //     Value::Null => OscType::Nil,
+                //     Value::Bool(v) => OscType::from(*v),
+                //     Value::Number(v) => {
+                //         println!("{:?} {:?}", v, v.is_f64());
+                //         if v.is_f64() {
+                //             OscType::Float(v.as_f64().unwrap() as f32)
+                //         } else {
+                //             OscType::Int(v.as_i64().unwrap() as i32)
+                //         }
+                //     }
+                //     Value::String(v) => OscType::from(v.to_string()),
+                //     Value::Array(_) => OscType::Nil,
+                //     Value::Object(_) => OscType::Nil,
+                // };
+                // t
             })
             .collect();
 
@@ -58,9 +67,17 @@ impl OscPlugin {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+enum OscValue {
+    Bool(bool),
+    Float(f64),
+    Int(i64),
+    String(String),
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct RpcOscMessage {
     path: String,
-    args: Vec<Value>,
+    args: Vec<OscValue>,
 }
 
 #[command]

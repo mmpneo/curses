@@ -6,6 +6,7 @@ export enum TTS_Backends {
   windows = "windows",
   azure = "azure",
   tiktok = "tiktok",
+  voicevox = "voicevox",
 }
 
 export type TTS_State = {
