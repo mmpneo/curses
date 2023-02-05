@@ -32,7 +32,6 @@ windows = { version = "0.44.0", features = [
   "Win32_UI_TextServices",
   "Win32_UI_WindowsAndMessaging",
   "Win32_Foundation",
-  "Media_SpeechRecognition",
   "Win32_Media_Speech",
   "Win32_Media_Audio",
   "Win32_System_Com",
@@ -42,6 +41,10 @@ windows = { version = "0.44.0", features = [
 clap = { version = "4.0.29", features = ["derive"] }
 local-ip-address = "0.4.9"
 rodio = "0.16.0"
+
+[profile.release]
+lto = true
+codegen-units = 1
 
 [features]
 default = ["custom-protocol"]

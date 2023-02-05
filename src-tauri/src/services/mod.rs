@@ -2,7 +2,6 @@ pub mod osc;
 pub mod web;
 pub mod audio;
 pub mod windows_tts;
-// pub mod windows_stt;
 pub mod translate;
 
 // #[cfg(background_input)]
