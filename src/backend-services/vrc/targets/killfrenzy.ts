@@ -20,9 +20,9 @@ class VRC_KillFrenzyTarget implements IVRCTarget {
   }
 
   // api
-  setVisibility = (Bool: boolean) => sendOsc("/avatar/parameters/KAT_Visible", [{ Bool }]);
-  setPointer =(Int: number) => sendOsc("/avatar/parameters/KAT_Pointer", [{ Int }]);
-  setSyncChar = (index: number, Float: number) => sendOsc(`/avatar/parameters/KAT_CharSync${index}`, [{ Float }]);
+  setVisibility = (Bool: boolean) => sendOsc(`/avatar/parameters/${this.state.KAT_Visible || 'KAT_Visible'}`, [{ Bool }]);
+  setPointer =(Int: number) => sendOsc(`/avatar/parameters/${this.state.KAT_Pointer || 'KAT_Pointer'}`, [{ Int }]);
+  setSyncChar = (index: number, Float: number) => sendOsc(`/avatar/parameters/${this.state.KAT_CharSync || 'KAT_CharSync'}${index}`, [{ Float }]);
 
   private triggerTimer() {
     clearTimeout(this.hideTimer);

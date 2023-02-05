@@ -25,7 +25,7 @@ const KillFrenzyInspector: FC = () => {
   const up = <K extends keyof VRC_State["killfrenzy"]>(key: K, v: VRC_State["killfrenzy"][K]) => window.API.patchService("vrc", s => s.data.killfrenzy[key] = v);
   return <>
     <Inspector.SubHeader>KillFrenzy options</Inspector.SubHeader>
-    <Input.Checkbox label="Show indicator" value={state.indicator} onChange={e => up("indicator", e)} />
+    {/* <Input.Checkbox label="Show indicator" value={state.indicator} onChange={e => up("indicator", e)} /> */}
     <Input.Checkbox label="Split large messages" value={state.splitSentences} onChange={e => up("splitSentences", e)} />
     <Input.Text type="number" label="Hide after" min={0} max={4} value={state.visibleTimer} onChange={e => up("visibleTimer", e.target.value)}/>
     <Input.Text type="number" label="Sync points" min={0} max={4} value={state.syncPoints} onChange={e => up("syncPoints", e.target.value)}/>

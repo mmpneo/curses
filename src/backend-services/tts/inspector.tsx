@@ -257,7 +257,7 @@ const serviceOptions = [
   { label: "Windows", value: TTS_Backends.windows },
   { label: "Azure", value: TTS_Backends.azure },
   { label: "TikTok", value: TTS_Backends.tiktok },
-  { label: "VoiceVox", value: TTS_Backends.voicevox },
+  // { label: "VoiceVox", value: TTS_Backends.voicevox },
 ]
 
 const TTSInspector: FC = () => {
