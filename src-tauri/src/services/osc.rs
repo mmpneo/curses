@@ -1,8 +1,6 @@
 use std::net::{SocketAddr, UdpSocket};
-
 use rosc::{encoder, OscMessage, OscPacket, OscType};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use tauri::{
     command,
     plugin::{Builder, TauriPlugin},
@@ -42,22 +40,6 @@ impl OscPlugin {
                     _ => OscType::Nil,
                 };
                 tt
-                // let t = match arg {
-                //     Value::Null => OscType::Nil,
-                //     Value::Bool(v) => OscType::from(*v),
-                //     Value::Number(v) => {
-                //         println!("{:?} {:?}", v, v.is_f64());
-                //         if v.is_f64() {
-                //             OscType::Float(v.as_f64().unwrap() as f32)
-                //         } else {
-                //             OscType::Int(v.as_i64().unwrap() as i32)
-                //         }
-                //     }
-                //     Value::String(v) => OscType::from(v.to_string()),
-                //     Value::Array(_) => OscType::Nil,
-                //     Value::Object(_) => OscType::Nil,
-                // };
-                // t
             })
             .collect();
 

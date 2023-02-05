@@ -276,7 +276,7 @@ const TTSInspector: FC = () => {
     {data.data.backend === TTS_Backends.azure && <Azure />}
     {data.data.backend === TTS_Backends.native && <Native />}
     {data.data.backend === TTS_Backends.tiktok && <TikTok />}
-    {data.data.backend === TTS_Backends.voicevox && <VoiceVox />}
+    {/* {data.data.backend === TTS_Backends.voicevox && <VoiceVox />} */}
 
     <ServiceButton status={state.status} onStart={() => window.API.tts.start()} onStop={() => window.API.tts.stop()} />
   </>
