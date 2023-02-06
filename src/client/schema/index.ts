@@ -1,8 +1,8 @@
-import { JSONSchemaType } from "ajv";
-import * as Y                               from "yjs";
-import { FileState, fileStateSchema }                                                              from "../services/files/schema";
+import {JSONSchemaType} from "ajv";
+import * as Y from "yjs";
+import {FileState, fileStateSchema} from "../services/files/schema";
 import {createTransformRect, ElementState, elementStateSchema, TransformRect, transformRectSchema} from "../elements/schema";
-import { createSceneState, SceneState, sceneStateSchema }                                          from "../services/scenes/schema";
+import {createSceneState, SceneState, sceneStateSchema} from "../services/scenes/schema";
 
 type SceneId = string;
 type ElementId = string;
