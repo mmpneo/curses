@@ -1,5 +1,5 @@
-import { createContext } from "react";
-import { TextEvent } from "../../../types";
+import { createContext }     from "react";
+import { TextEvent }         from "@/types";
 import { Element_TextState } from "./schema";
 
 export type TextSentenceData = {
