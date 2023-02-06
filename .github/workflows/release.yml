@@ -34,11 +34,11 @@ jobs:
 
       - name: create release
         uses: softprops/action-gh-release@v1
-        if: ${{startsWith(github.ref, 'refs/tags/') }}
+#        if: ${{startsWith(github.ref, 'refs/tags/') }}
         with:
           draft: true
           generate_release_notes: true
-#          tag_name: v${{steps.version.outputs.value}}
+          tag_name: v${{steps.version.outputs.value}}
 #          files: |
 #            src-tauri/target/release/curses.exe
 #            src-tauri/target/release/bundle/msi/curses_0.0.9_x64_en-US.msi
