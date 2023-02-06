@@ -1,10 +1,10 @@
 import groupBy from "lodash/groupBy";
 import { FC, memo, useEffect, useRef, useState } from "react";
 import { RiAddFill, RiTwitchFill } from "react-icons/ri";
-import { toast }       from "react-toastify";
-import { useGetState } from "@/client";
-import Dropdown        from "../../../dropdown/Dropdown";
-import Inspector                                  from "../../index";
+import { toast }                                  from "react-toastify";
+import { useGetState }                            from "@/client";
+import Dropdown                                   from "../dropdown/Dropdown";
+import Inspector                                  from "./components";
 import FileElement, { FontGroup, FontGroupProps } from "@/server/ui/file-element";
 import { FileState }                              from "@/client/services/files/schema";
 

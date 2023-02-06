@@ -1,9 +1,9 @@
 import { FC } from "react";
 import { RiMessage2Fill } from "react-icons/ri";
-import { useSnapshot }             from "valtio";
-import Input                       from "../../ui/input";
-import Inspector                   from "../../ui/inspector";
-import { VRC_Backends, VRC_State } from "./schema";
+import { useSnapshot } from "valtio";
+import Input           from "./components/input";
+import Inspector       from "./components";
+import { VRC_Backends, VRC_State } from "../../services/vrc/schema";
 
 const targetOptions = [
   { label: "Chatbox", value: VRC_Backends.textbox },

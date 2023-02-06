@@ -1,13 +1,13 @@
 import { invoke } from "@tauri-apps/api/tauri";
 import { FC } from "react";
 import { RiUserVoiceFill } from "react-icons/ri";
-import { useSnapshot }             from "valtio";
-import Input                       from "../../ui/input";
-import Inspector                   from "../../ui/inspector";
-import { ServiceNetworkState }     from "@/types";
-import ServiceButton               from "../../ui/service-button";
-import { STT_Backends, STT_State } from "./schema";
-import { azureLanguages, deepGramLangs }   from "./service_data";
+import { useSnapshot } from "valtio";
+import Input           from "./components/input";
+import Inspector       from "./components";
+import { ServiceNetworkState }             from "@/types";
+import ServiceButton                       from "../service-button";
+import { STT_Backends, STT_State }         from "@/server/services/stt/schema";
+import { azureLanguages, deepGramLangs }   from "../../services/stt/stt_data";
 import { SiGooglechrome, SiMicrosoftedge } from "react-icons/si";
 
 const Browser: FC = () => {
@@ -99,7 +99,7 @@ const Deepgram: FC = () => {
     <span className="text-base-content/60 text-xs">
       Some languages cannot be used with "enhanced" quality option
       <br />
-      <a className="link link-primary link-hover" target="_blank" href="src/server/services/stt/inspector#language-options">See language table</a>
+      <a className="link link-primary link-hover" target="_blank" href="@/server/ui/inspector/server/inspector#language-options">See language table</a>
     </span>
 
     <Input.Checkbox label="Interim result" onChange={e => handleUpdate("interim", e)} value={pr.interim} />

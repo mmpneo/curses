@@ -1,7 +1,7 @@
 import { FC }                          from "react";
 import { useGetState, useUpdateState } from "@/client";
-import Input           from "../../../input";
-import {TransformRect} from "@/client/elements/schema";
+import Input                           from "./input";
+import {TransformRect}                 from "@/client/elements/schema";
 
 const TransformInput: FC<{id: string}> = ({id}) => {
   const rect = useGetState(state => state.elements[id].scenes["main"].rect);

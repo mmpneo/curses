@@ -145,7 +145,7 @@ const Sidebar: FC = memo(() => {
           exit="hidden"
           animate="visible"
           className="flex h-full overflow-hidden shadow-xl">
-          <Inspector.Base path={tab} />
+          <Inspector path={tab} />
         </motion.div>
       </motion.div>}
     </AnimatePresence>

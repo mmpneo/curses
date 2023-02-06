@@ -1,12 +1,13 @@
-import { FC } from "react";
-import { RiImageFill, RiImageLine } from "react-icons/ri";
+import { FC }                          from "react";
+import { RiImageFill, RiImageLine }    from "react-icons/ri";
 import { SiCsswizardry }               from "react-icons/si";
 import { useGetState, useUpdateState } from "@/client";
-import Input                           from "../../../input";
-import Inspector, { useInspectorTabs } from "../../index";
-import NameInput              from "./name-input";
-import TransformInput         from "./transform-input";
+import Input                           from "./components/input";
+import Inspector      from "./components";
+import NameInput              from "./components/name-input";
+import TransformInput         from "./components/transform-input";
 import { Element_ImageState } from "@/client/elements/image/schema";
+import {useInspectorTabs}              from "@/server/ui/inspector/components/tabs";
 
 
 const BaseInspector: FC<{ id: string }> = ({ id }) => {
@@ -63,7 +64,7 @@ const Inspector_ElementImage: FC<{ id: string }> = ({ id }) => {
   const data: Element_ImageState = useGetState(state => state.elements[id]?.scenes["main"].data);
 
   if (!data)
-    return <Inspector.Body>Deleted</Inspector.Body>
+    return <Inspector.Deleted/>
 
   return <Inspector.Body>
     <Inspector.Header><RiImageFill /> <NameInput id={id} /></Inspector.Header>

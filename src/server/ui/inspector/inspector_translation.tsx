@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { RiTranslate2 } from "react-icons/ri";
-import Input            from "../../ui/input";
-import Inspector        from "../../ui/inspector";
+import Input            from "./components/input";
+import Inspector        from "./components";
 
 const Inspector_Translation: FC = () => {
   return <Inspector.Body>

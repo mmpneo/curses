@@ -8,6 +8,7 @@ class APIShared {
 
   async init() {
     await this.pubsub.init();
+    await this.peer.init();
   }
 }
 

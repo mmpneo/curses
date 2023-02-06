@@ -6,12 +6,12 @@ import { RiAlignBottom, RiAlignTop, RiAlignVertically, RiFileCopyLine, RiFontSiz
 import { SiCsswizardry } from "react-icons/si";
 import { TbTextResize } from "react-icons/tb";
 import { VscSettings } from "react-icons/vsc";
-import { useCopyToClipboard }          from "react-use";
+import { useCopyToClipboard }                     from "react-use";
 import { useGetState, useUpdateState } from "@/client";
-import Input                           from "../../../input";
-import Inspector      from "../../index";
-import NameInput                                  from "./name-input";
-import TransformInput                             from "./transform-input";
+import Input                           from "./components/input";
+import Inspector      from "./components";
+import NameInput                                  from "./components/name-input";
+import TransformInput                             from "./components/transform-input";
 import { Element_TextState, FlexAlign, FontCase } from "@/client/elements/text/schema";
 
 const SourceInspector: FC<{ id: string }> = ({ id }) => {
@@ -282,7 +282,7 @@ const Inspector_ElementText: FC<{ id: string }> = memo(({ id }) => {
   }
 
   if (!data)
-    return <Inspector.Body>Deleted</Inspector.Body>
+    return <Inspector.Deleted/>
 
   return <Inspector.Body>
     <Inspector.Header><TbTextResize /> <NameInput id={id} /></Inspector.Header>

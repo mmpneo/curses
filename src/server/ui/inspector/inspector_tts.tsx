@@ -1,14 +1,15 @@
-import { invoke } from "@tauri-apps/api/tauri";
-import { FC, useEffect, useState } from "react";
+import { invoke }                       from "@tauri-apps/api/tauri";
+import { FC, useEffect, useState }      from "react";
 import { RiChatVoiceFill, RiListCheck } from "react-icons/ri";
-import { useSnapshot }                 from "valtio";
-import Input                           from "../../ui/input";
-import Inspector, { useInspectorTabs } from "../../ui/inspector";
-import ServiceButton                   from "../../ui/service-button";
-import { ServiceNetworkState }         from "@/types";
-import { useBackendUpdate }            from "../../../utils";
-import { TTS_Backends, TTS_State }     from "./schema";
-import { azureVoices, tiktokVoices }   from "./service_data";
+import { useSnapshot }                  from "valtio";
+import Input                            from "./components/input";
+import Inspector                        from "./components";
+import ServiceButton                    from "../service-button";
+import { ServiceNetworkState }          from "@/types";
+import { useBackendUpdate }             from "@/utils";
+import { TTS_Backends, TTS_State }      from "@/server/services/tts/schema";
+import { azureVoices, tiktokVoices }    from "../../services/tts/tts_data";
+import {useInspectorTabs}               from "@/server/ui/inspector/components/tabs";
 
 type WindowsToken = {
   id: string;

@@ -5,10 +5,10 @@ import { FC, InputHTMLAttributes, memo, PropsWithChildren, ReactNode, useCallbac
 import { RgbaColor, RgbaColorPicker } from "react-colorful";
 import { RiDeleteBack2Fill, RiUpload2Fill, RiKeyboardBoxFill, RiDeleteBin3Fill } from "react-icons/ri";
 import Select, { MenuListProps, MenuProps, OptionProps, Props as SelectProps } from 'react-select';
-import SimpleBar               from "simplebar-react";
-import FileElement             from "../file-element";
-import { FileState, FileType } from "@/client/services/files/schema";
-import Dropdown                from "../dropdown/Dropdown";
+import SimpleBar                                                       from "simplebar-react";
+import FileElement                                                     from "../../../file-element";
+import { FileState, FileType }                                         from "@/client/services/files/schema";
+import Dropdown                                                        from "../../../dropdown/Dropdown";
 
 // import "ace-builds/src-noconflict/mod";
 import AceEditor from "react-ace";
@@ -20,8 +20,8 @@ import { MappedGroupDictionary, ServiceNetworkState, TextEventSource } from "@/t
 import { useSnapshot }  from "valtio";
 import styles           from "./style.module.css";
 import produce          from "immer";
-import { BackendState } from "../../schema";
-import Tooltip          from "../dropdown/Tooltip";
+import { BackendState } from "../../../../schema";
+import Tooltip          from "../../../dropdown/Tooltip";
 import { invoke }       from "@tauri-apps/api/tauri";
 const cx = classNames.bind(styles);
 

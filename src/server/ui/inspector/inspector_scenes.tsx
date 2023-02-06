@@ -1,10 +1,10 @@
 import { FC }                                                                              from "react";
-import Inspector                       from "../../index";
-import { useGetState, useUpdateState } from "@/client";
-import Input                           from "../../../input";
+import Inspector                                                                           from "./components";
+import { useGetState, useUpdateState }                                                     from "@/client";
+import Input                                                                               from "./components/input";
 import { RiCheckboxBlankCircleLine, RiCheckboxCircleFill, RiDeleteBack2Fill, RiStackFill } from "react-icons/ri";
-import classNames     from "classnames";
-import { SceneState } from "@/client/services/scenes/schema";
+import classNames                                                                          from "classnames";
+import { SceneState }                                                                      from "@/client/services/scenes/schema";
 
 const Scene: FC<{ data: SceneState }> = ({ data }) => {
   const defaultScene = useGetState(state => state.activeScene);

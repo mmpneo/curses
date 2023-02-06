@@ -1,12 +1,13 @@
-import { FC, useState } from "react";
+import { FC, useState }         from "react";
 import { BsEmojiHeartEyesFill } from "react-icons/bs";
-import { MdChat } from "react-icons/md";
-import { RiTwitchFill } from "react-icons/ri";
-import { useSnapshot }                 from "valtio";
-import Tooltip                         from "../../ui/dropdown/Tooltip";
-import Input                           from "../../ui/input";
-import Inspector, { useInspectorTabs } from "../../ui/inspector";
-import { Twitch_State }                from "./schema";
+import { MdChat }               from "react-icons/md";
+import { RiTwitchFill }         from "react-icons/ri";
+import { useSnapshot }          from "valtio";
+import Tooltip                  from "../dropdown/Tooltip";
+import Input                    from "./components/input";
+import Inspector                from "./components";
+import { Twitch_State }         from "@/server/services/twitch/schema";
+import {useInspectorTabs}       from "@/server/ui/inspector/components/tabs";
 
 const ChatInspector: FC = () => {
   const pr = useSnapshot(window.ApiServer.state.services.twitch.data);

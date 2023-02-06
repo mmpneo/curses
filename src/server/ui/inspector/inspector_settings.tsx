@@ -1,16 +1,16 @@
 import classNames from "classnames";
 import { FC, memo, useEffect, useState } from "react";
 import { RiFileCopyLine, RiSettings2Fill } from "react-icons/ri";
-import { SiDiscord, SiKofi, SiObsstudio, SiPatreon, SiTwitch, SiTwitter } from "react-icons/si";
+import { SiDiscord, SiObsstudio, SiPatreon, SiTwitch, SiTwitter } from "react-icons/si";
 import { toast } from "react-toastify";
 import { useSnapshot }                 from "valtio";
-import Inspector                       from "./index";
+import Inspector                       from "./components";
 import { useGetState, useUpdateState } from "@/client";
 import { ServiceNetworkState }         from "@/types";
 import Dropdown, { useDropdown }       from "../dropdown/Dropdown";
-import Tooltip                         from "../dropdown/Tooltip";
-import Input                           from "../input";
-import Logo                            from "../logo";
+import Tooltip from "../dropdown/Tooltip";
+import Input   from "./components/input";
+import Logo    from "../logo";
 import ServiceButton                   from "../service-button";
 import { getVersion }                  from '@tauri-apps/api/app';
 const themesLight = [
