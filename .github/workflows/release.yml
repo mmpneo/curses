@@ -17,16 +17,25 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: install rust
-        uses: dtolnay/rust-toolchain@stable
-      - name: install ts deps
-        run: yarn
-      - uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: SebRollen/toml-action@v1.0.1
+        id: read_version
         with:
-          tagName: v__VERSION__
-          releaseName: 'Curses v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
-          releaseDraft: true
-          prerelease: false
+          file: 'src-tauri/Cargo.toml'
+          field: 'package.version'
+      - run echo ${{steps.read_version.outputs.value}}
+#      - name: setup rust
+#        uses: dtolnay/rust-toolchain@stable
+#      - name: setup tauri cli
+#        run: cargo install tauri-cli
+#      - name: setup yarn deps
+#        run: yarn
+#      - name: compile
+#        run: cargo tauri build
+
+#      - name: upload binaries to release
+#        uses: softprops/action-gh-release@v1
+#        if: ${{startsWith(github.ref, 'refs/tags/') }}
+#        with:
+#          files: |
+#            src-tauri/target/release/curses.exe
+#            src-tauri/target/release/bundle/msi/curses_0.0.9_x64_en-US.msi
