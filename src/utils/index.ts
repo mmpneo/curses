@@ -1,7 +1,7 @@
 import difference from "lodash/difference";
-import { subscribeKey } from "valtio/utils";
-import { BackendState } from "../backend-services/schema";
-import { TextEvent, TextEventSource } from "../types";
+import { subscribeKey }               from "valtio/utils";
+import { BackendState }               from "@/server/schema";
+import { TextEvent, TextEventSource } from "@/types";
 
 export function GetArrayDiff(source: string[], target: string[]) {
   const add      = difference(target, source);
@@ -10,34 +10,34 @@ export function GetArrayDiff(source: string[], target: string[]) {
 }
 
 export const useBackendUpdate = <Servicekey extends keyof BackendState["services"]>(serviceKey: Servicekey) => {
-  return (key: keyof BackendState["services"][Servicekey]["data"], value: any) => window.API.patchService(serviceKey, s => (s.data as any)[key] = value)
+  return (key: keyof BackendState["services"][Servicekey]["data"], value: any) => window.ApiServer.patchService(serviceKey, s => (s.data as any)[key] = value)
 }
 
 // allows to dynamically switch text source
 export function serviceSubscibeToSource<Obj extends object>(baseProxy: Obj, key: keyof Obj, fn: (e?: TextEvent) => void) {
   let lastSub = "";
   subscribeKey(baseProxy, key, (e: any) => {
-    window.API.pubsub.unsubscribe(lastSub);
+    window.ApiShared.pubsub.unsubscribe(lastSub);
     if (e)
-      lastSub = window.API.pubsub.subscribeText(e, fn)
+      lastSub = window.ApiShared.pubsub.subscribeText(e, fn)
   });
-  lastSub = window.API.pubsub.subscribeText(baseProxy[key] as any, fn)
+  lastSub = window.ApiShared.pubsub.subscribeText(baseProxy[key] as any, fn)
 }
 
 export function serviceSubscibeToInput<Obj extends object>(baseProxy: Obj, enableKey: keyof Obj, fn: (e?: TextEvent) => void) {
   let lastSub = "";
   subscribeKey(baseProxy, enableKey, (e: any) => {
-    window.API.pubsub.unsubscribe(lastSub);
+    window.ApiShared.pubsub.unsubscribe(lastSub);
     if (e)
-      lastSub = window.API.pubsub.subscribeText(TextEventSource.textfield, fn)
+      lastSub = window.ApiShared.pubsub.subscribeText(TextEventSource.textfield, fn)
   });
   if (baseProxy[enableKey])
-    lastSub = window.API.pubsub.subscribeText(TextEventSource.textfield, fn)
+    lastSub = window.ApiShared.pubsub.subscribeText(TextEventSource.textfield, fn)
 }
 
 export function isEmptyValue(value: any) {
-  return value === undefined 
-  || value === null 
+  return value === undefined
+  || value === null
   || (typeof value === 'object' && Object.keys(value).length === 0) || (typeof value === 'string' && value.trim().length === 0)
 }
 

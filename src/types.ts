@@ -1,6 +1,6 @@
 import { JSONSchemaType } from "ajv";
-import { Services } from "./backend-services";
-import { ElementType } from "./frontend-services/schema/element";
+import { Services }    from "./server";
+import { ElementType } from "./client/elements/schema";
 
 export type MappedGroupDictionary<Options = any> = Record<string, ([string] | [string, string] | [string, string, Options])[]>
 

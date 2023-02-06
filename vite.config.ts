@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
-import {visualizer} from "rollup-plugin-visualizer";
+import react            from "@vitejs/plugin-react-swc";
+import {visualizer}     from "rollup-plugin-visualizer";
+import * as path        from "path";
 export default defineConfig({
   plugins: [
     // visualizer({
@@ -19,8 +20,10 @@ export default defineConfig({
     strictPort: true,
   },
   // to make use of `TAURI_DEBUG` and other env variables
-  // https://tauri.studio/v1/api/config#buildconfig.beforedevcommand
   envPrefix: ["VITE_", "TAURI_"],
+  resolve: {
+    alias: [{ find: '@', replacement: path.resolve(__dirname, 'src') }],
+  },
   build: {
     // Tauri supports es2021
     target: ["es2021", "chrome100", "safari13"],
