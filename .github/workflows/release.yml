@@ -22,7 +22,7 @@ jobs:
         with:
           file: 'src-tauri/Cargo.toml'
           field: 'package.version'
-      - run echo ${{steps.read_version.outputs.value}}
+      - run: echo ${{steps.read_version.outputs.value}}
 #      - name: setup rust
 #        uses: dtolnay/rust-toolchain@stable
 #      - name: setup tauri cli
