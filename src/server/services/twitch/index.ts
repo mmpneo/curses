@@ -84,14 +84,15 @@ class Service_Twitch implements IServiceInterface {
 
   login() {
     try {
-      const redirect = import.meta.env.MODE === "development" ? "http://localhost:1420/oauth_twitch.html" : import.meta.env.VITE_TWITCH_CLIENT_REDIRECT_LOCAL;
-      const auth_link   = `https://id.twitch.tv/oauth2/authorize?client_id=${import.meta.env.VITE_TWITCH_CLIENT_ID}&redirect_uri=${redirect}&response_type=token&scope=${scope.join('+')}`
+      const redirect = import.meta.env.MODE === "development" ? "http://localhost:1420/oauth_twitch.html" : import.meta.env.CURSES_TWITCH_CLIENT_REDIRECT_LOCAL;
+      const auth_link   = `https://id.twitch.tv/oauth2/authorize?client_id=${import.meta.env.CURSES_TWITCH_CLIENT_ID}&redirect_uri=${redirect}&response_type=token&scope=${scope.join('+')}`
       const auth_window = window.open(auth_link, '', 'width=600,height=600');
       const handleMessage = (msg: MessageEvent<unknown>) => {
         if (typeof msg.data === "string" && msg.data.startsWith("smplstt_tw_auth:")) {
           const access_token = msg.data.split(":")[1]
           if (typeof access_token === "string"){
             this.#state.data.token = access_token;
+            console.log(access_token)
             this.connect();
           }
         }
@@ -164,7 +165,7 @@ class Service_Twitch implements IServiceInterface {
     if (!token)
       return;
 
-      const authProvider = new StaticAuthProvider(import.meta.env.VITE_TWITCH_CLIENT_ID, token);
+      const authProvider = new StaticAuthProvider(import.meta.env.CURSES_TWITCH_CLIENT_ID, token);
       try {
         this.apiClient = new ApiClient({authProvider});
         const me        = await this.apiClient.users.getMe();
