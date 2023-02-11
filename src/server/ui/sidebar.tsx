@@ -1,16 +1,17 @@
 import classNames from "classnames";
 import { AnimatePresence, motion } from "framer-motion";
 import { ButtonHTMLAttributes, FC, memo, PropsWithChildren, useEffect } from "react";
-import { RiAddFill, RiChatVoiceFill, RiFolderMusicFill, RiImageFill, RiMessage2Fill, RiSettings2Fill, RiTranslate2, RiTwitchFill, RiUserVoiceFill } from "react-icons/ri";
+import { RiAddFill, RiChatVoiceFill, RiFolderMusicFill, RiImageFill, RiMessage2Fill, RiSettings2Fill, RiTranslate2, RiUserVoiceFill } from "react-icons/ri";
 import { TbArrowBarToLeft, TbArrowBarToRight, TbTextResize } from "react-icons/tb";
-import { useSnapshot }                           from "valtio";
-import { Services }    from "../index";
-import { useGetState }                           from "@/client";
-import { ElementType }                           from "@/client/elements/schema";
+import { useSnapshot } from "valtio";
+import { Services } from "../index";
+import { useGetState } from "@/client";
+import { ElementType } from "@/client/elements/schema";
 import { InspectorTabPath, ServiceNetworkState } from "@/types";
-import Dropdown                                  from "./dropdown/Dropdown";
-import Tooltip                                   from "./dropdown/Tooltip";
-import Inspector                                 from "./inspector";
+import Dropdown from "./dropdown/Dropdown";
+import Tooltip from "./dropdown/Tooltip";
+import Inspector from "./inspector";
+import { MdExtension } from "react-icons/md";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   tooltip: string;
@@ -118,7 +119,7 @@ const Sidebar: FC = memo(() => {
         <SideBarButton status={ttsState.status} tab={{ tab: Services.tts }} tooltip="Text to Speech"><RiChatVoiceFill /></SideBarButton>
         <SideBarButton disabled tab={{ tab: Services.translation }} tooltip="Translation\WIP"><RiTranslate2 /></SideBarButton>
         <SideBarButton tab={{ tab: Services.vrc }} tooltip="VRChat chatbox"><RiMessage2Fill /></SideBarButton>
-        <SideBarButton tab={{ tab: Services.twitch }} tooltip="Twitch Integration"><RiTwitchFill /></SideBarButton>
+        <SideBarButton tab={{ tab: "integrations" }} tooltip="Integrations"><MdExtension /></SideBarButton>
         <SideBarButton tab={{ tab: "settings" }} tooltip="Settings & About"><RiSettings2Fill /></SideBarButton>
         <Divider />
         {/* <SideBarButton tab={{ tab: "scenes" }} tooltip="Canvas & Scenes"><RiStackFill /></SideBarButton> */}

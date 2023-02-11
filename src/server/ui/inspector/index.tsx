@@ -7,7 +7,7 @@ import {Services}                                                               
 import Inspector_STT                                                              from "./inspector_stt";
 import Inspector_Translation                                                      from "./inspector_translation";
 import Inspector_TTS                                                              from "./inspector_tts";
-import Inspector_Twitch                                                           from "./inspector_twitch";
+import Inspector_Integrations                                                           from "./inspector_integrations";
 import Inspector_VRC                                                              from "./inspector_vrc";
 import Inspector_ElementImage                                                     from "./inspector_image";
 import Inspector_ElementText                                                      from "./inspector_text";
@@ -47,7 +47,7 @@ const Inspector: FC<{ path?: InspectorTabPath }> = ({ path }) => {
         {path?.tab === Services.stt && <Inspector_STT key="stt" />}
         {path?.tab === Services.tts && <Inspector_TTS key="tts" />}
         {path?.tab === Services.translation && <Inspector_Translation key="translation" />}
-        {path?.tab === Services.twitch && <Inspector_Twitch key="twitch" />}
+        {path?.tab === "integrations" && <Inspector_Integrations key="integrations" />}
         {path?.tab === Services.vrc && <Inspector_VRC key="vrc" />}
         {path?.tab === "settings" && <Inspector_Settings key="settings" />}
         {path?.tab === "scenes" && <Inspector_Scenes key="scenes" />}
