@@ -50,10 +50,10 @@ const DiscordInspector: FC = () => {
   return <>
     <Inspector.SubHeader><div className="flex gap-2 items-center"><SiDiscord/> Discord</div></Inspector.SubHeader>
     <Inspector.Description>Post STT results to discord channel</Inspector.Description>
+    <Input.Checkbox label="Enable" value={pr.postEnable} onChange={e => up("postEnable", e)} />
     <Input.Text type="password" label="Channel hook" value={pr.channelHook} onChange={e => up("channelHook", e.target.value)} />
     <Input.Text label="Bot name" placeholder="Curses" value={pr.channelBotName} onChange={e => up("channelBotName", e.target.value)} />
     <Input.Text label="Bot avatar" placeholder="Image url" value={pr.channelAvatarUrl} onChange={e => up("channelAvatarUrl", e.target.value)} />
-    <Input.Checkbox label="Enable" value={pr.postEnable} onChange={e => up("postEnable", e)} />
     <Input.TextSource label="Post from" value={pr.postSource} onChange={e => up("postSource", e)} />
     <Input.Checkbox label="Post from text field" value={pr.postInput} onChange={e => up("postInput", e)} />
   </>
