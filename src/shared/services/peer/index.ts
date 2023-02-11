@@ -16,7 +16,7 @@ class Service_Peer implements IServiceInterface {
 
   getClientLink(): string {
     const n = window.Config.serverNetwork;
-    return `${n.host}:${n.port}/client?id=${window.ApiServer.state.id}`;
+    return `${n.host}:${n.port}/client`;
   }
 
   copyClientLink() {
