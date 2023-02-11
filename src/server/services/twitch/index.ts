@@ -21,20 +21,18 @@ class Service_Twitch implements IServiceInterface {
   chatClient?: ChatClient;
   apiClient?: ApiClient;
 
-  chatState = proxy({
-    status: ServiceNetworkState.disconnected
-  })
-
   state = proxy<{
     user: {
       id: string
       name: string
       avatar: string
     } | null,
-    live: false
+    liveStatus: ServiceNetworkState,
+    chatStatus: ServiceNetworkState
   }>({
+    liveStatus: ServiceNetworkState.disconnected,
+    chatStatus: ServiceNetworkState.disconnected,
     user: null,
-    live: false
   });
 
   get #state() {
@@ -47,7 +45,7 @@ class Service_Twitch implements IServiceInterface {
       value ? this.chatConnect() : this.chatDisconnect();
     });
     serviceSubscibeToSource(this.#state.data, "chatPostSource", data => {
-      if (this.#state.data.chatPostLive && !this.state.live)
+      if (this.#state.data.chatPostLive && this.state.liveStatus !== ServiceNetworkState.connected)
         return;
       this.chatClient?.isConnected
       && this.#state.data.chatPostEnable
@@ -55,10 +53,10 @@ class Service_Twitch implements IServiceInterface {
       && data?.type === TextEventType.final
       && this.say(data.value);
     });
-    serviceSubscibeToInput(this.#state.data, "chatPostInput", data => {
-      if (this.#state.data.chatPostLive && !this.state.live)
-        return;
 
+    serviceSubscibeToInput(this.#state.data, "chatPostInput", data => {
+      if (this.#state.data.chatPostLive && this.state.liveStatus !== ServiceNetworkState.connected)
+        return;
       this.chatClient?.isConnected
       && this.#state.data.chatPostEnable
       && data?.textFieldType !== "twitchChat"
@@ -71,7 +69,7 @@ class Service_Twitch implements IServiceInterface {
   chatConnect() {
     if (this.chatClient?.isConnecting || this.chatClient?.isConnected)
       return;
-    this.chatState.status = ServiceNetworkState.connecting;
+    this.state.chatStatus = ServiceNetworkState.connecting;
     this.chatClient?.connect();
   }
   chatDisconnect() {
@@ -110,10 +108,7 @@ class Service_Twitch implements IServiceInterface {
   logout() {
     window.ApiServer.state.services.twitch.data.token = "";
     this.state.user                                   = null;
-    clearInterval(this.liveCheckInterval);
-    // disconnect chat
-    // disconnect auth
-    // remove token
+    this.stopLiveCheck()
   }
 
   emotes: Record<string, string> = {}
@@ -139,17 +134,29 @@ class Service_Twitch implements IServiceInterface {
     this.emotes = {...this.emotes, ...data};
   }
 
+  async #checkLive() {
+    if (!this.state.user?.name) {
+      this.state.liveStatus = ServiceNetworkState.disconnected;
+      return;
+    }
+    try {
+      const resp = await this.apiClient?.streams.getStreamByUserName(this.state.user.name);
+      this.state.liveStatus = !!resp ? ServiceNetworkState.connected : ServiceNetworkState.disconnected;
+    } catch (error) {
+      this.state.liveStatus = ServiceNetworkState.disconnected;
+    }
+  }
   startLiveCheck() {
     if (this.liveCheckInterval !== null)
       clearInterval(this.liveCheckInterval);
-    this.liveCheckInterval = setInterval(async () => {
-      if (!this.state.user?.name) {
-        this.state.live == false;
-        return;
-      }
-      const resp = await this.apiClient?.streams.getStreamByUserName(this.state.user.name);
-      this.state.live == !!resp;
-    }, 7000);
+    this.#checkLive();
+    this.liveCheckInterval = setInterval(() => {
+      this.#checkLive();
+    }, 8000);
+  }
+  stopLiveCheck() {
+    clearInterval(this.liveCheckInterval);
+    this.state.liveStatus = ServiceNetworkState.disconnected;
   }
 
   async connect() {
@@ -161,13 +168,15 @@ class Service_Twitch implements IServiceInterface {
       try {
         this.apiClient = new ApiClient({authProvider});
         const me        = await this.apiClient.users.getMe();
-        const stream = await me.getStream();
-
         this.state.user = {
           id:     me.id,
           name:   me.name,
           avatar: me.profilePictureUrl
         };
+        this.startLiveCheck();
+
+        // todo sub/follow messages
+        // const listener = new EventSubWsListener({ apiClient: this.apiClient });
 
         const emotes = await this.apiClient.chat.getChannelEmotes(me.id);
         const globalEmotes = await this.apiClient.chat.getGlobalEmotes();
@@ -187,8 +196,8 @@ class Service_Twitch implements IServiceInterface {
         this.addTwitchEmotes(globalEmotes);
 
         this.chatClient = new ChatClient({authProvider, channels: [me.name]});
-        this.chatClient.onConnect(() => this.chatState.status = ServiceNetworkState.connected)
-        this.chatClient.onDisconnect(() => this.chatState.status = ServiceNetworkState.disconnected)
+        this.chatClient.onConnect(() => this.state.chatStatus = ServiceNetworkState.connected)
+        this.chatClient.onDisconnect(() => this.state.chatStatus = ServiceNetworkState.disconnected)
         this.chatClient.onMessage((channel, user, message, msg) => {
           if (msg.userInfo.userId === this.state.user?.id) {
             if (this.#state.data.chatReceiveEnable) {
