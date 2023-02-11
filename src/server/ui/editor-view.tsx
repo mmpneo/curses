@@ -15,6 +15,7 @@ import { useGetState }            from "@/client";
 import classNames                 from "classnames";
 import { RiCheckFill }                    from "react-icons/ri";
 import BackgroundInput                    from "./background-input";
+import RecordingAlerts from "./recording-alerts";
 
 const EditorView: FC = () => {
   const { showOverlay } = useSnapshot(window.ApiServer.state);
@@ -38,6 +39,16 @@ const EditorView: FC = () => {
         </AnimatePresence>
         <ShortcutRecorder />
         <BackgroundInput />
+        <AnimatePresence>
+          {!showOverlay && <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ ease: "anticipate", duration: 0.3 }}
+            className="absolute top-16 right-4">
+          <RecordingAlerts/>
+        </motion.div>}
+        </AnimatePresence>
         <ToastContainer className="toasts" draggable={false} closeOnClick limit={3} hideProgressBar theme="colored" />
       </NiceModal.Provider>
     </motion.div>

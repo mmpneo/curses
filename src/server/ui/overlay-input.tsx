@@ -7,6 +7,7 @@ import { TbArrowBarToLeft, TbArrowBarToRight } from "react-icons/tb";
 import { useSnapshot }                    from "valtio";
 import { TextEventSource, TextEventType } from "../../types";
 import Tooltip                            from "./dropdown/Tooltip";
+import RecordingAlerts from "./recording-alerts";
 
 const overlayVariant = {
   show: {
@@ -118,8 +119,12 @@ const OverlayInput: FC<{ onClose: () => void }> = forwardRef(({ onClose }, ref: 
           className="absolute font-header inset-0 bg-transparent resize-none text-2xl sm:text-5xl pt-4 px-6 outline-none font-medium focus:placeholder-base-content/10 placeholder-base-content/30"
           value={inputValue}
           onChange={e => handleChange(e.target.value)}></textarea>
-        <button className="hidden sm:flex absolute bottom-4 right-4 btn btn-xl text-xl btn-primary gap-2" onClick={submit}>Send <RiSendPlaneFill /></button>
-        <button className="flex sm:hidden absolute bottom-2 right-2 btn btn-sm btn-primary gap-2" onClick={submit}>Send <RiSendPlaneFill /></button>
+
+        <div className="flex absolute bottom-4 right-4 space-x-2 items-center">
+          <RecordingAlerts/>
+          <button className="hidden sm:flex btn btn-xl text-xl btn-primary gap-2" onClick={submit}>Send <RiSendPlaneFill /></button>
+          <button className="flex sm:hidden btn btn-sm btn-primary gap-2" onClick={submit}>Send <RiSendPlaneFill /></button>
+        </div>
 
         <Tooltip content={showOverlayLogs ? "Hide Logs" : "Show Logs"} className="absolute right-2 top-2">
           <button className="btn btn-sm btn-ghost btn-square border-none" onClick={handleLogsSwitch}>
