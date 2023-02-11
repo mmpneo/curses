@@ -79,7 +79,7 @@ class Service_PubSub implements IServiceInterface {
 
   receivePubSub(msg: BaseEvent) {
     this.#publishLocally(msg);
-    this.#publishToClients(msg);
+    this.#publishPeers(msg);
   }
 
   publishLocally(msg: BaseEvent) {
@@ -89,14 +89,14 @@ class Service_PubSub implements IServiceInterface {
     PubSub.publishSync(topic, data);
   }
   #publishPubSub(msg: BaseEvent) {
-    if (window.platform === "app")
-      invoke("plugin:web|pubsub_broadcast", {value: JSON.stringify(msg)});
+    window.Config.isApp() &&
+    invoke("plugin:web|pubsub_broadcast", {value: JSON.stringify(msg)});
   }
   #publishLink(msg: BaseEvent) {
     if (this.#socket && this.#socket.readyState === this.#socket.OPEN)
       this.#socket.send(JSON.stringify(msg));
   }
-  #publishToClients(msg: BaseEvent) {
+  #publishPeers(msg: BaseEvent) {
     window.ApiShared.peer.broadcast(msg);
   }
 
@@ -106,7 +106,7 @@ class Service_PubSub implements IServiceInterface {
     let data = this.applyEmotes(textData);
     let msg = {topic, data};
     this.#publishLocally(msg);
-    this.#publishToClients(msg);
+    this.#publishPeers(msg);
     this.#publishPubSub(msg);
     this.#publishLink(msg);
   }
