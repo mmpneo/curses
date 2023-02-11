@@ -23,22 +23,24 @@ jobs:
           file: 'src-tauri/Cargo.toml'
           field: 'package.version'
       - run: echo ${{steps.version.outputs.value}}
-#      - name: setup rust
-#        uses: dtolnay/rust-toolchain@stable
-#      - name: setup tauri cli
-#        run: cargo install tauri-cli
-#      - name: setup yarn deps
-#        run: yarn
-#      - name: compile
-#        run: cargo tauri build
+      - name: setup rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: setup tauri cli
+        run: cargo install tauri-cli
+      - name: setup yarn deps
+        run: yarn
+      - name: compile
+        run: cargo tauri build
 
       - name: create release
         uses: softprops/action-gh-release@v1
 #        if: ${{startsWith(github.ref, 'refs/tags/') }}
         with:
+          name: Release ${{steps.version.outputs.value}}
+          tag_name: v${{steps.version.outputs.value}}
           draft: true
           generate_release_notes: true
-          tag_name: v${{steps.version.outputs.value}}
-#          files: |
-#            src-tauri/target/release/curses.exe
-#            src-tauri/target/release/bundle/msi/curses_0.0.9_x64_en-US.msi
+          fail_on_unmatched_files: true
+          files: |
+            src-tauri/target/release/curses.exe
+            src-tauri/target/release/bundle/msi/curses_${{steps.version.outputs.value}}_x64_en-US.msi
