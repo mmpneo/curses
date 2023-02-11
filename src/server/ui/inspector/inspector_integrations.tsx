@@ -27,18 +27,18 @@ const TwitchInspector: FC = () => {
 
     {!user && <button className="btn gap-2 border-none" style={{backgroundColor: "#9147ff", color: "#fff"}} onClick={handleLogin}><SiTwitch size={20}/> Login</button>}
     <Inspector.Switchable visible={!!user}>
-      <Input.Checkbox label="Enable" value={pr.chatEnable} onChange={e => up("chatEnable", e)} />
       <Input.NetworkStatus label="Live" value={liveStatus} />
-      <Input.NetworkStatus label="Connection" value={chatStatus} />
-      <Input.Checkbox label="Post in chat" value={pr.chatPostEnable} onChange={e => up("chatPostEnable", e)} />
-      <Inspector.Description>Post speech to text or translation results in chat</Inspector.Description>
-      <Inspector.Switchable visible={pr.chatPostEnable}>
+      <Input.NetworkStatus label="Chat Connection" value={chatStatus} />
+      <Input.Checkbox label="Enable chat" value={pr.chatEnable} onChange={e => up("chatEnable", e)} />
+      <Inspector.Switchable visible={pr.chatEnable}>
+        <Input.Checkbox label="Post in chat" value={pr.chatPostEnable} onChange={e => up("chatPostEnable", e)} />
+        <Inspector.Description>Post speech to text or translation results in chat</Inspector.Description>
         <Input.Checkbox label="Post only when live" value={pr.chatPostLive} onChange={e => up("chatPostLive", e)} />
         <Input.TextSource label="Post from" value={pr.chatPostSource} onChange={e => up("chatPostSource", e)} />
         <Input.Checkbox label="Post from text field" value={pr.chatPostInput} onChange={e => up("chatPostInput", e)} />
+        <Input.Checkbox label="Post from chat" value={pr.chatReceiveEnable} onChange={e => up("chatReceiveEnable", e)} />
+        <Inspector.Description>Chat as a text field</Inspector.Description>
       </Inspector.Switchable>
-      <Input.Checkbox label="Post from chat" value={pr.chatReceiveEnable} onChange={e => up("chatReceiveEnable", e)} />
-      <Inspector.Description>Chat as a text field</Inspector.Description>
     </Inspector.Switchable>
   </>
 }
