@@ -24,10 +24,10 @@ class Service_Peer implements IServiceInterface {
     toast.success("Copied!");
   }
 
-  startServer(id: string) {
+  startServer() {
     this.#initializePeer();
     this.#provider?.connectServer({
-      id: window.ApiServer.state.id,
+      id: "server",
       host: window.Config.serverNetwork.host,
       port: window.Config.serverNetwork.port,
     });
@@ -36,7 +36,7 @@ class Service_Peer implements IServiceInterface {
     this.#initializePeer();
     if (window.Config.isClient()) {
       await this.#provider?.connectClient({
-        id:   window.Config.clientNetwork.serverId,
+        id:   "server",
         host: window.Config.clientNetwork.host,
         port: window.Config.clientNetwork.port,
       });

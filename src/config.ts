@@ -61,8 +61,6 @@ class AppConfiguration {
         host:     q.get("host") ?? location.hostname,
         port:     q.get("port") ?? location.port
       }
-      if (!this.clientNetwork.serverId)
-        throw Error("Invalid client ID")
     }
       // server is always app
     // load network params from rust

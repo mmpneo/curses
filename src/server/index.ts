@@ -110,7 +110,7 @@ class ApiServer {
     if (window.Config.isClient())
       return;
     await this._state.init();
-    await window.ApiShared.peer.startServer(this.state.id);
+    await window.ApiShared.peer.startServer();
     await this.twitch.init();
     await this.stt.init();
     await this.tts.init();
