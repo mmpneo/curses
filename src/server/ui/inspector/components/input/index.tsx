@@ -244,7 +244,7 @@ const Checkbox: FC<CheckboxTextProps> = memo(({ label, value, onChange }) => {
   const id = useId();
   return (
     <Container label={label} id={id}>
-      <input className="toggle toggle-primary" id={id} type="checkbox" onChange={e => onChange?.(e.target.checked)} checked={value} />
+      <input className="toggle toggle-neutral" id={id} type="checkbox" onChange={e => onChange?.(e.target.checked)} checked={value} />
     </Container>
   )
 })
