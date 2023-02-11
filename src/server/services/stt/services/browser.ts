@@ -51,7 +51,6 @@ export class STT_BrowserService implements ISpeechRecognitionService{
 
     this.#instance.onend = (e: any) => {
       setTimeout(() => this.#instance.start(), 1000);
-      console.log(`[Native] Restart`, e);
     } // auto restart after silence
     this.#instance.start();
   }

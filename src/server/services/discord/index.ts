@@ -23,8 +23,7 @@ class Service_Discord implements IServiceInterface {
   }
 
   say(value: string) {
-    console.log(value);
-    fetch(this.#state.data.channelHook, {
+    this.#state.data.channelHook && fetch(this.#state.data.channelHook, {
       method: "POST",
       headers: {
         "Content-type": "application/json"

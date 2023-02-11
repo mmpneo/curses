@@ -200,7 +200,6 @@ const VoiceVox: FC = () => {
       })
     });
     const jsn = await resp.json();
-    console.log(jsn);
   };
 
   const handleQueryVoices = async () => {

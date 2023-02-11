@@ -49,7 +49,6 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
     if (!nextSentence)
       return;
 
-    // console.log(sentencesRef.current.length);
     if (stateRef.current.behaviorLastSentence)
       setSentences([nextSentence]);
     else {
