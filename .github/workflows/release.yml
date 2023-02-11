@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  publish-tauri:
+  build:
     permissions:
       contents: write
     strategy:
@@ -31,6 +31,8 @@ jobs:
         run: yarn
       - name: compile
         run: cargo tauri build
+        env:
+          CURSES_TWITCH_CLIENT_ID: ${{secrets.CURSES_TWITCH_CLIENT_ID}}
 
       - name: create release
         uses: softprops/action-gh-release@v1
