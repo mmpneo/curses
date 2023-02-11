@@ -1,5 +1,5 @@
+import { Discord_State } from "@/server/services/discord/schema";
 import { Twitch_State } from "@/server/services/twitch/schema";
-import { useInspectorTabs } from "@/server/ui/inspector/components/tabs";
 import { FC } from "react";
 import { MdExtension } from "react-icons/md";
 import { SiDiscord, SiTwitch } from "react-icons/si";
@@ -44,14 +44,18 @@ const TwitchInspector: FC = () => {
 }
 
 const DiscordInspector: FC = () => {
-  const pr = useSnapshot(window.ApiServer.state.services.twitch.data);
-  const up = <K extends keyof Twitch_State>(key: K, v: Twitch_State[K]) => window.ApiServer.patchService("twitch", s => s.data[key] = v);
+  const pr = useSnapshot(window.ApiServer.state.services.discord.data);
+  const up = <K extends keyof Discord_State>(key: K, v: Discord_State[K]) => window.ApiServer.patchService("discord", s => s.data[key] = v);
 
   return <>
     <Inspector.SubHeader><div className="flex gap-2 items-center"><SiDiscord/> Discord</div></Inspector.SubHeader>
     <Inspector.Description>Post STT results to discord channel</Inspector.Description>
-    {/* <Input.Checkbox label="Enable" value={pr.chatEnable} onChange={e => up("chatEnable", e)} />
-    <Input.Text label="Channel hook" value={pr.chatPostSource} onChange={e => up("chatPostSource", e.target.value)} /> */}
+    <Input.Text type="password" label="Channel hook" value={pr.channelHook} onChange={e => up("channelHook", e.target.value)} />
+    <Input.Text label="Bot name" placeholder="Curses" value={pr.channelBotName} onChange={e => up("channelBotName", e.target.value)} />
+    <Input.Text label="Bot avatar" placeholder="Image url" value={pr.channelAvatarUrl} onChange={e => up("channelAvatarUrl", e.target.value)} />
+    <Input.Checkbox label="Enable" value={pr.postEnable} onChange={e => up("postEnable", e)} />
+    <Input.TextSource label="Post from" value={pr.postSource} onChange={e => up("postSource", e)} />
+    <Input.Checkbox label="Post from text field" value={pr.postInput} onChange={e => up("postInput", e)} />
   </>
 }
 
@@ -70,24 +74,11 @@ const EmotesInspector: FC = () => {
 }
 
 const Inspector_Integrations: FC = () => {
-  const [[tab, direction], handleTab] = useInspectorTabs();
-
   return <Inspector.Body>
     <Inspector.Header><MdExtension /> Integrations</Inspector.Header>
     <Inspector.Content>
-
       <TwitchInspector />
-        {/* <Inspector.Tabs>
-          <Inspector.Tab tooltip="Chat" tooltipBody="Chat options" onClick={() => handleTab(0)} active={tab === 0}><MdChat /></Inspector.Tab>
-          <Inspector.Tab tooltip="Emotes" tooltipBody="Available emotes" onClick={() => handleTab(1)} active={tab === 1}><BsEmojiHeartEyesFill /></Inspector.Tab>
-        </Inspector.Tabs> */}
-        {/* <Inspector.TabsContent direction={direction} tabKey={tab}>
-          {tab === 0 && <>
-            </>}
-            {tab === 1 && <EmotesInspector />}
-          </Inspector.TabsContent> */}
       <DiscordInspector />
-
     </Inspector.Content>
   </Inspector.Body>
 }

@@ -10,6 +10,7 @@ import Service_TTS          from "./services/tts";
 import Service_Twitch       from "./services/twitch";
 import Service_VRC          from "./services/vrc";
 import Service_Sound        from "@/server/services/sound";
+import Service_Discord from "./services/discord";
 
 export enum Services {
   vrc = "vrc",
@@ -27,6 +28,7 @@ class ApiServer {
   public readonly tts = new Service_TTS();
   public readonly translation = new Service_Translation();
   public readonly twitch = new Service_Twitch();
+  public readonly discord = new Service_Discord();
   public readonly vrc = new Service_VRC();
   public readonly keyboard = new Service_Keyboard();
   public readonly sound = new Service_Sound();
@@ -112,6 +114,7 @@ class ApiServer {
     await this._state.init();
     await window.ApiShared.peer.startServer();
     await this.twitch.init();
+    await this.discord.init();
     await this.stt.init();
     await this.tts.init();
     await this.translation.init();
