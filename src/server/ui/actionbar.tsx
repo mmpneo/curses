@@ -80,7 +80,7 @@ const AppActions: FC = () => {
 }
 
 const WindowActions: FC = () => {
-  const handleMinimize = () => window.platform === "app" && appWindow.minimize();
+  const handleMinimize = () => window.Config.isApp() && appWindow.minimize();
   const handleMaximize = async () => {
     const state = await appWindow.isMaximized();
     state ? appWindow.unmaximize() : appWindow.maximize();
