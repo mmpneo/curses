@@ -52,7 +52,7 @@ For help, feature requests, bug reports, release notifications, design templates
 
 # Getting Started with OBS
 ### 1. Get the App
-Get the latest [release here](https://github.com/mmpneo/curses/edit/master/README.md). You can also [Join Discord](https://discord.gg/Sw6pw8fGYS) to get release notifications and download the new version from there as soon as it is published
+Get the latest [release here](https://github.com/mmpneo/curses/releases/latest). You can also [Join Discord](https://discord.gg/Sw6pw8fGYS) to get release notifications and download the new version from there as soon as it is published
 
 ### 2. Open app and copy link for OBS
 Or click "Set Up OBS" to have everything set up automatically with **obs-websocket** plugin
