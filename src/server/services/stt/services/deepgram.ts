@@ -43,12 +43,14 @@ export class STT_DeepgramService implements ISpeechRecognitionService {
         try {
           const rec = JSON.parse(e.data);
           const transcript = rec?.channel?.alternatives?.[0]?.transcript;
+          console.log(transcript, rec);
+          
           if (!transcript)
             return;
-            if(!rec.speech_final)
-              this.bindings.onInterim(transcript);
-            else
+            if(rec.speech_final || rec.is_final)
               this.bindings.onFinal(transcript);
+            else
+              this.bindings.onInterim(transcript);
         } catch (error) {}
       };
       this.socket.onclose = (ev) => {
