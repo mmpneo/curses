@@ -10,12 +10,6 @@ type SoundEffects = {
   detuneMax?: number;
 };
 
-type VoiceClipOptions = {
-  device_name: string;
-  volume: number; // 1 - base
-  rate: number; // 1 - base
-};
-
 class Service_Sound implements IServiceInterface {
   constructor() {}
   private audioContext!: AudioContext;
@@ -23,16 +17,15 @@ class Service_Sound implements IServiceInterface {
   async init() {
     this.audioContext = new AudioContext();
   }
-  public serviceState = proxy({
-    muted: false,
-  });
 
   #audioFiles: { [fileId: string]: AudioBuffer } = {};
 
   private random = (min: number, max: number) =>
     Math.random() * (max - min) + min;
   async playFile(fileId: string, effects?: SoundEffects) {
-    if (this.serviceState.muted) return;
+    if (window.Config.isServer() && window.ApiServer.state.muteSoundEffects) {
+      return;
+    }
 
     if (!this.#audioFiles[fileId])
       try {
