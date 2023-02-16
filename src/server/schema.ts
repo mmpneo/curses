@@ -12,6 +12,7 @@ export interface BackendState {
   clientTheme: string;
   uiScale: number;
   showOverlay: boolean;
+  muteSoundEffects: boolean;
   showOverlayLogs: boolean;
   backgroundInputTimer: string;
   shortcuts: {
@@ -55,6 +56,7 @@ export const backendSchema: JSONSchemaType<BackendState> = {
     clientTheme: { type: "string", default: "curses" },
     uiScale: { type: "number", default: 1 },
     showOverlay: { type: "boolean", default: false },
+    muteSoundEffects: { type: "boolean", default: false },
     showOverlayLogs: { type: "boolean", default: false },
     backgroundInputTimer: { type: "string", default: "5000" },
     shortcuts: {
@@ -87,6 +89,7 @@ export const backendSchema: JSONSchemaType<BackendState> = {
     "linkAddress",
     "uiScale",
     "showOverlay",
+    "muteSoundEffects",
     "showOverlayLogs",
     "clientTheme",
     "backgroundInputTimer",

@@ -31,7 +31,7 @@ const ButtonService: FC<PropsWithChildren<HtmlHTMLAttributes<HTMLButtonElement> 
 
 const handleSwitchFullscreenInput = () => window.ApiServer.state.showOverlay = !window.ApiServer.state.showOverlay;
 const handleSwitchMuteSTT = () => window.ApiServer.stt.serviceState.muted = !window.ApiServer.stt.serviceState.muted;
-const handleSwitchSound = () => window.ApiClient.sound.serviceState.muted = !window.ApiClient.sound.serviceState.muted;
+const handleSwitchSoundEffects = () => window.ApiServer.state.muteSoundEffects = !window.ApiServer.state.muteSoundEffects;
 const handleSwitchSTT = () => {
   if (window.ApiServer.stt.serviceState.status === ServiceNetworkState.disconnected)
     window.ApiServer.stt.start();
@@ -61,7 +61,7 @@ const ActionBar: FC = () => {
 
 const AppActions: FC = () => {
   const { muted: sttMute, status: sttStatus } = useSnapshot(window.ApiServer.stt.serviceState);
-  const { muted: vfxMute } = useSnapshot(window.ApiClient.sound.serviceState);
+  const { muteSoundEffects: vfxMute } = useSnapshot(window.ApiServer.state);
   const { status: ttsStatus } = useSnapshot(window.ApiServer.tts.serviceState);
 
   const { showActionButton: sttButton } = useSnapshot(window.ApiServer.state.services.stt);
@@ -69,7 +69,7 @@ const AppActions: FC = () => {
 
   return <div className="flex flex-none items-center space-x-0 sm:space-x-2">
     <Button tooltip="Fullscreen input" onClick={handleSwitchFullscreenInput} ><RxInput /></Button>
-    <Button className={vfxMute ? "btn-error" : "btn-ghost"} tooltip="Mute sound effects" body={<>Mute effects like text typing sound <b>in this window</b>. <br /> Does not affect text-to-speech</>} onClick={handleSwitchSound}>{vfxMute ? <RiVolumeMuteFill /> : <RiVolumeUpFill />}</Button>
+    <Button className={vfxMute ? "btn-error" : "btn-ghost"} tooltip="Mute sound effects" body={<>Mute effects like text typing sound <b>in this window</b>. <br /> Does not affect text-to-speech</>} onClick={handleSwitchSoundEffects}>{vfxMute ? <RiVolumeMuteFill /> : <RiVolumeUpFill />}</Button>
     <Button className={sttMute ? "btn-error" : "btn-ghost"} tooltip="Mute speech to text" body="Prevents speech-to-text from sending any output" onClick={handleSwitchMuteSTT}>
       {sttMute ? <RiMicOffFill /> : <RiMicFill />}
     </Button>
