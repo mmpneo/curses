@@ -6,6 +6,7 @@ export type Discord_State = {
   channelBotName: string,
   channelAvatarUrl: string,
   postEnable: boolean,
+  postWithTwitchLive: boolean,
   postSource: TextEventSource,
   postInput: boolean,
 };
@@ -17,6 +18,7 @@ const Schema_Discord: JSONSchemaType<Discord_State> = {
     channelBotName: { type: "string", default: "" },
     channelAvatarUrl: { type: "string", default: "" },
     postEnable: { type: "boolean", default: false },
+    postWithTwitchLive: { type: "boolean", default: false },
     postSource: { type: "string", default: TextEventSource.stt },
     postInput: { type: "boolean", default: false },
   },
@@ -25,6 +27,7 @@ const Schema_Discord: JSONSchemaType<Discord_State> = {
     "channelBotName",
     "channelAvatarUrl",
     "postEnable",
+    "postWithTwitchLive",
     "postSource",
     "postInput",
   ],
