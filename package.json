@@ -14,9 +14,9 @@
     "@floating-ui/react-dom-interactions": "^0.13.3",
     "@speechly/browser-client": "^2.6.2",
     "@tauri-apps/api": "^1.2.0",
-    "@twurple/api": "^5.3.2",
-    "@twurple/auth": "^5.3.2",
-    "@twurple/chat": "^5.3.2",
+    "@twurple/api": "^6.0.3",
+    "@twurple/auth": "^6.0.3",
+    "@twurple/chat": "^6.0.3",
     "@types/use-sync-external-store": "^0.0.3",
     "ace-builds": "^1.14.0",
     "ajv": "^8.12.0",
@@ -24,7 +24,7 @@
     "autoprefixer": "^10.4.13",
     "browser-fs-access": "^0.31.2",
     "classnames": "^2.3.2",
-    "daisyui": "^2.46.0",
+    "daisyui": "^2.51.0",
     "framer-motion": "^8.4.2",
     "hotkeys-js": "^3.10.1",
     "immer": "^9.0.16",
@@ -50,12 +50,12 @@
     "react-use": "^17.4.0",
     "shepherd.js": "^11.0.1",
     "simplebar-react": "^2.4.3",
-    "tailwindcss": "^3.2.4",
+    "tailwindcss": "^3.2.7",
     "use-sync-external-store": "^1.2.0",
-    "valtio": "^1.8.2",
+    "valtio": "^1.10.2",
     "y-protocols": "^1.0.5",
     "y-utility": "^0.1.2",
-    "yjs": "^13.5.44"
+    "yjs": "^13.5.47"
   },
   "devDependencies": {
     "@playwright/test": "^1.30.0",
@@ -66,12 +66,12 @@
     "@types/pubsub-js": "^1.8.3",
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
-    "@vitejs/plugin-react": "^3.0.0",
-    "@vitejs/plugin-react-swc": "^3.1.0",
+    "@vitejs/plugin-react": "^3.1.0",
+    "@vitejs/plugin-react-swc": "^3.2.0",
     "@welldone-software/why-did-you-render": "^7.0.1",
     "prettier": "^2.7.1",
     "rollup-plugin-visualizer": "^5.8.3",
     "typescript": "^4.6.4",
-    "vite": "^4.1.1"
+    "vite": "^4.1.4"
   }
 }
