@@ -446,6 +446,16 @@
         (ws.OPEN === ws.readyState) && ws.send(JSON.stringify(obj));
       }
 
+      // throttle interim
+      let w = false;
+      function sendInterimThrottle(message) {
+        if (w) return;
+        send(message);
+        w = true;
+        setTimeout(() => (w = false), 400);
+      }
+    
+
       async function spawnInstance() {
         await navigator.mediaDevices.getUserMedia({ audio: true });
         let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
@@ -473,7 +483,7 @@
               }
               else {
                 interim_transcript += event.results[i][0].transcript;
-                send({topic: "text.stt",data: {type: 1, value: interim_transcript}});
+                sendInterimThrottle({topic: "text.stt",data: {type: 1, value: interim_transcript}})
               }
             }
           } catch (error) { }
