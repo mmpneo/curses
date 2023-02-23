@@ -71,6 +71,9 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
   const enqueueSentence = (event: TextEvent) => {
     clearTimeout(behaviorClearDelayCancelToken.current); // cancel clear
     cancelClearTimer();
+    if (document.visibilityState === "hidden")
+      return;
+
     const isInterim = event.type === TextEventType.interim;
     const data: TextSentenceData = {
       id: nanoid(),
@@ -174,7 +177,6 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
           stateRef.current.particlesSpriteFileIdFirst,
           stateRef.current.particlesSpriteFileIdSecond,
           stateRef.current.particlesSpriteFileIdThird,
-          // "https://www.pngkit.com/png/full/114-1146708_sushi-sashimi-pixel-art-pixelart-food-asian-pixel.png"
         ].filter(s => !!s),
         particlesCountMin: parseFloat(stateRef.current.particlesCountMin) || 0,
         particlesCountMax: parseFloat(stateRef.current.particlesCountMax) || 0,

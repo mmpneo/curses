@@ -26,6 +26,9 @@ class Service_Particles implements IServiceInterface {
     // if (window.Config.isServer())
     //   return;
 
+    if (document.visibilityState === "hidden")
+      return
+
     const listOfParticles = new Array(Math.min(10, anime.random(params.particlesCountMin, params.particlesCountMax))).fill(null).map(_ => {
       var particle = document.createElement("div");
       particle.classList.add("dot");

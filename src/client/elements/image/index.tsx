@@ -23,7 +23,8 @@ const Element_Image: FC<{ id: string }> = memo(({ id }) => {
   const debounce = useCallback(() => {
     setActive(true);
     clearTimeout(timeoutN.current);
-    timeoutN.current = setTimeout(() => setActive(false), state.activeDuration);
+    if (document.visibilityState === "visible")
+      timeoutN.current = setTimeout(() => setActive(false), state.activeDuration);
   }, [state.activeDuration])
 
   useEffect(() => {
