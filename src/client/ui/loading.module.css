@@ -1,0 +1,21 @@
+.screen {
+  font-family: Outfit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  text-shadow: 2px 2px 2px black;
+  background-color: transparent;
+}
+
+.spinner {
+  @apply animate-spin duration-100;
+  width: 24px;
+  height: 24px;
+  border: 3px solid #ffffff1c;
+  border-bottom-color: #55D6BE;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+}
