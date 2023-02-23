@@ -133,6 +133,7 @@ const Sidebar: FC = memo(() => {
     </div>
     <AnimatePresence initial={false}>
       {show && <motion.div
+        data-tauri-drag-region
         key="inspector-opacity"
         variants={inspectorOpacityVariants}
         initial="hidden"
