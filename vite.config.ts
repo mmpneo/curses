@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
-import react            from "@vitejs/plugin-react-swc";
-import {visualizer}     from "rollup-plugin-visualizer";
-import * as path        from "path";
+import react from "@vitejs/plugin-react-swc";
+import * as path from "path";
+import { VitePWA } from "vite-plugin-pwa";
 export default defineConfig({
   plugins: [
     // visualizer({
@@ -12,6 +12,15 @@ export default defineConfig({
     react({
       // jsxImportSource: '@welldone-software/why-did-you-render'
     }),
+    VitePWA({
+      workbox: {
+        skipWaiting: true
+      },
+      injectRegister: null,
+      // devOptions: {
+      //   enabled: true
+      // },
+    }),
   ],
 
   clearScreen: false,
@@ -21,7 +30,7 @@ export default defineConfig({
   },
   envPrefix: ["VITE_", "TAURI_", "CURSES_"],
   resolve: {
-    alias: [{ find: '@', replacement: path.resolve(__dirname, 'src') }],
+    alias: [{ find: "@", replacement: path.resolve(__dirname, "src") }],
   },
   build: {
     // Tauri supports es2021

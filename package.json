@@ -53,6 +53,7 @@
     "tailwindcss": "^3.2.7",
     "use-sync-external-store": "^1.2.0",
     "valtio": "^1.10.2",
+    "vite-plugin-pwa": "^0.14.4",
     "y-protocols": "^1.0.5",
     "y-utility": "^0.1.2",
     "yjs": "^13.5.47"

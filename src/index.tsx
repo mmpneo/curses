@@ -7,6 +7,7 @@ import ClientView         from "./client/ui/view";
 import React, {ReactNode} from "react";
 import AppConfiguration   from "@/config";
 import ApiShared          from "@/shared";
+import ClientLoadingView from "./client/ui/view_loading";
 
 type NativeFeatures = {
   background_input: boolean
@@ -18,7 +19,6 @@ declare global {
     ApiShared: ApiShared;
     ApiServer: ApiServer;
     ApiClient: ApiClient;
-    platform: "app" | "web";
   }
 }
 
@@ -28,8 +28,7 @@ declare module 'csstype' {
   }
 }
 
-window.platform = window.__TAURI_METADATA__ ? "app" : "web";
-
+// prevent rightclicks
 window.addEventListener('contextmenu', e => {
   const ele = e.target as HTMLElement;
   if (ele.nodeName !== "INPUT" && ele.nodeName !== "TEXTAREA") {
@@ -38,12 +37,18 @@ window.addEventListener('contextmenu', e => {
   }
 }, false);
 
+let root_ele = document.getElementById("root");
+if (!root_ele)
+  throw Error("Root not found");
+
+const root = ReactDOM.createRoot(root_ele);
+
 function renderView(view: ReactNode) {
-  const root = document.getElementById("root");
-  root && ReactDOM.createRoot(root).render(view);
+  root && root.render(view);
 }
 
 const LazyServerView = React.lazy(() => import("./server/ui/editor-view"));
+
 (async function () {
   window.Config = new AppConfiguration();
   window.ApiShared = new ApiShared();
@@ -51,6 +56,25 @@ const LazyServerView = React.lazy(() => import("./server/ui/editor-view"));
 
   await window.Config.init();
   await window.ApiShared.init();
+  
+  if (window.Config.isClient()) {
+    if('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js', { scope: '/', type: 'classic' }).then((sw) => {
+        sw.addEventListener("updatefound", async _ => {
+          console.log("found update");
+          await sw.update();
+          location.reload();
+        } )
+      });
+    }
+  }
+
+
+  if (window.Config.isClient())
+    renderView(<ClientLoadingView/>);
+  // else
+  //   renderView(<LazyServerView/>);
+
 
   // load server api only in app
   if (window.Config.isServer()) {
