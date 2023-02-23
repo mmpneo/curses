@@ -70,7 +70,7 @@ class Service_PubSub implements IServiceInterface {
 
   private applyEmotes(data: PartialWithRequired<TextEvent, "type" | "value">) {
     if (!data.emotes) {
-      let emotes = window.ApiServer.twitch.scanForEmotes(data.value);
+      let emotes = window.ApiServer.twitch.emotes.scanForEmotes(data.value);
       return  {...data, emotes};
     }
     else

@@ -1,138 +1,129 @@
-import { ApiClient } from "@twurple/api";
-import { HelixEmote } from "@twurple/api/lib/api/helix/chat/HelixEmote";
+import { IServiceInterface, ServiceNetworkState, TextEventType } from "@/types";
+import { ApiClient, HelixUser } from "@twurple/api";
 import { StaticAuthProvider } from "@twurple/auth";
-import { ChatClient } from "@twurple/chat";
 import { proxy } from "valtio";
-import { subscribeKey }                                                                                              from "valtio/utils";
-import { IServiceInterface, ServiceNetworkState, TextEvent, TextEventSource, TextEventType }                         from "@/types";
-import { serviceSubscibeToInput, serviceSubscibeToSource }                                                           from "../../../utils";
-import { Load_7TV_CHANNEL, Load_7TV_GLOBAL, Load_BTTV_CHANNEL, Load_BTTV_GLOBAL, Load_FFZ_CHANNEL, Load_FFZ_GLOBAL } from "./emote_loaders";
-const scope = [
-  'chat:read',
-  'chat:edit',
-  'channel:read:subscriptions'
-]
+import { subscribeKey } from "valtio/utils";
+import {
+  serviceSubscibeToInput,
+  serviceSubscibeToSource,
+} from "../../../utils";
+import TwitchChatApi from "./chat";
+import TwitchEmotesApi from "./emotes";
+const scope = ["chat:read", "chat:edit", "channel:read:subscriptions"];
 
 class Service_Twitch implements IServiceInterface {
+  authProvider?: StaticAuthProvider;
   constructor() {}
+
+  emotes = new TwitchEmotesApi();
+  chat = new TwitchChatApi();
 
   liveCheckInterval?: any = null;
 
-  chatClient?: ChatClient;
   apiClient?: ApiClient;
 
   state = proxy<{
-    user: {
-      id: string
-      name: string
-      avatar: string
-    } | null,
-    liveStatus: ServiceNetworkState,
-    chatStatus: ServiceNetworkState
+    user: HelixUser | null;
+    liveStatus: ServiceNetworkState;
   }>({
     liveStatus: ServiceNetworkState.disconnected,
-    chatStatus: ServiceNetworkState.disconnected,
     user: null,
   });
 
   get #state() {
-    return window.ApiServer.state.services.twitch
+    return window.ApiServer.state.services.twitch;
   }
 
   async init() {
+    // check live status
+    setInterval(() => this.#checkLive(), 8000);
+
+    // login with token
     this.connect();
-    subscribeKey(this.#state.data, "chatEnable", value => {
-      value ? this.chatConnect() : this.chatDisconnect();
+
+    subscribeKey(this.#state.data, "chatEnable", (value) => {
+      if (value) {
+        if (this.state.user && this.authProvider)
+          this.chat.connect(this.state.user.name, this.authProvider);
+      } else this.chat.disconnect();
     });
-    serviceSubscibeToSource(this.#state.data, "chatPostSource", data => {
-      if (this.#state.data.chatPostLive && this.state.liveStatus !== ServiceNetworkState.connected)
+
+    serviceSubscibeToSource(this.#state.data, "chatPostSource", (data) => {
+      if (
+        this.#state.data.chatPostLive &&
+        this.state.liveStatus !== ServiceNetworkState.connected
+      )
         return;
-      this.chatClient?.isConnected
-      && this.#state.data.chatPostEnable
-      && data?.value
-      && data?.type === TextEventType.final
-      && this.say(data.value);
+      this.#state.data.chatPostEnable &&
+        data?.value &&
+        data?.type === TextEventType.final &&
+        this.chat.post(data.value);
     });
 
-    serviceSubscibeToInput(this.#state.data, "chatPostInput", data => {
-      if (this.#state.data.chatPostLive && this.state.liveStatus !== ServiceNetworkState.connected)
+    serviceSubscibeToInput(this.#state.data, "chatPostInput", (data) => {
+      if (
+        this.#state.data.chatPostLive &&
+        this.state.liveStatus !== ServiceNetworkState.connected
+      )
         return;
-      this.chatClient?.isConnected
-      && this.#state.data.chatPostEnable
-      && data?.textFieldType !== "twitchChat"
-      && data?.value
-      && data?.type === TextEventType.final
-      && this.say(data.value);
+      this.#state.data.chatPostEnable &&
+        data?.textFieldType !== "twitchChat" &&
+        data?.value &&
+        data?.type === TextEventType.final &&
+        this.chat.post(data.value);
     });
-  }
-
-  chatConnect() {
-    if (this.chatClient?.isConnecting || this.chatClient?.isConnected)
-      return;
-    this.state.chatStatus = ServiceNetworkState.connecting;
-    this.chatClient?.connect();
-  }
-  chatDisconnect() {
-    this.chatClient?.quit();
-  }
-
-  say(value: string) {
-    this.state.user?.name &&
-    this.chatClient?.isConnected &&
-    this.chatClient?.say(this.state.user.name, value);
   }
 
   login() {
     try {
-      const redirect = import.meta.env.MODE === "development" ? "http://localhost:1420/oauth_twitch.html" : import.meta.env.CURSES_TWITCH_CLIENT_REDIRECT_LOCAL;
-      const auth_link   = `https://id.twitch.tv/oauth2/authorize?client_id=${import.meta.env.CURSES_TWITCH_CLIENT_ID}&redirect_uri=${redirect}&response_type=token&scope=${scope.join('+')}`
-      const auth_window = window.open(auth_link, '', 'width=600,height=600');
+      const redirect =
+        import.meta.env.MODE === "development"
+          ? "http://localhost:1420/oauth_twitch.html"
+          : import.meta.env.CURSES_TWITCH_CLIENT_REDIRECT_LOCAL;
+
+      const link = new URL("https://id.twitch.tv/oauth2/authorize");
+      link.searchParams.set(
+        "client_id",
+        import.meta.env.CURSES_TWITCH_CLIENT_ID
+      );
+      link.searchParams.set("redirect_uri", redirect);
+      link.searchParams.set("response_type", "token");
+      link.searchParams.set("scope", scope.join("+"));
+      link.search = decodeURIComponent(link.search);
+
+      const auth_window = window.open(link, "", "width=600,height=600");
+      const thisRef = this;
+
       const handleMessage = (msg: MessageEvent<unknown>) => {
-        if (typeof msg.data === "string" && msg.data.startsWith("smplstt_tw_auth:")) {
-          const access_token = msg.data.split(":")[1]
-          if (typeof access_token === "string"){
-            this.#state.data.token = access_token;
-            console.log(access_token)
-            this.connect();
+        if (
+          typeof msg.data === "string" &&
+          msg.data.startsWith("smplstt_tw_auth:")
+        ) {
+          const access_token = msg.data.split(":")[1];
+          if (typeof access_token === "string") {
+            thisRef.#state.data.token = access_token;
+            thisRef.connect();
+            window.removeEventListener("message", handleMessage, true);
           }
         }
-      }
+      };
       if (auth_window) {
-        window.addEventListener("message", m => handleMessage(m));
+        window.addEventListener("message", handleMessage, true);
         auth_window.onbeforeunload = () => {
-          window?.removeEventListener("message", m => handleMessage(m), false);
-        }
+          window?.removeEventListener("message", (m) => handleMessage(m), true);
+        };
       }
     } catch (error) {}
   }
 
   logout() {
     window.ApiServer.state.services.twitch.data.token = "";
-    this.state.user                                   = null;
-    this.stopLiveCheck()
-  }
-
-  emotes: Record<string, string> = {}
-  scanForEmotes(sentence: string) {
-    let emotes: TextEvent["emotes"] = {}
-    if (!sentence)
-      return {};
-    const wl = sentence.split(" ");
-    for (let i = 0; i < wl.length; i++) {
-      if (wl[i] in this.emotes) {
-        emotes[i] = this.emotes[wl[i]];
-      }
-    }
-    return emotes;
-  }
-
-  addTwitchEmotes(data: HelixEmote[]) {
-    const newEmotes = Object.fromEntries(data.map(e => [e.name, e.getImageUrl(1)]))
-    this.emotes = {...this.emotes, ...newEmotes};
-  }
-
-  addEmotes(data:  Record<string, string>) {
-    this.emotes = {...this.emotes, ...data};
+    this.chat.dispose();
+    delete this.apiClient;
+    delete this.authProvider;
+    this.emotes.dispose();
+    this.state.user = null;
+    this.state.liveStatus = ServiceNetworkState.disconnected;
   }
 
   async #checkLive() {
@@ -141,83 +132,48 @@ class Service_Twitch implements IServiceInterface {
       return;
     }
     try {
-      const resp = await this.apiClient?.streams.getStreamByUserName(this.state.user.name);
-      this.state.liveStatus = !!resp ? ServiceNetworkState.connected : ServiceNetworkState.disconnected;
+      const resp = await this.apiClient?.streams.getStreamByUserName(
+        this.state.user.name
+      );
+      this.state.liveStatus = !!resp
+        ? ServiceNetworkState.connected
+        : ServiceNetworkState.disconnected;
     } catch (error) {
       this.state.liveStatus = ServiceNetworkState.disconnected;
     }
   }
-  startLiveCheck() {
-    if (this.liveCheckInterval !== null)
-      clearInterval(this.liveCheckInterval);
-    this.#checkLive();
-    this.liveCheckInterval = setInterval(() => {
-      this.#checkLive();
-    }, 8000);
-  }
-  stopLiveCheck() {
-    clearInterval(this.liveCheckInterval);
-    this.state.liveStatus = ServiceNetworkState.disconnected;
-  }
 
   async connect() {
-    const token = window.ApiServer.state.services.twitch.data.token;
-    if (!token)
-      return;
+    try {
+      if (!this.#state.data.token) return this.logout();
 
-      const authProvider = new StaticAuthProvider(import.meta.env.CURSES_TWITCH_CLIENT_ID, token);
-      try {
-        this.apiClient = new ApiClient({authProvider});
-        const me        = await this.apiClient.users.getMe();
-        this.state.user = {
-          id:     me.id,
-          name:   me.name,
-          avatar: me.profilePictureUrl
-        };
-        this.startLiveCheck();
+      this.authProvider = new StaticAuthProvider(
+        import.meta.env.CURSES_TWITCH_CLIENT_ID,
+        this.#state.data.token,
+        scope
+      );
 
-        // todo sub/follow messages
-        // const listener = new EventSubWsListener({ apiClient: this.apiClient });
+      this.apiClient = new ApiClient({ authProvider: this.authProvider });
+      const tokenInfo = await this.apiClient.getTokenInfo();
+      if (!tokenInfo.userId) return this.logout();
 
-        const emotes = await this.apiClient.chat.getChannelEmotes(me.id);
-        const globalEmotes = await this.apiClient.chat.getGlobalEmotes();
+      const me = await this.apiClient?.users.getUserById({
+        id: tokenInfo.userId,
+      });
 
-        const res = await Promise.allSettled([
-          Load_FFZ_CHANNEL(me.id),
-          Load_FFZ_GLOBAL(),
-          Load_BTTV_CHANNEL(me.id),
-          Load_BTTV_GLOBAL(),
-          Load_7TV_CHANNEL(me.id),
-          Load_7TV_GLOBAL(),
-        ]);
+      if (!me) return this.logout();
 
-        res.forEach(p => p.status === "fulfilled" && this.addEmotes(p.value));
+      this.state.user = me;
 
-        this.addTwitchEmotes(emotes);
-        this.addTwitchEmotes(globalEmotes);
+      // initial live check
+      this.#checkLive();
 
-        this.chatClient = new ChatClient({authProvider, channels: [me.name]});
-        this.chatClient.onConnect(() => this.state.chatStatus = ServiceNetworkState.connected)
-        this.chatClient.onDisconnect(() => this.state.chatStatus = ServiceNetworkState.disconnected)
-        this.chatClient.onMessage((channel, user, message, msg) => {
-          if (msg.userInfo.userId === this.state.user?.id) {
-            if (this.#state.data.chatReceiveEnable) {
-              window.ApiShared.pubsub.publishText(TextEventSource.textfield, {
-                type: TextEventType.final,
-                value: msg.content.value,
-                textFieldType: "twitchChat"
-              })
-            }
-          }
-        });
-        if (this.#state.data.chatEnable)
-          this.chatConnect();
-      } catch (error) {
-        this.logout();
-      }
-
+      this.emotes.loadEmotes(me.id, this.apiClient);
+      this.chat.connect(me.name, this.authProvider);
+    } catch (error) {
+      this.logout();
+    }
   }
-
 }
 
 export default Service_Twitch;
