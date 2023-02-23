@@ -1,6 +1,6 @@
 [package]
 name = "curses"
-version = "0.0.10"
+version = "0.0.11"
 description = "A very cool app"
 authors = ["mmpneo@gmail.com"]
 license = ""
