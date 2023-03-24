@@ -7,24 +7,28 @@ import { STT_DeepgramService }                                                  
 import { STT_Backends }                                                           from "./schema";
 import {
   ISpeechRecognitionService,
-  SpeechServiceEventBindings
+  SpeechServiceEventBindings,
+  SttMuteState
 }                                                                                 from "./types";
 import { STT_SpeechlyService }                                                    from "./services/speechly";
 
 class Service_STT implements IServiceInterface {
   #serviceInstance?: ISpeechRecognitionService;
 
+  private lastMessageState = {
+    value: "",
+    isInterim: false
+  }
+
   serviceState = proxy({
     status: ServiceNetworkState.disconnected,
     error: "",
-    muted: false
+    muted: SttMuteState.unmuted
   });
 
-  async init() {
-    if (this.data.autoStart)
-      this.start();
+  isMuted() {
+    return this.serviceState.muted === SttMuteState.muted || this.serviceState.muted === SttMuteState.pendingUnmute;
   }
-
 
   get data() {
     return window.ApiServer.state.services.stt.data;
@@ -32,22 +36,67 @@ class Service_STT implements IServiceInterface {
 
   stop(): void {
     this.#serviceInstance?.stop();
+    this.tryCancelSentence();
+  }
+
+  toggleMute() {
+    if (this.serviceState.muted === SttMuteState.unmuted) {
+      // cancel mid sentence and notify user
+      this.tryCancelSentence();
+      this.serviceState.muted = SttMuteState.muted;
+    }
+    else if (this.serviceState.muted === SttMuteState.muted){
+      // set pending if unmuting during interim results
+      if (this.lastMessageState.isInterim) {
+        this.serviceState.muted = SttMuteState.pendingUnmute;
+      }
+      else {
+        this.serviceState.muted = SttMuteState.unmuted;
+      }
+    }
+    else 
+      this.serviceState.muted = SttMuteState.unmuted;
+  }
+
+  triggerPendingUnmute() {
+    // apply unmute if pending
+    if (this.serviceState.muted === SttMuteState.pendingUnmute) {
+      this.serviceState.muted = SttMuteState.unmuted;
+    }
+  }
+
+  async init() {
+    if (this.data.autoStart)
+      this.start();
+  }
+
+  tryCancelSentence() {
+    if (this.lastMessageState.isInterim) {
+      this.#sendFinal("[...]");
+      this.lastMessageState = {value: "", isInterim: false}
+    }
   }
 
   async #sendFinal(value: string) {
-    !this.serviceState.muted &&
+    !this.isMuted() &&
     window.ApiShared.pubsub.publishText(TextEventSource.stt, {
       value,
       type: TextEventType.final,
     });
+
+    this.lastMessageState = {value, isInterim: false};
+
+    // apply unmute if pending
+    this.triggerPendingUnmute();
   }
 
   #sendInterim(value: string) {
-    !this.serviceState.muted &&
+    !this.isMuted() &&
     window.ApiShared.pubsub.publishText(TextEventSource.stt, {
       value,
       type: TextEventType.interim,
     });
+    this.lastMessageState = {value, isInterim: true};
   }
 
   #setStatus(value: ServiceNetworkState) {

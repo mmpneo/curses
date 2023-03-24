@@ -12,3 +12,10 @@ export interface ISpeechRecognitionService {
   stop(): void;
   dispose(): void;
 }
+
+
+export const enum SttMuteState {
+  muted,
+  pendingUnmute,
+  unmuted,
+}
