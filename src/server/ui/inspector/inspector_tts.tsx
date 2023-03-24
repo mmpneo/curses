@@ -2,7 +2,7 @@ import { invoke }                       from "@tauri-apps/api/tauri";
 import { FC, useEffect, useState }      from "react";
 import { RiChatVoiceFill, RiListCheck } from "react-icons/ri";
 import { useSnapshot }                  from "valtio";
-import Input                            from "./components/input";
+import { InputCheckbox, InputMapObject, InputMappedGroupSelect, InputNativeAudioOutput, InputRange, InputSelect, InputText, InputTextSource }                            from "./components/input";
 import Inspector                        from "./components";
 import ServiceButton                    from "../service-button";
 import { ServiceNetworkState }          from "@/types";
@@ -28,19 +28,19 @@ const Windows: FC = () => {
 
   return <>
     <Inspector.SubHeader>WindowsTTS options</Inspector.SubHeader>
-    <Input.NewSelect
+    <InputSelect
       value={data.device}
       onValueChange={e => handleUpdate("device", e)}
       options={config?.devices.map(d => ({label: d.label, value: d.id })) || []}
       label="Audio output" />
-    {/* <Input.NativeAudioOutput label="Audio Output" value={pr.device} onChange={e => handleUpdate("device", e)} /> */}
-    <Input.NewSelect
+    {/* <InputNativeAudioOutput label="Audio Output" value={pr.device} onChange={e => handleUpdate("device", e)} /> */}
+    <InputSelect
       value={data.voice}
       onValueChange={e => handleUpdate("voice", e)}
       options={config?.voices.map(d => ({ ...d, value: d.id })) || []}
       label="Voice" />
-    <Input.Range value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} label={`Volume (${data.volume})`} step="0.05" min="0" max="1" />
-    <Input.Range value={data.rate} onChange={e => handleUpdate("rate", e.target.value)} label={`Rate (${data.rate})`} step="0.05" min="0.1" max="5" />
+    <InputRange value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} label={`Volume (${data.volume})`} step="0.05" min="0" max="1" />
+    <InputRange value={data.rate} onChange={e => handleUpdate("rate", e.target.value)} label={`Rate (${data.rate})`} step="0.05" min="0.1" max="5" />
   </>
 }
 
@@ -49,14 +49,14 @@ const TikTok: FC = () => {
   const handleUpdate = <K extends keyof TTS_State["tiktok"]>(key: K, v: TTS_State["tiktok"][K]) => window.ApiServer.patchService("tts", s => s.data.tiktok[key] = v);
   return <>
     <Inspector.SubHeader>TikTok options</Inspector.SubHeader>
-    <Input.NativeAudioOutput label="Audio Output" value={data.device} onChange={e => handleUpdate("device", e)} />
-    <Input.NewSelect
+    <InputNativeAudioOutput label="Audio Output" value={data.device} onChange={e => handleUpdate("device", e)} />
+    <InputSelect
       value={data.voice}
       onValueChange={e => handleUpdate("voice", e)}
       options={tiktokVoices}
       label="Voice" />
-    <Input.Range value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} label={`Volume (${data.volume})`} step="0.05" min="0" max="1" />
-    {/* <Input.Range value={data.rate} onChange={e => handleUpdate("rate", e.target.value)} label={`Rate (${data.rate})`} step="0.05" min="0.1" max="5" /> */}
+    <InputRange value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} label={`Volume (${data.volume})`} step="0.05" min="0" max="1" />
+    {/* <InputRange value={data.rate} onChange={e => handleUpdate("rate", e.target.value)} label={`Rate (${data.rate})`} step="0.05" min="0.1" max="5" /> */}
   </>
 }
 
@@ -84,16 +84,16 @@ const Native: FC = () => {
   return <>
     <Inspector.SubHeader>Native options</Inspector.SubHeader>
     <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
-      <Input.NewSelect
+      <InputSelect
         value={data.voice}
         onValueChange={e => handleUpdate("voice", e)}
         options={voices}
         label="Voice" />
     </Inspector.Deactivatable>
 
-    <Input.Range value={data.pitch} onChange={e => handleUpdate("pitch", e.target.value)} label={`Pitch (${data.pitch})`} step="0.1" min="0" max="2" />
-    <Input.Range value={data.rate} onChange={e => handleUpdate("rate", e.target.value)} label={`Rate (${data.rate})`} step="0.1" min="0.1" max="10" />
-    <Input.Range value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} label={`Volume (${data.volume})`} step="0.05" min="0" max="1" />
+    <InputRange value={data.pitch} onChange={e => handleUpdate("pitch", e.target.value)} label={`Pitch (${data.pitch})`} step="0.1" min="0" max="2" />
+    <InputRange value={data.rate} onChange={e => handleUpdate("rate", e.target.value)} label={`Rate (${data.rate})`} step="0.1" min="0.1" max="10" />
+    <InputRange value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} label={`Volume (${data.volume})`} step="0.05" min="0" max="1" />
   </>
 }
 
@@ -128,21 +128,21 @@ const Azure: FC = () => {
   return <>
     <Inspector.SubHeader>Azure options</Inspector.SubHeader>
     <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
-      <Input.NativeAudioOutput label="Audio Output" value={data.device} onChange={e => handleUpdate("device", e)} />
-      <Input.Text type="password" label="Key" value={data.key} onChange={e => handleUpdate("key", e.target.value)} />
-      <Input.Text type="password" label="Location" value={data.location} onChange={e => handleUpdate("location", e.target.value)} />
+      <InputNativeAudioOutput label="Audio Output" value={data.device} onChange={e => handleUpdate("device", e)} />
+      <InputText type="password" label="Key" value={data.key} onChange={e => handleUpdate("key", e.target.value)} />
+      <InputText type="password" label="Location" value={data.location} onChange={e => handleUpdate("location", e.target.value)} />
     </Inspector.Deactivatable>
 
-    <Input.MappedGroupSelect
+    <InputMappedGroupSelect
       labelGroup="Language"
       labelOption="Voice"
       value={{ group: data.language, option: data.voice }}
       onChange={updateVoice}
       library={azureVoices} />
 
-    {voiceStyles.length > 0 && <Input.NewSelect value={data.voiceStyle} options={voiceStyles} label="Voice Style" onValueChange={e => handleUpdate("voiceStyle", e)} />}
-    {voiceRoles.length > 0 && <Input.NewSelect value={data.voiceRole} options={voiceRoles} label="Voice Role" onValueChange={e => handleUpdate("voiceRole", e)} />}
-    <Input.NewSelect options={[
+    {voiceStyles.length > 0 && <InputSelect value={data.voiceStyle} options={voiceStyles} label="Voice Style" onValueChange={e => handleUpdate("voiceStyle", e)} />}
+    {voiceRoles.length > 0 && <InputSelect value={data.voiceRole} options={voiceRoles} label="Voice Role" onValueChange={e => handleUpdate("voiceRole", e)} />}
+    <InputSelect options={[
       { label: "silent", value: "silent" },
       { label: "x-soft", value: "x-soft" },
       { label: "soft", value: "soft" },
@@ -151,7 +151,7 @@ const Azure: FC = () => {
       { label: "x-loud", value: "x-loud" },
       { label: "default", value: "default" }
     ]} label="Voice volume" value={data.voiceVolume} onValueChange={e => handleUpdate("voiceVolume", e)} />
-    <Input.NewSelect options={[
+    <InputSelect options={[
       { label: "x-slow", value: "x-slow" },
       { label: "slow", value: "slow" },
       { label: "medium", value: "medium" },
@@ -159,7 +159,7 @@ const Azure: FC = () => {
       { label: "x-fast", value: "x-fast" },
       { label: "default", value: "default" },
     ]} label="Voice rate" value={data.voiceRate} onValueChange={e => handleUpdate("voiceRate", e)} />
-    <Input.NewSelect options={[
+    <InputSelect options={[
       { label: "x-low", value: "x-low" },
       { label: "low", value: "low" },
       { label: "medium", value: "medium" },
@@ -167,7 +167,7 @@ const Azure: FC = () => {
       { label: "x-high", value: "x-high" },
       { label: "default", value: "default" },
     ]} label="Voice pitch" value={data.voicePitch} onValueChange={e => handleUpdate("voicePitch", e)} />
-    <Input.NewSelect options={[
+    <InputSelect options={[
       { label: "x-low", value: "x-low" },
       { label: "low", value: "low" },
       { label: "medium", value: "medium" },
@@ -175,8 +175,8 @@ const Azure: FC = () => {
       { label: "x-high", value: "x-high" },
       { label: "default", value: "default" },
     ]} label="Voice range" value={data.voiceRange} onValueChange={e => handleUpdate("voiceRange", e)} />
-    <Input.Range value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} label={`Volume (${data.volume})`} step="0.05" min="0" max="1" />
-    {/* <Input.Range value={data.rate} onChange={e => handleUpdate("rate", e.target.value)} label={`Rate (${data.rate})`} step="0.05" min="0.1" max="5" /> */}
+    <InputRange value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} label={`Volume (${data.volume})`} step="0.05" min="0" max="1" />
+    {/* <InputRange value={data.rate} onChange={e => handleUpdate("rate", e.target.value)} label={`Rate (${data.rate})`} step="0.05" min="0.1" max="5" /> */}
   </>
 }
 
@@ -259,9 +259,9 @@ const TTSInspector: FC = () => {
   return <>
     <Inspector.SubHeader>Options</Inspector.SubHeader>
     <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
-      <Input.TextSource label="Source" value={data.data.source} onChange={e => up("source", e)} />
-      <Input.Checkbox label="Text field" value={data.data.inputField} onChange={e => up("inputField", e)} />
-      <Input.NewSelect value={data.data.backend} options={serviceOptions} label="Service" onValueChange={e => up("backend", e as TTS_Backends)} />
+      <InputTextSource label="Source" value={data.data.source} onChange={e => up("source", e)} />
+      <InputCheckbox label="Text field" value={data.data.inputField} onChange={e => up("inputField", e)} />
+      <InputSelect value={data.data.backend} options={serviceOptions} label="Service" onValueChange={e => up("backend", e as TTS_Backends)} />
     </Inspector.Deactivatable>
 
     {data.data.backend === TTS_Backends.windows && <Windows />}
@@ -276,9 +276,11 @@ const TTSInspector: FC = () => {
 const GlobalInspector: FC = () => {
   const data = useSnapshot(window.ApiServer.state.services.tts);
   const up = useBackendUpdate("tts");
+
+  const update = (newMap: Record<string, string>) => window.ApiServer.state.services.tts.data.replaceWords = {...newMap};
   return <>
     <Inspector.SubHeader>Replace words</Inspector.SubHeader>
-    <Input.Object keyPlaceholder="Word" valuePlaceholder="Replacement" addLabel="Add word" value={data.data.replaceWords} onChange={e => up("replaceWords", e)} label="" />
+    <InputMapObject keyPlaceholder="Word" valuePlaceholder="Replacement" addLabel="Add word" value={{...data.data.replaceWords}} onChange={e => update(e)} label="" />
   </>
 }
 
@@ -293,8 +295,8 @@ const Inspector_TTS: FC = () => {
   return <Inspector.Body>
     <Inspector.Header><RiChatVoiceFill /> Text to Speech</Inspector.Header>
     <Inspector.Content>
-      <Input.Checkbox label="Add to action bar" value={data.showActionButton} onChange={handleStart} />
-      <Input.Checkbox label="Auto start" value={data.data.autoStart} onChange={e => up("autoStart", e)} />
+      <InputCheckbox label="Add to action bar" value={data.showActionButton} onChange={handleStart} />
+      <InputCheckbox label="Auto start" value={data.data.autoStart} onChange={e => up("autoStart", e)} />
       <Inspector.Tabs>
         <Inspector.Tab tooltip="Configuration" tooltipBody="Service and text sources" onClick={() => handleTab(0)} active={tab === 0}><RiChatVoiceFill /></Inspector.Tab>
         <Inspector.Tab tooltip="Word replacements" onClick={() => handleTab(1)} active={tab === 1}><RiListCheck /></Inspector.Tab>

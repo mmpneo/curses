@@ -10,7 +10,7 @@ export function GetArrayDiff(source: string[], target: string[]) {
 }
 
 export const useBackendUpdate = <Servicekey extends keyof BackendState["services"]>(serviceKey: Servicekey) => {
-  return (key: keyof BackendState["services"][Servicekey]["data"], value: any) => window.ApiServer.patchService(serviceKey, s => (s.data as any)[key] = value)
+  return (key: keyof BackendState["services"][Servicekey]["data"], value: any) => window.ApiServer.patchService(serviceKey, s => {(s.data as any)[key] = value})
 }
 
 // allows to dynamically switch text source

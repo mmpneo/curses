@@ -9,7 +9,7 @@ import { useGetState, useUpdateState } from "@/client";
 import { ServiceNetworkState }         from "@/types";
 import Dropdown, { useDropdown }       from "../dropdown/Dropdown";
 import Tooltip from "../dropdown/Tooltip";
-import Input   from "./components/input";
+import { InputBaseText, InputChips, InputDoubleCountainer, InputNetworkStatus, InputSelect, InputShortcut, InputText }   from "./components/input";
 import Logo    from "../logo";
 import ServiceButton                   from "../service-button";
 import { getVersion }                  from '@tauri-apps/api/app';
@@ -83,9 +83,9 @@ const ObsSetupDropdown: FC = () => {
   }
 
   return <div className="menu bg-base-100 p-4 w-72 rounded-box flex flex-col space-y-2">
-    <Input.Text value={name} onChange={e => setName(e.target.value)} label="Source name" />
-    <Input.Text value={port} onChange={e => setPort(e.target.value)} label="Port" />
-    <Input.Text type="password" autoComplete="false" value={password} onChange={e => setPassword(e.target.value)} label="Password" />
+    <InputText value={name} onChange={e => setName(e.target.value)} label="Source name" />
+    <InputText value={port} onChange={e => setPort(e.target.value)} label="Port" />
+    <InputText type="password" autoComplete="false" value={password} onChange={e => setPassword(e.target.value)} label="Password" />
     <span className="text-xs opacity-50">New source will be created in the currently active scene</span>
     {error && <span className="text-xs text-error">{error}</span>}
     <button onClick={handleSetup} className={classNames("btn btn-sm btn-primary", { loading })}>Confirm</button>
@@ -98,14 +98,14 @@ const AddrInput = () => {
     setV(v);
     window.ApiServer.state.linkAddress = v;
   }
-  return <Input.Text value={v} onChange={e => upd(e.target.value)} label="Address" placeholder="192.168..smth" />
+  return <InputText value={v} onChange={e => upd(e.target.value)} label="Address" placeholder="192.168..smth" />
 }
 
 const ExportMenu: FC = () => {
   const [name, setName] = useState("");
   return <div className="menu bg-base-100 p-4 w-72 rounded-box flex flex-col space-y-2">
     <span className="menu-title"><span>Export template</span></span>
-    <Input.Text label="Author" value={name} onChange={e => setName(e.target.value)} />
+    <InputText label="Author" value={name} onChange={e => setName(e.target.value)} />
     <button className="btn btn-sm btn-primary" onClick={() => name && window.ApiClient.document.exportDocument(name)}>Export</button>
   </div>;
 }
@@ -154,8 +154,8 @@ const Inspector_Settings: FC = memo(() => {
       <div className="divider"></div>
 
       {/* <Inspector.SubHeader>UI</Inspector.SubHeader> */}
-      <Input.NewSelect label="Theme" options={options} value={clientTheme} onValueChange={handleChangeTheme} />
-      <Input.Chips label="UI scale" value={uiScale} onChange={e => handleChangeScale(e)} options={[
+      <InputSelect label="Theme" options={options} value={clientTheme} onValueChange={handleChangeTheme} />
+      <InputChips label="UI scale" value={uiScale} onChange={e => handleChangeScale(e)} options={[
         { label: "S", value: .8 },
         { label: "M", value: 1 },
         { label: "L", value: 1.2 },
@@ -176,10 +176,10 @@ const Inspector_Settings: FC = memo(() => {
 
       <Inspector.SubHeader>Template</Inspector.SubHeader>
       {author && <span className="text-sm text-secondary font-semibold">Created by {author}</span>}
-      <Input.DoubleCountainer label="Canvas Size">
-        <Input.BaseText value={canvas?.w} onChange={e => updateState(state => { state.canvas.w = parseFloat(e.target.value) })} type="number" />
-        <Input.BaseText value={canvas?.h} onChange={e => updateState(state => { state.canvas.h = parseFloat(e.target.value) })} type="number" />
-      </Input.DoubleCountainer>
+      <InputDoubleCountainer label="Canvas Size">
+        <InputBaseText value={canvas?.w} onChange={e => updateState(state => { state.canvas.w = parseFloat(e.target.value) })} type="number" />
+        <InputBaseText value={canvas?.h} onChange={e => updateState(state => { state.canvas.h = parseFloat(e.target.value) })} type="number" />
+      </InputDoubleCountainer>
       <div className="flex items-center space-x-2">
         <button onClick={() => window.ApiClient.document.importDocument()} className="flex-grow btn btn-sm gap-2"><RiFileCopyLine /> Import</button>
         <Dropdown className="flex-grow btn btn-sm gap-2" targetOffset={24} placement="right" content={<ExportMenu />}>
@@ -189,8 +189,8 @@ const Inspector_Settings: FC = memo(() => {
 
       {window.Config.features.background_input && <>
         <Inspector.SubHeader>Background Input</Inspector.SubHeader>
-        <Input.Shortcut label="Shortcut" shortcut="bgInput" />
-        <Input.Text label="Timer" value={backgroundInputTimer} onChange={e => window.ApiServer.state.backgroundInputTimer = e.target.value} type="number"/>
+        <InputShortcut label="Shortcut" shortcut="bgInput" />
+        <InputText label="Timer" value={backgroundInputTimer} onChange={e => window.ApiServer.state.backgroundInputTimer = e.target.value} type="number"/>
         <div className="text-xs opacity-70">
           Use <kbd className="kbd kbd-sm font-semibold text-primary">Esc</kbd> to cancel input, <kbd className="kbd kbd-sm font-semibold text-primary">Enter</kbd> to submit and <kbd className="kbd kbd-sm font-semibold text-primary">Backspace</kbd> to delete
         </div>
@@ -201,7 +201,7 @@ const Inspector_Settings: FC = memo(() => {
       <Inspector.Description>Sync text events with remote app instance</Inspector.Description>
       <Inspector.Deactivatable active={linkStatus === ServiceNetworkState.disconnected}>
         <AddrInput />
-        <Input.NetworkStatus value={linkStatus} label="Status" />
+        <InputNetworkStatus value={linkStatus} label="Status" />
       </Inspector.Deactivatable>
       <ServiceButton startLabel="Connect" stopLabel="Disconnect" status={linkStatus} onStart={() => window.ApiShared.pubsub.linkConnect()} onStop={() => window.ApiShared.pubsub.linkDisconnect()} />
       <button className="btn btn-sm btn-ghost" onClick={() => window.ApiShared.pubsub.copyLinkAddress()}>Copy my address</button>

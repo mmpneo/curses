@@ -28,7 +28,7 @@ interface InputBaseProps {
   label: string
 }
 
-const Container: FC<PropsWithChildren<{ id?: string, vertical?: boolean, label: string }>> = memo(({ id, vertical, label, children }) => {
+export const InputContainer: FC<PropsWithChildren<{ id?: string, vertical?: boolean, label: string }>> = memo(({ id, vertical, label, children }) => {
   const layout = vertical ? "flex-col space-y-2" : "justify-between items-center"
   return <div className={cx("flex min-h-8", layout)}>
     <label className="flex-grow font-medium text-base-content/80 text-xs cursor-pointer" htmlFor={id}>{label}</label>
@@ -36,7 +36,7 @@ const Container: FC<PropsWithChildren<{ id?: string, vertical?: boolean, label: 
   </div>
 });
 
-const BaseText: FC<InputHTMLAttributes<HTMLInputElement>> = memo((props: any) => <input {...props} className={cx(styles.clearAppearance, props.className, "field-width input input-bordered overflow-hidden input-sm font-semibold leading-none")} />);
+export const InputBaseText: FC<InputHTMLAttributes<HTMLInputElement>> = memo((props: any) => <input {...props} className={cx(styles.clearAppearance, props.className, "field-width input input-bordered overflow-hidden input-sm font-semibold leading-none")} />);
 
 interface InputTextProps extends InputBaseProps, InputHTMLAttributes<HTMLInputElement> { }
 
@@ -61,9 +61,9 @@ const rgbaToString = (e: RgbaColor) => {
   return `rgba(${clampRGB(e.r)},${clampRGB(e.g)},${clampRGB(e.b)},${clampAlpha(e.a) || 0})`
 }
 
-const Text: FC<InputTextProps> = memo(({ label, ...rest }) => {
+export const InputText: FC<InputTextProps> = memo(({ label, ...rest }) => {
   const id = useId();
-  return <Container label={label} id={id}><BaseText id={id} className="flex-none" type="text" {...rest} /></Container>
+  return <InputContainer label={label} id={id}><InputBaseText id={id} className="flex-none" type="text" {...rest} /></InputContainer>
 });
 
 const ColorSelectDropdown: FC<any> = ({ onChange, value }) => {
@@ -92,23 +92,23 @@ interface InputColorProps extends InputBaseProps {
   onChange: (color: string) => void,
   value: string
 }
-const Color: FC<InputColorProps> = memo(({ label, ...rest }) => {
+export const InputColor: FC<InputColorProps> = memo(({ label, ...rest }) => {
   return <Dropdown targetOffset={24} placement="right" content={<ColorSelectDropdown {...rest} />}>
-    <Container label={label} id={label}>
+    <InputContainer label={label} id={label}>
       <div className="field-width grid grid-cols-2 gap-2">
         <div></div>
         <div className="cursor-pointer hover:bg-base-300 input input-bordered input-sm" style={{ backgroundColor: rest.value as string }}></div>
       </div>
-    </Container>
+    </InputContainer>
   </Dropdown>
 });
 
 //margin: 0.375rem 0;
-const Range: FC<InputTextProps> = memo(({ label, ...rest }) => {
+export const InputRange: FC<InputTextProps> = memo(({ label, ...rest }) => {
   const id = useId();
-  return <Container label={label} id={id}>
+  return <InputContainer label={label} id={id}>
     <input {...rest} id={id} type="range" className="field-width range range-sm range-primary" />
-  </Container>
+  </InputContainer>
 });
 
 interface ChipsProps extends InputBaseProps {
@@ -119,13 +119,13 @@ interface ChipsProps extends InputBaseProps {
   onChange: (value: string | number) => void,
   value?: string | number
 }
-const Chips: FC<ChipsProps> = memo(({ label, value, options, onChange }) => {
+export const InputChips: FC<ChipsProps> = memo(({ label, value, options, onChange }) => {
   const id = useId();
-  return <Container label={label} id={id}>
+  return <InputContainer label={label} id={id}>
     <div className="flex field-width btn-group">
       {options.map((option, i) => <button className={cx("btn btn-sm flex-grow", { "btn-active": option.value === value })} key={i} onClick={() => onChange(option.value)}>{option.label}</button>)}
     </div>
-  </Container>
+  </InputContainer>
 });
 
 import * as RadixSelect from '@radix-ui/react-select';
@@ -147,10 +147,10 @@ type Option = { label: string; value: string };
 interface NewNewSelectProps extends InputBaseProps, RadixSelect.SelectProps {
   options: (Option | {label: string, options: Option[]})[];
 }
-export const NewNewSelect: FC<NewNewSelectProps> = ({ options, ...props }) => {
+export const InputSelect: FC<NewNewSelectProps> = ({ options, ...props }) => {
   const id = useId();
   return (
-    <Container label={props.label} id={id}>
+    <InputContainer label={props.label} id={id}>
       <RadixSelect.Root key={props.value} {...props}>
           <RadixSelect.Trigger className="input relative input-sm pr-4 truncate input-bordered field-width font-semibold text-start">
             <RadixSelect.Value placeholder="Select"/>
@@ -186,7 +186,7 @@ export const NewNewSelect: FC<NewNewSelectProps> = ({ options, ...props }) => {
             </RadixSelect.Content>
           </RadixSelect.Portal>
         </RadixSelect.Root>
-    </Container>
+    </InputContainer>
   );
 };
 
@@ -195,21 +195,21 @@ interface CheckboxTextProps extends InputBaseProps {
   value?: boolean
 }
 
-const DoubleCountainer: FC<PropsWithChildren<{ label: string }>> = ({ label, children }) => {
-  return <Container label={label}>
+export const InputDoubleCountainer: FC<PropsWithChildren<{ label: string }>> = ({ label, children }) => {
+  return <InputContainer label={label}>
     <div className="field-width flex space-x-2">
       {children}
     </div>
-  </Container>
+  </InputContainer>
 }
 
-/* margin: 0.25rem 0; */
-const Checkbox: FC<CheckboxTextProps> = memo(({ label, value, onChange }) => {
+
+export const InputCheckbox: FC<CheckboxTextProps> = memo(({ label, value, onChange }) => {
   const id = useId();
   return (
-    <Container label={label} id={id}>
+    <InputContainer label={label} id={id}>
       <input className="toggle toggle-neutral" id={id} type="checkbox" onChange={e => onChange?.(e.target.checked)} checked={value} />
-    </Container>
+    </InputContainer>
   )
 })
 
@@ -218,7 +218,7 @@ interface FileProps extends InputBaseProps {
   value: string,
   onChange: (value: string) => void
 }
-const File: FC<FileProps> = ({ label, type, onChange, value }) => {
+export const InputFile: FC<FileProps> = ({ label, type, onChange, value }) => {
   const [file, setFile] = useState<FileState>();
 
   useEffect(() => {
@@ -240,7 +240,7 @@ const File: FC<FileProps> = ({ label, type, onChange, value }) => {
     if (fileId && typeof fileId === "string") onChange(fileId);
   }
 
-  return <Container label={label} vertical>
+  return <InputContainer label={label} vertical>
     {file && <FileElement actions={[
       { label: "Clear", fn: () => onChange("") },
       { label: "Change", fn: handleSelect },
@@ -255,16 +255,16 @@ const File: FC<FileProps> = ({ label, type, onChange, value }) => {
         {/* <button onClick={handleSelect} className="flex-grow btn btn-sm btn-primary">Select existing file</button> */}
       </div>
     </div>}
-  </Container>
+  </InputContainer>
 }
 
 interface EventProps extends InputBaseProps {
   onChange: (value: string) => void,
   value: string
 }
-const Event: FC<EventProps> = memo(({ label, value, onChange }) => {
+export const InputEvent: FC<EventProps> = memo(({ label, value, onChange }) => {
   const events = Array.from(window.ApiShared.pubsub.registeredEvents.values());
-  return <NewNewSelect options={events} label={label} defaultValue={value} onValueChange={e => onChange(e || "")} />
+  return <InputSelect options={events} label={label} defaultValue={value} onValueChange={e => onChange(e || "")} />
 });
 
 const sourceOptions = [
@@ -275,8 +275,8 @@ interface TextSourceProps extends InputBaseProps {
   onChange: (value: TextEventSource) => void,
   value: string
 }
-const TextSource: FC<TextSourceProps> = memo(({ label, value, onChange }) => {
-  return <NewNewSelect label={label} value={value} options={sourceOptions} onValueChange={onChange} />
+export const InputTextSource: FC<TextSourceProps> = memo(({ label, value, onChange }) => {
+  return <InputSelect label={label} value={value} options={sourceOptions} onValueChange={onChange} />
 });
 
 interface CodeProps extends InputBaseProps {
@@ -288,8 +288,8 @@ interface CodeProps extends InputBaseProps {
 interface NetworkStatusProps extends InputBaseProps {
   value: ServiceNetworkState
 }
-const NetworkStatus: FC<NetworkStatusProps> = ({ label, value }) => {
-  return <Container label={label}>
+export const InputNetworkStatus: FC<NetworkStatusProps> = ({ label, value }) => {
+  return <InputContainer label={label}>
     <div className="self-end flex space-x-2 items-center pl-2 pr-3 h-8 py-1 rounded-full bg-neutral/50 border-dashed border-neutral">
       {value === ServiceNetworkState.disconnected && <>
         <span className="text-xs font-semibold text-error leading-none">Disconnected</span>
@@ -308,7 +308,7 @@ const NetworkStatus: FC<NetworkStatusProps> = ({ label, value }) => {
         <div className="rounded-full ring-2 bg-red-500 ring-red-500 ring-offset-base-100 ring-offset-2 w-2 h-2 " />
       </>} */}
     </div>
-  </Container>
+  </InputContainer>
 }
 
 interface MappedGroupSelectProps {
@@ -318,7 +318,7 @@ interface MappedGroupSelectProps {
   value: { group: string, option: string },
   onChange: (v: { group: string, option: string }) => void,
 }
-const MappedGroupSelect: FC<MappedGroupSelectProps> = memo(({ labelGroup, labelOption, value, onChange, library }) => {
+export const InputMappedGroupSelect: FC<MappedGroupSelectProps> = memo(({ labelGroup, labelOption, value, onChange, library }) => {
   const handleSelectGroup = (group: string) => {
     onChange({ group, option: library[group]?.[0]?.[0] || "" });
   }
@@ -342,14 +342,14 @@ const MappedGroupSelect: FC<MappedGroupSelectProps> = memo(({ labelGroup, labelO
   }, [value]);
 
   return <>
-    <NewNewSelect 
+    <InputSelect 
       label={labelGroup}
       options={getGroupOptions()}
       value={value.group}
       onValueChange={handleSelectGroup}
     />
 
-    {getCurrentOptions().length > 1 && <NewNewSelect
+    {getCurrentOptions().length > 1 && <InputSelect
       options={getCurrentOptions()}
       label={labelOption}
       value={getCurrentOption()}
@@ -357,8 +357,8 @@ const MappedGroupSelect: FC<MappedGroupSelectProps> = memo(({ labelGroup, labelO
   </>
 });
 
-const Code: FC<CodeProps> = memo(({ label, ...rest }) => {
-  return <Container label={label} vertical>
+export const InputCode: FC<CodeProps> = memo(({ label, ...rest }) => {
+  return <InputContainer label={label} vertical>
     <AceEditor
       showGutter={false}
       enableLiveAutocompletion
@@ -371,7 +371,7 @@ const Code: FC<CodeProps> = memo(({ label, ...rest }) => {
       name="UNIQUE_ID_OF_DIV"
       editorProps={{ $blockScrolling: true }}
     />
-  </Container>
+  </InputContainer>
 });
 
 interface FontProps extends InputBaseProps {
@@ -405,17 +405,17 @@ const FontSelectDropdown: FC<any> = memo(({ onChange, value }) => {
       <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Font name" className="w-full input input-sm input-bordered" />
       <button className="btn btn-sm btn-square" onClick={handleInstallGFonts}>+</button>
     </div>
-    <span className="text-xs text-base-content/50">Find font at <a className="link link-primary link-hover font-medium" target="_blank" href="@/server/components/input/index">Google Fonts</a> and copypaste it's name here</span>
+    <span className="text-xs text-base-content/50">Find font at <a className="link link-primary link-hover font-medium" target="_blank" href="@/server/components/input/index">Google Fonts</a> and copypaste its name here</span>
     <button className="btn btn-sm btn-primary" onClick={handleInstallDrive}>Install from file system</button>
   </div>
 })
-const Font: FC<FontProps> = memo(({ label, ...rest }) => {
+export const InputFont: FC<FontProps> = memo(({ label, ...rest }) => {
   return <Dropdown targetOffset={24} placement="right" content={<FontSelectDropdown {...rest} />}>
-    <Container label={label}>
+    <InputContainer label={label}>
       <div style={{ fontFamily: rest.value || "inherit" }} className="cursor-pointer hover:bg-base-300 flex items-center input input-bordered input-sm field-width overflow-hidden" title={rest.value}>
         <span className="truncate block w-full">{rest.value || "Select font"}</span>
       </div>
-    </Container>
+    </InputContainer>
   </Dropdown>
 })
 
@@ -427,7 +427,7 @@ interface ObjectProps extends InputBaseProps {
   valuePlaceholder?: string,
   addLabel?: string
 }
-const MapObject: FC<ObjectProps> = memo(({ label, onChange, ...rest }) => {
+export const InputMapObject: FC<ObjectProps> = memo(({ label, onChange, ...rest }) => {
   const [value, setValue] = useState<ObjectRecord>(rest.value);
 
   const handleAdd = () => {
@@ -458,7 +458,7 @@ const MapObject: FC<ObjectProps> = memo(({ label, onChange, ...rest }) => {
     onChange(newVal);
   }
 
-  return <Container vertical label={label}>
+  return <InputContainer vertical label={label}>
     <div className="flex flex-col space-y-2">
       {!Object.keys(value).length && <div className="h-20 px-4 flex justify-center items-center rounded-md border-2 border-primary/10 border-dashed ">
         <span className="text-sm font-medium text-center">
@@ -466,13 +466,13 @@ const MapObject: FC<ObjectProps> = memo(({ label, onChange, ...rest }) => {
         </span>
       </div>}
       {Object.entries(value).map(([key,], i) => <div key={i} className="flex space-x-2">
-        <BaseText placeholder={rest.keyPlaceholder || "Key"} value={key} onChange={v => handleUpdateKey(key, v.target.value)} />
-        <BaseText placeholder={rest.valuePlaceholder || "Value"} value={value[key]} onChange={v => handleUpdateValue(key, v.target.value)} />
+        <InputBaseText placeholder={rest.keyPlaceholder || "Key"} value={key} onChange={v => handleUpdateKey(key, v.target.value)} />
+        <InputBaseText placeholder={rest.valuePlaceholder || "Value"} value={value[key]} onChange={v => handleUpdateValue(key, v.target.value)} />
         <button className="btn btn-sm btn-circle btn-ghost" onClick={() => handleRemove(key)}><RiDeleteBack2Fill /></button>
       </div>)}
       {Object.keys(value).length > 0 && <button className="btn btn-sm btn-neutral" onClick={handleAdd}>{rest.addLabel || "Add pair"}</button>}
     </div>
-  </Container>
+  </InputContainer>
 })
 
 interface ShortuctProps extends InputBaseProps {
@@ -480,7 +480,7 @@ interface ShortuctProps extends InputBaseProps {
   value?: string,
   onChange?: (value: string) => void
 }
-const Shortcut: FC<ShortuctProps> = ({ shortcut, label, onChange, ...rest }) => {
+export const InputShortcut: FC<ShortuctProps> = ({ shortcut, label, onChange, ...rest }) => {
   const id = useId();
   const { shortcuts } = useSnapshot(window.ApiServer.state);
 
@@ -496,7 +496,7 @@ const Shortcut: FC<ShortuctProps> = ({ shortcut, label, onChange, ...rest }) => 
     window.ApiServer.keyboard.confirmShortcutRecord();
   }
 
-  return <Container vertical label={label} id={id}>
+  return <InputContainer vertical label={label} id={id}>
     <div className="input-group w-full">
       <input type="text" value={shortcuts[shortcut]} id={id} disabled className="w-full input input-sm input-bordered" />
       <Tooltip content="Listen" className="btn btn-sm btn-primary btn-square">
@@ -507,7 +507,7 @@ const Shortcut: FC<ShortuctProps> = ({ shortcut, label, onChange, ...rest }) => 
       </Tooltip>
     </div>
     {/* <BaseText disabled type="text" /> */}
-  </Container>
+  </InputContainer>
 }
 
 type WindowsToken = {
@@ -519,18 +519,16 @@ interface AudioOutputProps extends InputBaseProps {
   value: string,
   onChange: (value: string) => void
 }
-const NativeAudioOutput: FC<AudioOutputProps> = memo(({ label, value, onChange }) => {
+export const InputNativeAudioOutput: FC<AudioOutputProps> = memo(({ label, value, onChange }) => {
   const [config, setConfig] = useState<WindowsConfig>();
 
   useEffect(() => {
     invoke<WindowsConfig>("plugin:windows_tts|get_voices").then(setConfig);
   }, []);
 
-  return <NewNewSelect
+  return <InputSelect
     value={value}
     onValueChange={onChange}
     options={config?.devices.map(d => ({ ...d, value: d.label })) || []}
     label={label} />
-})
-
-export default { BaseText, Text, Chips, Object: MapObject, Range, Color, Font, NewSelect: NewNewSelect, MappedGroupSelect, Checkbox, File, Event, Code, TextSource, Container, DoubleCountainer, NetworkStatus, Shortcut, NativeAudioOutput };
+});

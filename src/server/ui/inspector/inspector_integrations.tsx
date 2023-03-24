@@ -6,7 +6,7 @@ import { SiDiscord, SiTwitch } from "react-icons/si";
 import { useSnapshot } from "valtio";
 import Tooltip from "../dropdown/Tooltip";
 import Inspector from "./components";
-import Input from "./components/input";
+import { InputCheckbox, InputNetworkStatus, InputText, InputTextSource } from "./components/input";
 
 const TwitchInspector: FC = () => {
   const {user, liveStatus} = useSnapshot(window.ApiServer.twitch.state);
@@ -28,16 +28,16 @@ const TwitchInspector: FC = () => {
 
     {!user && <button className="btn gap-2 border-none" style={{backgroundColor: "#9147ff", color: "#fff"}} onClick={handleLogin}><SiTwitch size={20}/> Login</button>}
     <Inspector.Switchable visible={!!user}>
-      <Input.NetworkStatus label="Live" value={liveStatus} />
-      <Input.NetworkStatus label="Chat Connection" value={chatState.connection} />
-      <Input.Checkbox label="Enable chat" value={pr.chatEnable} onChange={e => up("chatEnable", e)} />
+      <InputNetworkStatus label="Live" value={liveStatus} />
+      <InputNetworkStatus label="Chat Connection" value={chatState.connection} />
+      <InputCheckbox label="Enable chat" value={pr.chatEnable} onChange={e => up("chatEnable", e)} />
       <Inspector.Switchable visible={pr.chatEnable}>
-        <Input.Checkbox label="Post in chat" value={pr.chatPostEnable} onChange={e => up("chatPostEnable", e)} />
+        <InputCheckbox label="Post in chat" value={pr.chatPostEnable} onChange={e => up("chatPostEnable", e)} />
         <Inspector.Description>Post speech to text or translation results in chat</Inspector.Description>
-        <Input.Checkbox label="Post only when live streaming" value={pr.chatPostLive} onChange={e => up("chatPostLive", e)} />
-        <Input.TextSource label="Post from" value={pr.chatPostSource} onChange={e => up("chatPostSource", e)} />
-        <Input.Checkbox label="Post from text field" value={pr.chatPostInput} onChange={e => up("chatPostInput", e)} />
-        <Input.Checkbox label="Post from chat" value={pr.chatReceiveEnable} onChange={e => up("chatReceiveEnable", e)} />
+        <InputCheckbox label="Post only when live streaming" value={pr.chatPostLive} onChange={e => up("chatPostLive", e)} />
+        <InputTextSource label="Post from" value={pr.chatPostSource} onChange={e => up("chatPostSource", e)} />
+        <InputCheckbox label="Post from text field" value={pr.chatPostInput} onChange={e => up("chatPostInput", e)} />
+        <InputCheckbox label="Post from chat" value={pr.chatReceiveEnable} onChange={e => up("chatReceiveEnable", e)} />
         <Inspector.Description>Chat as a text field</Inspector.Description>
       </Inspector.Switchable>
     </Inspector.Switchable>
@@ -51,13 +51,13 @@ const DiscordInspector: FC = () => {
   return <>
     <Inspector.SubHeader><div className="flex gap-2 items-center"><SiDiscord/> Discord</div></Inspector.SubHeader>
     <Inspector.Description>Post STT results to discord channel</Inspector.Description>
-    <Input.Checkbox label="Enable" value={pr.postEnable} onChange={e => up("postEnable", e)} />
-    <Input.Checkbox label="Post only when live streaming" value={pr.postWithTwitchLive} onChange={e => up("postWithTwitchLive", e)} />
-    <Input.Text type="password" label="Channel hook" value={pr.channelHook} onChange={e => up("channelHook", e.target.value)} />
-    <Input.Text label="Bot name" placeholder="Curses" value={pr.channelBotName} onChange={e => up("channelBotName", e.target.value)} />
-    <Input.Text label="Bot avatar" placeholder="Image url" value={pr.channelAvatarUrl} onChange={e => up("channelAvatarUrl", e.target.value)} />
-    <Input.TextSource label="Post from" value={pr.postSource} onChange={e => up("postSource", e)} />
-    <Input.Checkbox label="Post from text field" value={pr.postInput} onChange={e => up("postInput", e)} />
+    <InputCheckbox label="Enable" value={pr.postEnable} onChange={e => up("postEnable", e)} />
+    <InputCheckbox label="Post only when live streaming" value={pr.postWithTwitchLive} onChange={e => up("postWithTwitchLive", e)} />
+    <InputText type="password" label="Channel hook" value={pr.channelHook} onChange={e => up("channelHook", e.target.value)} />
+    <InputText label="Bot name" placeholder="Curses" value={pr.channelBotName} onChange={e => up("channelBotName", e.target.value)} />
+    <InputText label="Bot avatar" placeholder="Image url" value={pr.channelAvatarUrl} onChange={e => up("channelAvatarUrl", e.target.value)} />
+    <InputTextSource label="Post from" value={pr.postSource} onChange={e => up("postSource", e)} />
+    <InputCheckbox label="Post from text field" value={pr.postInput} onChange={e => up("postInput", e)} />
   </>
 }
 

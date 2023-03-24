@@ -2,7 +2,7 @@ import { FC }                          from "react";
 import { RiImageFill, RiImageLine }    from "react-icons/ri";
 import { SiCsswizardry }               from "react-icons/si";
 import { useGetState, useUpdateState } from "@/client";
-import Input                           from "./components/input";
+import { InputFile, InputText, InputEvent, InputCode }                           from "./components/input";
 import Inspector      from "./components";
 import NameInput              from "./components/name-input";
 import TransformInput         from "./components/transform-input";
@@ -18,8 +18,8 @@ const BaseInspector: FC<{ id: string }> = ({ id }) => {
   });
   return <>
     <Inspector.SubHeader>Base style</Inspector.SubHeader>
-    <Input.File type="image" value={data.fileId} onChange={id => up("fileId", id)} label="File" />
-    <Input.Text type="number" value={data.styleOpacity} onChange={e => up("styleOpacity", parseFloat(e.target.value) || 0)} label="Opacity" />
+    <InputFile type="image" value={data.fileId} onChange={id => up("fileId", id)} label="File" />
+    <InputText type="number" value={data.styleOpacity} onChange={e => up("styleOpacity", parseFloat(e.target.value) || 0)} label="Opacity" />
   </>
 }
 
@@ -37,13 +37,13 @@ const ActiveInspector: FC<{ id: string }> = ({ id }) => {
         <p className="text-xs text-base-content/70 whitespace-normal font-normal">Temporary replace your image when something happens. For more advanced animations (tweening, keyframes) use css</p>
       </div>
     </Inspector.SubHeader>
-    <Input.File type="image" value={data.activeFileId} onChange={id => up("activeFileId", id)} label="File" />
-    <Input.Text type="number" value={data.activeStyleOpacity} onChange={e => up("activeStyleOpacity", parseFloat(e.target.value) || 0)} label="Opacity" />
-    <Input.Text type="number" min={0} value={data.activeTransitionDuration} onChange={e => up("activeTransitionDuration", parseFloat(e.target.value) || 0)} label="Transition" />
+    <InputFile type="image" value={data.activeFileId} onChange={id => up("activeFileId", id)} label="File" />
+    <InputText type="number" value={data.activeStyleOpacity} onChange={e => up("activeStyleOpacity", parseFloat(e.target.value) || 0)} label="Opacity" />
+    <InputText type="number" min={0} value={data.activeTransitionDuration} onChange={e => up("activeTransitionDuration", parseFloat(e.target.value) || 0)} label="Transition" />
 
     <Inspector.SubHeader>Event</Inspector.SubHeader>
-    <Input.Event value={data.activeEvent} onChange={event => up("activeEvent", event)} label="Event" />
-    <Input.Text type="number" min={0} value={data.activeDuration} onChange={e => up("activeDuration", parseFloat(e.target.value) || 0)} label="Duration" />
+    <InputEvent value={data.activeEvent} onChange={event => up("activeEvent", event)} label="Event" />
+    <InputText type="number" min={0} value={data.activeDuration} onChange={e => up("activeDuration", parseFloat(e.target.value) || 0)} label="Duration" />
   </>
 }
 
@@ -55,7 +55,7 @@ const CssInspector: FC<{ id: string }> = ({ id }) => {
   });
   return <>
     <Inspector.SubHeader>CSS style</Inspector.SubHeader>
-    <Input.Code language="css" label="CSS" value={data.styleCss} onChange={e => up("styleCss", e || "")} />
+    <InputCode language="css" label="CSS" value={data.styleCss} onChange={e => up("styleCss", e || "")} />
   </>
 }
 

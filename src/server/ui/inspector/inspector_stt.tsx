@@ -1,14 +1,14 @@
+import { STT_Backends, STT_State } from "@/server/services/stt/schema";
+import { ServiceNetworkState } from "@/types";
 import { invoke } from "@tauri-apps/api/tauri";
 import { FC } from "react";
 import { RiUserVoiceFill } from "react-icons/ri";
-import { useSnapshot } from "valtio";
-import Input           from "./components/input";
-import Inspector       from "./components";
-import { ServiceNetworkState }             from "@/types";
-import ServiceButton                       from "../service-button";
-import { STT_Backends, STT_State }         from "@/server/services/stt/schema";
-import { azureLanguages, nativeLangs, deepGramLangs }   from "../../services/stt/stt_data";
 import { SiGooglechrome, SiMicrosoftedge } from "react-icons/si";
+import { useSnapshot } from "valtio";
+import { azureLanguages, deepGramLangs, nativeLangs } from "../../services/stt/stt_data";
+import ServiceButton from "../service-button";
+import Inspector from "./components";
+import { InputCheckbox, InputMappedGroupSelect, InputSelect, InputText } from "./components/input";
 
 const Native: FC = () => {
   const pr = useSnapshot(window.ApiServer.state.services.stt.data.native);
@@ -17,7 +17,7 @@ const Native: FC = () => {
     window.ApiServer.state.services.stt.data.native.language_group = value.group;
   };
   return <>
-    <Input.MappedGroupSelect
+    <InputMappedGroupSelect
       labelGroup="Language"
       labelOption="Dialect"
       value={{ option: pr.language, group: pr.language_group }}
@@ -67,17 +67,17 @@ const Azure: FC = () => {
 
   return <>
     <Inspector.SubHeader>Azure options</Inspector.SubHeader>
-    <Input.Text label="Key" type="password" value={pr.key} onChange={e => up("key", e.target.value)} />
-    <Input.Text label="Location" value={pr.location} onChange={e => up("location", e.target.value)} />
+    <InputText label="Key" type="password" value={pr.key} onChange={e => up("key", e.target.value)} />
+    <InputText label="Location" value={pr.location} onChange={e => up("location", e.target.value)} />
 
-    <Input.MappedGroupSelect
+    <InputMappedGroupSelect
       labelGroup="Language"
       labelOption="Dialect"
       value={{ option: pr.language, group: pr.language_group }}
       onChange={updateLanguage}
       library={azureLanguages} />
 
-    <Input.NewSelect 
+    <InputSelect 
       label="Profanity"
       options={[
         { label: 'Masked', value: 'masked' },
@@ -87,8 +87,8 @@ const Azure: FC = () => {
       value={pr.profanity}
       onValueChange={e => up("profanity", e)}
     />
-    <Input.Text type="number" step="1" label="Silence timeout" value={pr.silenceTimeout} onChange={e => up("silenceTimeout", e.target.value)} />
-    <Input.Checkbox label="Interim result" onChange={e => up("interim", e)} value={pr.interim} />
+    <InputText type="number" step="1" label="Silence timeout" value={pr.silenceTimeout} onChange={e => up("silenceTimeout", e.target.value)} />
+    <InputCheckbox label="Interim result" onChange={e => up("interim", e)} value={pr.interim} />
   </>
 }
 
@@ -103,16 +103,16 @@ const Deepgram: FC = () => {
 
   return <>
     <Inspector.SubHeader>Deepgram options</Inspector.SubHeader>
-    <Input.Text label="Key" type="password" value={pr.key} onChange={e => handleUpdate("key", e.target.value)} />
+    <InputText label="Key" type="password" value={pr.key} onChange={e => handleUpdate("key", e.target.value)} />
 
-    <Input.MappedGroupSelect
+    <InputMappedGroupSelect
       labelGroup="Language"
       labelOption="Dialect"
       value={{ option: pr.language, group: pr.language_group }}
       onChange={updateLanguage}
       library={deepGramLangs} />
 
-    <Input.NewSelect options={[
+    <InputSelect options={[
       { label: 'Base', value: 'base' },
       { label: 'Enhanced', value: 'enhanced' },
     ]} label="Quality" value={pr.tier} onValueChange={e => handleUpdate("tier", e)} />
@@ -123,9 +123,9 @@ const Deepgram: FC = () => {
       <a className="link link-primary link-hover" target="_blank" href="@/server/ui/inspector/server/inspector#language-options">See language table</a>
     </span>
 
-    <Input.Checkbox label="Interim result" onChange={e => handleUpdate("interim", e)} value={pr.interim} />
-    <Input.Checkbox label="Profanity filter" onChange={e => handleUpdate("profanity", e)} value={pr.profanity} />
-    <Input.Checkbox label="Punctuate" onChange={e => handleUpdate("punctuate", e)} value={pr.punctuate} />
+    <InputCheckbox label="Interim result" onChange={e => handleUpdate("interim", e)} value={pr.interim} />
+    <InputCheckbox label="Profanity filter" onChange={e => handleUpdate("profanity", e)} value={pr.profanity} />
+    <InputCheckbox label="Punctuate" onChange={e => handleUpdate("punctuate", e)} value={pr.punctuate} />
   </>
 }
 
@@ -135,7 +135,7 @@ const Speechly: FC = () => {
 
   return <>
     <Inspector.SubHeader>Speechly options</Inspector.SubHeader>
-    <Input.Text label="App ID" type="password" value={pr.key} onChange={e => up("key", e.target.value)} />
+    <InputText label="App ID" type="password" value={pr.key} onChange={e => up("key", e.target.value)} />
   </>
 }
 
@@ -149,10 +149,10 @@ const Inspector_STT: FC = () => {
   return <Inspector.Body>
     <Inspector.Header><RiUserVoiceFill /> Speech to Text</Inspector.Header>
     <Inspector.Content>
-      <Input.Checkbox label="Add to action bar" onChange={handleStart} value={data.showActionButton} />
-      <Input.Checkbox label="Auto start" value={data.data.autoStart} onChange={e => up("autoStart", e)} />
+      <InputCheckbox label="Add to action bar" onChange={handleStart} value={data.showActionButton} />
+      <InputCheckbox label="Auto start" value={data.data.autoStart} onChange={e => up("autoStart", e)} />
       <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
-        <Input.NewSelect options={[
+        <InputSelect options={[
           { label: "Native", value: STT_Backends.native },
           { label: "Browser", value: STT_Backends.browser },
           { label: "Azure", value: STT_Backends.azure },
