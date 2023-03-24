@@ -37,6 +37,7 @@ class Service_PubSub implements IServiceInterface {
 
       // mute external stt sources
       if (topic === "text.stt") {
+        window.ApiServer.stt.updateLastMessage(textEvent.value, textEvent.type === 1);
         if (window.ApiServer.stt.isMuted()) {
           // trigger possible pending unmute
           if (textEvent.type === 0) {

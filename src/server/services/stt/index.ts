@@ -15,9 +15,12 @@ import { STT_SpeechlyService }                                                  
 class Service_STT implements IServiceInterface {
   #serviceInstance?: ISpeechRecognitionService;
 
-  private lastMessageState = {
+  #lastMessageState = {
     value: "",
     isInterim: false
+  }
+  updateLastMessage(value: string, isInterim: boolean) {
+    this.#lastMessageState = {value, isInterim};
   }
 
   serviceState = proxy({
@@ -47,7 +50,7 @@ class Service_STT implements IServiceInterface {
     }
     else if (this.serviceState.muted === SttMuteState.muted){
       // set pending if unmuting during interim results
-      if (this.lastMessageState.isInterim) {
+      if (this.#lastMessageState.isInterim) {
         this.serviceState.muted = SttMuteState.pendingUnmute;
       }
       else {
@@ -71,9 +74,9 @@ class Service_STT implements IServiceInterface {
   }
 
   tryCancelSentence() {
-    if (this.lastMessageState.isInterim) {
+    if (this.#lastMessageState.isInterim) {
       this.#sendFinal("[...]");
-      this.lastMessageState = {value: "", isInterim: false}
+      this.updateLastMessage("", false);
     }
   }
 
@@ -84,7 +87,7 @@ class Service_STT implements IServiceInterface {
       type: TextEventType.final,
     });
 
-    this.lastMessageState = {value, isInterim: false};
+    this.updateLastMessage(value, false);
 
     // apply unmute if pending
     this.triggerPendingUnmute();
@@ -96,7 +99,7 @@ class Service_STT implements IServiceInterface {
       value,
       type: TextEventType.interim,
     });
-    this.lastMessageState = {value, isInterim: true};
+    this.updateLastMessage(value, true);
   }
 
   #setStatus(value: ServiceNetworkState) {
