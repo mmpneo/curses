@@ -2,7 +2,7 @@ import { toast } from "react-toastify";
 import { proxy }                                                                  from "valtio";
 import { IServiceInterface, ServiceNetworkState, TextEventSource, TextEventType } from "@/types";
 import { STT_AzureService }                                                       from "./services/azure";
-import { STT_BrowserService }                                                     from "./services/browser";
+import { STT_NativeService }                                                     from "./services/native";
 import { STT_DeepgramService }                                                    from "./services/deepgram";
 import { STT_Backends }                                                           from "./schema";
 import {
@@ -121,8 +121,8 @@ class Service_STT implements IServiceInterface {
     };
 
     let backend = this.data.backend;
-    if (backend === STT_Backends.browser) {
-      this.#serviceInstance = new STT_BrowserService(bindings);
+    if (backend === STT_Backends.native) {
+      this.#serviceInstance = new STT_NativeService(bindings);
     }
     else if (backend === STT_Backends.azure) {
       this.#serviceInstance = new STT_AzureService(bindings);

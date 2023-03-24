@@ -17,6 +17,7 @@
     "@twurple/api": "^6.0.3",
     "@twurple/auth": "^6.0.3",
     "@twurple/chat": "^6.0.3",
+    "@types/dom-speech-recognition": "^0.0.1",
     "@types/use-sync-external-store": "^0.0.3",
     "ace-builds": "^1.14.0",
     "ajv": "^8.12.0",

@@ -1,8 +1,8 @@
 import { JSONSchemaType } from "ajv";
 
 export enum STT_Backends {
+  native = "native",
   browser = "browser",
-  browser_remote = "browser-remote",
   azure = "azure",
   deepgram = "deepgram",
   speechly = "speechly",
@@ -11,6 +11,10 @@ export enum STT_Backends {
 export type STT_State = {
   backend: STT_Backends;
   autoStart: boolean;
+  native: {
+    language_group: string;
+    language: string;
+  },
   azure: {
     device: string;
     language_group: string;
@@ -40,6 +44,16 @@ const Schema_STT: JSONSchemaType<STT_State> = {
   properties: {
     backend: { type: "string", default: STT_Backends.browser },
     autoStart: { type: "boolean", default: false },
+    native: {
+      type: "object",
+      properties: {
+        language_group: { type: "string", default: "" },
+        language: { type: "string", default: "" },
+      },
+      required: ["language_group", "language"],
+      default: {} as any,
+      additionalProperties: false,
+    },
     azure: {
       type: "object",
       properties: {
@@ -85,6 +99,7 @@ const Schema_STT: JSONSchemaType<STT_State> = {
     "backend",
     "autoStart",
     "speechly",
+    "native",
     "azure",
     "deepgram",
   ],

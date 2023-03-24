@@ -2531,6 +2531,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/dom-speech-recognition@npm:^0.0.1":
+  version: 0.0.1
+  resolution: "@types/dom-speech-recognition@npm:0.0.1"
+  checksum: 8b34af73c311580fa17842d72025a6d9d3eb0768f03e8eac91d2699566800efb6e99cba8138c0b44f16a00822ba8a6da00f830aff504cbf996bc86bbe4834fc2
+  languageName: node
+  linkType: hard
+
 "@types/estree@npm:0.0.39":
   version: 0.0.39
   resolution: "@types/estree@npm:0.0.39"
@@ -3568,6 +3575,7 @@ __metadata:
     "@twurple/auth": ^6.0.3
     "@twurple/chat": ^6.0.3
     "@types/animejs": ^3.1.6
+    "@types/dom-speech-recognition": ^0.0.1
     "@types/lodash": ^4.14.189
     "@types/node": ^18.7.10
     "@types/pubsub-js": ^1.8.3

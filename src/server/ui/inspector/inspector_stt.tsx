@@ -7,8 +7,24 @@ import Inspector       from "./components";
 import { ServiceNetworkState }             from "@/types";
 import ServiceButton                       from "../service-button";
 import { STT_Backends, STT_State }         from "@/server/services/stt/schema";
-import { azureLanguages, deepGramLangs }   from "../../services/stt/stt_data";
+import { azureLanguages, nativeLangs, deepGramLangs }   from "../../services/stt/stt_data";
 import { SiGooglechrome, SiMicrosoftedge } from "react-icons/si";
+
+const Native: FC = () => {
+  const pr = useSnapshot(window.ApiServer.state.services.stt.data.native);
+  const updateLanguage = (value: { group: string, option: string }) => {
+    window.ApiServer.state.services.stt.data.native.language       = value.option;
+    window.ApiServer.state.services.stt.data.native.language_group = value.group;
+  };
+  return <>
+    <Input.MappedGroupSelect
+      labelGroup="Language"
+      labelOption="Dialect"
+      value={{ option: pr.language, group: pr.language_group }}
+      onChange={updateLanguage}
+      library={nativeLangs} />
+  </>
+}
 
 const Browser: FC = () => {
   const handleOpen = () => {
@@ -132,6 +148,7 @@ const Inspector_STT: FC = () => {
       <Input.Checkbox label="Auto start" value={data.data.autoStart} onChange={e => up("autoStart", e)} />
       <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
         <Input.Select options={[
+          { label: "Native", value: STT_Backends.native },
           { label: "Browser", value: STT_Backends.browser },
           { label: "Azure", value: STT_Backends.azure },
           { label: "Deepgram", value: STT_Backends.deepgram },
@@ -142,6 +159,7 @@ const Inspector_STT: FC = () => {
         {data.data.backend === STT_Backends.azure && <Azure />}
         {data.data.backend === STT_Backends.deepgram && <Deepgram />}
         {data.data.backend === STT_Backends.speechly && <Speechly />}
+        {data.data.backend === STT_Backends.native && <Native />}
       </Inspector.Deactivatable>
 
 
