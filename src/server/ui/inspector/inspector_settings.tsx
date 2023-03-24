@@ -141,7 +141,7 @@ const Inspector_Settings: FC = memo(() => {
             <a target="_blank" href="https://twitter.com/mmpneo" className="btn text-primary btn-ghost btn-circle text-2xl"><SiTwitter /></a>
           </Tooltip>
           <Tooltip content="Code and Curses" body={<span>App updates and help</span>}>
-            <a target="_blank" href="https://discord.gg/SMKjA2yGf7" className="btn text-primary btn-ghost btn-circle text-2xl"><SiDiscord /></a>
+            <a target="_blank" href="https://discord.gg/Sw6pw8fGYS" className="btn text-primary btn-ghost btn-circle text-2xl"><SiDiscord /></a>
           </Tooltip>
           <Tooltip content="Support development" body={<span>😊 Donations will greatly help development</span>}>
             <a target="_blank" href="https://www.patreon.com/mmpcode" className="btn text-primary btn-ghost btn-circle text-2xl"><SiPatreon /></a>
