@@ -169,7 +169,8 @@ class Service_Twitch implements IServiceInterface {
       this.#checkLive();
 
       this.emotes.loadEmotes(me.id, this.apiClient);
-      this.chat.connect(me.name, this.authProvider);
+      if (this.#state.data.chatEnable)
+        this.chat.connect(me.name, this.authProvider);
     } catch (error) {
       this.logout();
     }
