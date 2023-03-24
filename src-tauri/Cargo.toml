@@ -1,6 +1,6 @@
 [package]
 name = "curses"
-version = "0.0.11"
+version = "0.0.12"
 description = "A very cool app"
 authors = ["mmpneo@gmail.com"]
 license = ""
@@ -15,6 +15,7 @@ tauri-build = { version = "1.2", features = [] }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 tauri = { version = "1.2", features = ["dialog-all", "fs-all", "global-shortcut-all", "shell-open", "window-all"] }
+tauri-plugin-window-state = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "dev" }
 window-shadows = "0.2.0"
 
 

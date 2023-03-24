@@ -49,13 +49,6 @@
       ],
       "identifier": "com.cursescaptions.app",
       "longDescription": "",
-      "macOS": {
-        "entitlements": null,
-        "exceptionDomain": "",
-        "frameworks": [],
-        "providerShortName": null,
-        "signingIdentity": null
-      },
       "resources": [],
       "shortDescription": "",
       "targets": "all",
@@ -74,11 +67,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "transparent": false,
         "height": 600,
         "resizable": true,
-        "title": "Curses",
         "decorations": false,
+        "title": "Curses",
         "width": 800
       }
     ]
