@@ -36,8 +36,7 @@ impl OscPlugin {
                     OscValue::Bool(v) => OscType::from(*v),
                     OscValue::Float(v) => OscType::Float(*v as f32),
                     OscValue::Int(v) => OscType::Int(*v as i32),
-                    OscValue::String(v) => OscType::from(v.to_string()),
-                    _ => OscType::Nil,
+                    OscValue::String(v) => OscType::from(v.to_string())
                 };
                 tt
             })
