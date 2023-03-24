@@ -77,11 +77,16 @@ const Azure: FC = () => {
       onChange={updateLanguage}
       library={azureLanguages} />
 
-    <Input.Select options={[
-      { label: 'Masked', value: 'masked' },
-      { label: 'Removed', value: 'removed' },
-      { label: 'Raw', value: 'raw' },
-    ]} label="Profanity" value={{ value: pr.profanity, label: pr.profanity }} onChange={(e: any) => up("profanity", e.value)} />
+    <Input.NewSelect 
+      label="Profanity"
+      options={[
+        { label: 'Masked', value: 'masked' },
+        { label: 'Removed', value: 'removed' },
+        { label: 'Raw', value: 'raw' },
+      ]}
+      value={pr.profanity}
+      onValueChange={e => up("profanity", e)}
+    />
     <Input.Text type="number" step="1" label="Silence timeout" value={pr.silenceTimeout} onChange={e => up("silenceTimeout", e.target.value)} />
     <Input.Checkbox label="Interim result" onChange={e => up("interim", e)} value={pr.interim} />
   </>
@@ -107,10 +112,10 @@ const Deepgram: FC = () => {
       onChange={updateLanguage}
       library={deepGramLangs} />
 
-    <Input.Select options={[
+    <Input.NewSelect options={[
       { label: 'Base', value: 'base' },
       { label: 'Enhanced', value: 'enhanced' },
-    ]} label="Quality" value={{ value: pr.tier, label: pr.tier }} onChange={(e: any) => handleUpdate("tier", e.value)} />
+    ]} label="Quality" value={pr.tier} onValueChange={e => handleUpdate("tier", e)} />
 
     <span className="text-base-content/60 text-xs">
       Some languages cannot be used with "enhanced" quality option
@@ -147,13 +152,13 @@ const Inspector_STT: FC = () => {
       <Input.Checkbox label="Add to action bar" onChange={handleStart} value={data.showActionButton} />
       <Input.Checkbox label="Auto start" value={data.data.autoStart} onChange={e => up("autoStart", e)} />
       <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
-        <Input.Select options={[
+        <Input.NewSelect options={[
           { label: "Native", value: STT_Backends.native },
           { label: "Browser", value: STT_Backends.browser },
           { label: "Azure", value: STT_Backends.azure },
           { label: "Deepgram", value: STT_Backends.deepgram },
           { label: "Speechly", value: STT_Backends.speechly }
-        ]} label="Service" value={{ value: data.data.backend, label: data.data.backend }} onChange={(e: any) => up("backend", e.value as STT_Backends)} />
+        ]} label="Service" value={data.data.backend} onValueChange={e => up("backend", e as STT_Backends)} />
 
         {data.data.backend === STT_Backends.browser && <Browser />}
         {data.data.backend === STT_Backends.azure && <Azure />}

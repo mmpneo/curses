@@ -1,11 +1,10 @@
 import NiceModal from "@ebay/nice-modal-react";
 import { useId } from "@floating-ui/react-dom-interactions";
 import classNames from "classnames/bind";
-import { FC, InputHTMLAttributes, memo, PropsWithChildren, ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { FC, forwardRef, InputHTMLAttributes, memo, PropsWithChildren, ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { RgbaColor, RgbaColorPicker } from "react-colorful";
-import { RiDeleteBack2Fill, RiUpload2Fill, RiKeyboardBoxFill, RiDeleteBin3Fill } from "react-icons/ri";
-import Select, { MenuListProps, MenuProps, OptionProps, Props as SelectProps } from 'react-select';
-import SimpleBar                                                       from "simplebar-react";
+import { RiDeleteBack2Fill, RiUpload2Fill, RiKeyboardBoxFill, RiDeleteBin3Fill, RiCheckboxCircleFill } from "react-icons/ri";
+import { HiChevronDown, HiChevronUp } from "react-icons/hi";
 import FileElement                                                     from "../../../file-element";
 import { FileState, FileType }                                         from "@/client/services/files/schema";
 import Dropdown                                                        from "../../../dropdown/Dropdown";
@@ -129,102 +128,67 @@ const Chips: FC<ChipsProps> = memo(({ label, value, options, onChange }) => {
   </Container>
 });
 
-const SelectMenu: FC<MenuProps> = ({ innerRef, innerProps, ...props }) => {
-  return <>
-    <div {...innerProps} ref={innerRef as any} className="absolute flex flex-col justify-start w-56 z-50 right-0 top-10 bg-base-100 rounded-box shadow-lg">
-      <SimpleBar className="h-full max-h-64 flex flex-col">
-        {props.children}
-      </SimpleBar>
-    </div>
-  </>
-};
-const SelectMenuList: FC<MenuListProps> = ({ innerRef, innerProps, ...props }) => {
-  return <ul className="flex flex-col menu menu-compact p-2 w-full">
-    {props.children}
-  </ul>
-};
-const SelectOption: FC<OptionProps> = ({ innerRef, innerProps, ...props }) => {
-  const ref = useRef<HTMLDivElement>()
-  useEffect(() => {
-    if (props.isFocused)
-      ref.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-  }, [props.isFocused])
-  return <li><a onClick={() => props.selectOption(props.data)} ref={ref as any} className={cx("font-medium capitalize", {
-    disabled: props.isDisabled,
-    "bg-neutral/60 text-neutral-content": props.isFocused,
-    active: props.isSelected
-  })}>{props.children}</a></li>
-};
+import * as RadixSelect from '@radix-ui/react-select';
 
-interface NewSelectProps extends SelectProps, InputBaseProps { }
-const NewSelect: FC<NewSelectProps> = ({ label, ...props }) => {
+const SelectItem = forwardRef<HTMLDivElement, PropsWithChildren<any>>(({ children, className, ...props }: any, ref) => {
+  return (
+    <RadixSelect.Item className="px-3 py-2 text-sm font-semibold flex items-center duration-100 rounded-btn transition-colors cursor-pointer data-[highlighted]:outline-none data-[highlighted]:bg-base-content/10 data-[highlighted]:text-base-content" {...props} ref={ref}>
+      <RadixSelect.ItemText className="font-semibold">{children}</RadixSelect.ItemText>
+      <RadixSelect.ItemIndicator className="absolute left-1 inline-flex items-center justify-center opacity-50">
+        {/* • */}
+        <RiCheckboxCircleFill color="current"/>
+        {/* <IconCheck size={18}/> */}
+        </RadixSelect.ItemIndicator>
+    </RadixSelect.Item>
+  );
+});
+
+type Option = { label: string; value: string };
+interface NewNewSelectProps extends InputBaseProps, RadixSelect.SelectProps {
+  options: (Option | {label: string, options: Option[]})[];
+}
+export const NewNewSelect: FC<NewNewSelectProps> = ({ options, ...props }) => {
   const id = useId();
   return (
-    <Container label={label} id={id}>
-      <Select components={{
-        Menu: SelectMenu,
-        MenuList: SelectMenuList,
-        Option: SelectOption,
-      }} className="react-select field-width"
-        inputId={id}
-        {...props}
-        menuPlacement="auto"
-        // menuPosition="fixed"
-        styles={{
-          input: (base) => ({
-            ...base,
-            fontSize: "0.875rem",
-            height: "auto",
-            margin: 0
-          }),
-          container: (base) => ({
-            ...base,
-            fontSize: "0.875rem",
-            height: "2rem",
-            minHeight: "2rem",
-          }),
-          valueContainer: (baseStyles, state) => ({
-            ...baseStyles,
-            paddingRight: 0,
-            fontSize: "0.875rem",
-            height: "2rem",
-            minHeight: "2rem",
-          }),
-          singleValue: (baseStyles, state) => ({
-            ...baseStyles,
-            fontWeight: 600,
-            textTransform: 'capitalize',
-            color: "hsla(var(--bc) / var(--tw-text-opacity, 1))"
-          }),
-          indicatorSeparator: state => ({
-            display: 'none',
-          }),
-          indicatorsContainer: (baseStyles, state) => ({
-            ...baseStyles,
-            paddingLeft: 0,
-            fontSize: "0.875rem",
-            height: "2rem",
-            minHeight: "2rem",
-          }),
-          placeholder: (baseStyles, state) => ({
-            ...baseStyles
-          }),
-          control: (baseStyles, state) => ({
-            ...baseStyles,
-            fontSize: "0.875rem",
-            height: "2rem",
-            minHeight: "2rem",
-            "--tw-border-opacity": 0.2,
-            "--tw-bg-opacity": 1,
-            borderWidth: '1px',
-            backgroundColor: 'hsl(var(--b1) / var(--tw-bg-opacity))',
-            borderRadius: 'var(--rounded-btn, 0.5rem)',
-            borderColor: 'hsl(var(--bc) / var(--tw-border-opacity))',
-          }),
-        }} />
+    <Container label={props.label} id={id}>
+      <RadixSelect.Root key={props.value} {...props}>
+          <RadixSelect.Trigger className="input relative input-sm pr-4 truncate input-bordered field-width font-semibold text-start">
+            <RadixSelect.Value placeholder="Select"/>
+            <RadixSelect.Icon className="text-primary absolute right-1 self-center top-2">
+              <HiChevronDown />
+            </RadixSelect.Icon>
+          </RadixSelect.Trigger>
+          <RadixSelect.Portal>
+            <RadixSelect.Content className="z-50 overflow-hidden bg-base-100 border-base-content/20 border rounded-btn shadow-xl">
+              <RadixSelect.ScrollUpButton className="flex items-center justify-center cursor-default h-4">
+                <HiChevronUp/>
+              </RadixSelect.ScrollUpButton>
+              <RadixSelect.Viewport className="p-2 bg-base-100 space-y-1">
+                {options?.map((item) => {
+                if ("options" in item) {
+                  return <RadixSelect.Group key={item.label}>
+                    <RadixSelect.Label className="p-2 text-sm font-semibold text-primary">{item.label}</RadixSelect.Label>
+                    {item.options?.map((item) => <SelectItem value={item.value} key={item.value}>
+                      {item.label}
+                    </SelectItem>)}
+                  </RadixSelect.Group>
+                }
+                else if ("value" in item) {
+                  return <SelectItem value={item.value} key={item.value}>
+                    {item.label}
+                  </SelectItem>
+                }
+                })}
+              </RadixSelect.Viewport>
+              <RadixSelect.ScrollDownButton className="flex items-center justify-center cursor-default h-4">
+                <HiChevronDown/>
+              </RadixSelect.ScrollDownButton>
+            </RadixSelect.Content>
+          </RadixSelect.Portal>
+        </RadixSelect.Root>
     </Container>
-  )
-}
+  );
+};
 
 interface CheckboxTextProps extends InputBaseProps {
   onChange?: (value: boolean) => void,
@@ -300,7 +264,7 @@ interface EventProps extends InputBaseProps {
 }
 const Event: FC<EventProps> = memo(({ label, value, onChange }) => {
   const events = Array.from(window.ApiShared.pubsub.registeredEvents.values());
-  return <NewSelect options={events} label={label} defaultValue={events.find(e => e.value === value)} onChange={(e: any) => onChange(e.value || "")} />
+  return <NewNewSelect options={events} label={label} defaultValue={value} onValueChange={e => onChange(e || "")} />
 });
 
 const sourceOptions = [
@@ -312,7 +276,7 @@ interface TextSourceProps extends InputBaseProps {
   value: string
 }
 const TextSource: FC<TextSourceProps> = memo(({ label, value, onChange }) => {
-  return <NewSelect label={label} value={sourceOptions.find(o => o.value === value)} options={sourceOptions} onChange={(e: any) => onChange(e.value as any)} placeholder="Text source" />
+  return <NewNewSelect label={label} value={value} options={sourceOptions} onValueChange={onChange} />
 });
 
 interface CodeProps extends InputBaseProps {
@@ -362,9 +326,9 @@ const MappedGroupSelect: FC<MappedGroupSelectProps> = memo(({ labelGroup, labelO
 
   const getCurrentOption = useCallback(() => {
     if (!library[value.group] || !value.option)
-      return null;
+      return undefined;
     const v = library[value.group].find(l => l[0] === value.option);
-    return v ? { value: v[0], label: v[1] ?? v[0] } : null;
+    return v?.[0];
   }, [value]);
 
   const getGroupOptions = useCallback(() => {
@@ -378,17 +342,18 @@ const MappedGroupSelect: FC<MappedGroupSelectProps> = memo(({ labelGroup, labelO
   }, [value]);
 
   return <>
-    <NewSelect
-      options={getGroupOptions()}
+    <NewNewSelect 
       label={labelGroup}
-      value={{ label: value.group, value: value.group }}
-      onChange={(e: any) => handleSelectGroup(e.value)} />
+      options={getGroupOptions()}
+      value={value.group}
+      onValueChange={handleSelectGroup}
+    />
 
-    {getCurrentOptions().length > 1 && <NewSelect
+    {getCurrentOptions().length > 1 && <NewNewSelect
       options={getCurrentOptions()}
       label={labelOption}
       value={getCurrentOption()}
-      onChange={(e: any) => handleSelectOption(e.value)} />}
+      onValueChange={handleSelectOption} />}
   </>
 });
 
@@ -561,13 +526,11 @@ const NativeAudioOutput: FC<AudioOutputProps> = memo(({ label, value, onChange }
     invoke<WindowsConfig>("plugin:windows_tts|get_voices").then(setConfig);
   }, []);
 
-  return <NewSelect
-    value={{ value: value, label: value }}
-    onChange={(e: any) => onChange(e.value)}
-    getOptionLabel={({ value }: any) => config?.devices.find(d => d.label === value)?.label || value}
-    options={config?.devices.map(d => ({ ...d, value: d.label }))}
-    placeholder="Device"
+  return <NewNewSelect
+    value={value}
+    onValueChange={onChange}
+    options={config?.devices.map(d => ({ ...d, value: d.label })) || []}
     label={label} />
 })
 
-export default { BaseText, Text, Chips, Object: MapObject, Range, Color, Font, Select: NewSelect, MappedGroupSelect, Checkbox, File, Event, Code, TextSource, Container, DoubleCountainer, NetworkStatus, Shortcut, NativeAudioOutput };
+export default { BaseText, Text, Chips, Object: MapObject, Range, Color, Font, NewSelect: NewNewSelect, MappedGroupSelect, Checkbox, File, Event, Code, TextSource, Container, DoubleCountainer, NetworkStatus, Shortcut, NativeAudioOutput };

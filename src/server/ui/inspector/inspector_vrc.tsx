@@ -49,7 +49,7 @@ const Inspector_VRC: FC = () => {
       <Input.TextSource label="Source" value={state.source} onChange={e => up("source", e)} />
       <Input.Checkbox label="Text field" value={state.inputField} onChange={e => up("inputField", e)} />
 
-      <Input.Select options={targetOptions} label="Target" value={targetOptions.find(o => o.value === state.target)} onChange={(e: any) => up("target", e.value as VRC_Backends)} />
+      <Input.NewSelect options={targetOptions} label="Target" value={state.target} onValueChange={e => up("target", e as VRC_Backends)} />
       {state.target === VRC_Backends.killfrenzy && <KillFrenzyInspector />}
       {state.target === VRC_Backends.textbox && <TextboxInspector />}
     </Inspector.Content>

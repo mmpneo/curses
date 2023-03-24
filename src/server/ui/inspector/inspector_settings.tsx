@@ -52,8 +52,8 @@ const themesDark = [
 ]
 
 const options = [
-  { label: 'Light', options: themesLight.map(theme => ({ value: theme, label: theme })) },
-  { label: 'Dark', options: themesDark.map(theme => ({ value: theme, label: theme })) }
+  { label: 'Light themes', options: themesLight.map(theme => ({ value: theme, label: theme })) },
+  { label: 'Dark themes', options: themesDark.map(theme => ({ value: theme, label: theme })) }
 ]
 
 const UI_SCALE_MIN = 0.8;
@@ -154,7 +154,7 @@ const Inspector_Settings: FC = memo(() => {
       <div className="divider"></div>
 
       {/* <Inspector.SubHeader>UI</Inspector.SubHeader> */}
-      <Input.Select label="Theme" options={options} value={{ value: clientTheme, label: clientTheme }} onChange={(e: any) => handleChangeTheme(e.value)} />
+      <Input.NewSelect label="Theme" options={options} value={clientTheme} onValueChange={handleChangeTheme} />
       <Input.Chips label="UI scale" value={uiScale} onChange={e => handleChangeScale(e)} options={[
         { label: "S", value: .8 },
         { label: "M", value: 1 },

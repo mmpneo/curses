@@ -119,10 +119,10 @@ const BoxInspector: FC<{ id: string }> = ({ id }) => {
     </Input.DoubleCountainer>
 
     <Inspector.SubHeader>Background</Inspector.SubHeader>
-    <Input.Select options={[
+    <Input.NewSelect options={[
       { label: 'Solid', value: 'solid' },
       { label: '9-Slice', value: 'slice' },
-    ]} label="Type" value={{ value: data.boxBackgroundType, label: data.boxBackgroundType }} onChange={(e: any) => up("boxBackgroundType", e.value)} />
+    ]} label="Type" value={data.boxBackgroundType} onValueChange={e => up("boxBackgroundType", e as any)} />
     <Input.File type="image" label="Image" value={data.boxImageFileId} onChange={e => up("boxImageFileId", e)} />
 
     <Inspector.Switchable visible={data.boxBackgroundType === "solid"}>
