@@ -286,21 +286,24 @@ interface CodeProps extends InputBaseProps {
 }
 
 interface NetworkStatusProps extends InputBaseProps {
-  value: ServiceNetworkState
+  value: ServiceNetworkState,
+  connectedLabel?: string
+  disconnectedLabel?: string
+  connectingLabel?: string
 }
-export const InputNetworkStatus: FC<NetworkStatusProps> = ({ label, value }) => {
+export const InputNetworkStatus: FC<NetworkStatusProps> = ({ label, value, connectedLabel = "Connected", disconnectedLabel = "Disconnected", connectingLabel = "Connecting.." }) => {
   return <InputContainer label={label}>
     <div className="self-end flex space-x-2 items-center pl-2 pr-3 h-8 py-1 rounded-full bg-neutral/50 border-dashed border-neutral">
       {value === ServiceNetworkState.disconnected && <>
-        <span className="text-xs font-semibold text-error leading-none">Disconnected</span>
+        <span className="text-xs font-semibold text-error leading-none">{disconnectedLabel}</span>
         <div className="rounded-full ring-2 bg-error ring-error ring-offset-base-100 ring-offset-2 w-2 h-2 " />
       </>}
       {value === ServiceNetworkState.connecting && <>
-        <span className="text-xs font-semibold text-erroneutralr leading-none">Connecting..</span>
+        <span className="text-xs font-semibold text-neutral leading-none">{connectingLabel}</span>
         <div className="rounded-full ring-2 bg-neutral ring-neutral ring-offset-base-100 ring-offset-2 w-2 h-2 " />
       </>}
       {value === ServiceNetworkState.connected && <>
-        <span className="text-xs font-semibold text-success leading-none">Connected</span>
+        <span className="text-xs font-semibold text-success leading-none">{connectedLabel}</span>
         <div className="rounded-full ring-2 bg-success ring-success ring-offset-base-100 ring-offset-2 w-2 h-2 " />
       </>}
       {/* {value === ServiceNetworkState.error && <>
