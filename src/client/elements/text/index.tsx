@@ -33,7 +33,7 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
 
     // play hide sound
     if (stateRef.current.soundFileOnHide) {
-      window.ApiClient.sound.playFile(stateRef.current.soundFileOnHide);
+      window.ApiClient.sound.playFile(stateRef.current.soundFileOnHide, {volume: stateRef.current.soundVolume ?? 1,});
     }
 
     if (sentenceQueue.current.length === 0)
@@ -56,14 +56,14 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
     }
 
     if (stateRef.current.soundFileNewSentence && sentencesRef.current.length) {
-      window.ApiClient.sound.playFile(stateRef.current.soundFileNewSentence);
+      window.ApiClient.sound.playFile(stateRef.current.soundFileNewSentence, {volume: stateRef.current.soundVolume ?? 1,});
     }
 
     setActive(true);
 
     // play show sound
     if (stateRef.current.soundFileOnShow)
-      window.ApiClient.sound.playFile(stateRef.current.soundFileOnShow);
+      window.ApiClient.sound.playFile(stateRef.current.soundFileOnShow, {volume: stateRef.current.soundVolume ?? 1});
 
     isRunning.current = true;
   }
@@ -163,11 +163,11 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
     // play sound
     if (stateRef.current.soundEnable && stateRef.current.soundFile) {
       window.ApiClient.sound.playFile(stateRef.current.soundFile, {
-        volume: stateRef.current.soundVolume || 1,
-        detuneMin: stateRef.current.soundDetuneMin || 0,
-        detuneMax: stateRef.current.soundDetuneMax || 0,
-        playbackMin: stateRef.current.soundPlaybackMin || 1,
-        playbackMax: stateRef.current.soundPlaybackMax || 1,
+        volume: stateRef.current.soundVolume ?? 1,
+        detuneMin: stateRef.current.soundDetuneMin ?? 0,
+        detuneMax: stateRef.current.soundDetuneMax ?? 0,
+        playbackMin: stateRef.current.soundPlaybackMin ?? 1,
+        playbackMax: stateRef.current.soundPlaybackMax ?? 1,
       });
     }
     if (rect && stateRef.current.particlesEnable) {
