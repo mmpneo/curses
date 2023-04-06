@@ -143,9 +143,9 @@ const SelectItem = forwardRef<HTMLDivElement, PropsWithChildren<any>>(({ childre
   );
 });
 
-type Option = { label: string; value: string };
+export type InputSelectOption = { label: string; value: string };
 interface NewNewSelectProps extends InputBaseProps, RadixSelect.SelectProps {
-  options: (Option | {label: string, options: Option[]})[];
+  options: (InputSelectOption | {label: string, options: InputSelectOption[]})[];
 }
 export const InputSelect: FC<NewNewSelectProps> = ({ options, ...props }) => {
   const id = useId();
@@ -408,7 +408,7 @@ const FontSelectDropdown: FC<any> = memo(({ onChange, value }) => {
       <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Font name" className="w-full input input-sm input-bordered" />
       <button className="btn btn-sm btn-square" onClick={handleInstallGFonts}>+</button>
     </div>
-    <span className="text-xs text-base-content/50">Find font at <a className="link link-primary link-hover font-medium" target="_blank" href="@/server/components/input/index">Google Fonts</a> and copypaste its name here</span>
+    <span className="text-xs text-base-content/50">Find font at <a className="link link-primary link-hover font-medium" target="_blank" href="https://fonts.google.com/">Google Fonts</a> and copypaste its name here</span>
     <button className="btn btn-sm btn-primary" onClick={handleInstallDrive}>Install from file system</button>
   </div>
 })
