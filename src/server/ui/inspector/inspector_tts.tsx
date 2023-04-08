@@ -197,7 +197,6 @@ const VoiceVox: FC = () => {
   const handleQueryVoices = async () => {
     let resp = await fetch("http://127.0.0.1:50021/speakers");
     const jsn = await resp.json();
-    console.log(jsn);
   };
 
   const handleSynth = async () => {
@@ -233,7 +232,6 @@ const VoiceVox: FC = () => {
       })
     });
     const jsn = await resp.arrayBuffer();
-    console.log(jsn);
   };
 
   return <>
