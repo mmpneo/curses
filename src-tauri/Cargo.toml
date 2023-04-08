@@ -1,6 +1,6 @@
 [package]
 name = "curses"
-version = "0.0.12"
+version = "0.0.13"
 description = "A very cool app"
 authors = ["mmpneo@gmail.com"]
 license = ""
@@ -42,6 +42,7 @@ windows = { version = "0.44.0", features = [
 clap = { version = "4.0.29", features = ["derive"] }
 local-ip-address = "0.4.9"
 rodio = "0.16.0"
+reqwest = {version = "0.11.15", features = ["json"] }
 
 [profile.release]
 lto = true
