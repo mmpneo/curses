@@ -4,8 +4,8 @@ import { FC, memo } from "react";
 import { useSnapshot } from "valtio";
 import style           from "./background-input.module.css";
 
-declare module 'csstype' {
-  interface Properties {
+declare module 'react' {
+  interface CSSProperties {
     "--size"?: string,
     "--value"?: string | number,
   }

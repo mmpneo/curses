@@ -3,8 +3,8 @@
     "productName": "curses"
   },
   "build": {
-    "beforeDevCommand": "yarn dev --host",
-    "beforeBuildCommand": "yarn build",
+    "beforeDevCommand": "pnpm dev --host",
+    "beforeBuildCommand": "pnpm build",
     "devPath": "http://localhost:1420",
     "distDir": "../dist",
     "withGlobalTauri": true

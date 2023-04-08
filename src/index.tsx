@@ -22,8 +22,8 @@ declare global {
   }
 }
 
-declare module 'csstype' {
-  interface Properties {
+declare module 'react' {
+  interface CSSProperties {
     '--uiscale'?: string
   }
 }

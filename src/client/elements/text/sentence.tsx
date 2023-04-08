@@ -2,8 +2,8 @@ import { FC, memo, useCallback, useContext, useEffect, useLayoutEffect, useRef }
 import { Element_TextState } from "./schema";
 import { sentenceCtx, TextSentenceData } from "./shared";
 
-declare module 'csstype' {
-  interface Properties {
+declare module 'react' {
+  interface CSSProperties {
     '--time'?: string
     '--index'?: string | number
     '--wordindex'?: string | number

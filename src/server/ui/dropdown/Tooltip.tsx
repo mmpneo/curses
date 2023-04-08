@@ -1,5 +1,5 @@
-import { Placement } from "@floating-ui/dom";
-import { arrow, autoPlacement, autoUpdate, flip, FloatingPortal, offset, shift, useFloating, useHover, useInteractions } from "@floating-ui/react-dom-interactions";
+import { Placement } from "@floating-ui/react-dom";
+import { arrow, autoUpdate, flip, FloatingPortal, offset, shift, useFloating, useHover, useInteractions } from "@floating-ui/react-dom-interactions";
 import { AnimatePresence, motion } from "framer-motion";
 import { FC, HtmlHTMLAttributes, memo, PropsWithChildren, ReactNode, useRef, useState } from "react";
 

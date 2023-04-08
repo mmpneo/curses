@@ -1,6 +1,6 @@
 import { createContext, FC, HtmlHTMLAttributes, memo, PropsWithChildren, ReactNode, useContext, useRef, useState } from "react";
 import { arrow, offset, autoUpdate, flip, safePolygon, shift, useClick, useDismiss, useFloating, useHover, useInteractions, FloatingPortal } from "@floating-ui/react-dom-interactions";
-import { Placement } from "@floating-ui/dom";
+import { Placement } from "@floating-ui/react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 interface Props {
   content: ReactNode,
@@ -18,7 +18,7 @@ export const dropdownContext = createContext({
   close: () => { }
 });
 
-const Dropdown: FC<PropsWithChildren<HtmlHTMLAttributes<HTMLSpanElement> & Props>> = memo(({ children, content, interact = "click", placement = "bottom", targetOffset = 8, ...props }) => {
+const Dropdown: FC<PropsWithChildren<Omit<HtmlHTMLAttributes<HTMLSpanElement>, "content"> & Props>> = memo(({ children, content, interact = "click", placement = "bottom", targetOffset = 8, ...props }) => {
   const arrowRef = useRef(null);
   const [open, setOpen] = useState(false);
   const { x, y, reference, floating, strategy, context, middlewareData: { arrow: { x: arrowX, y: arrowY } = {} } } = useFloating({

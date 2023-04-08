@@ -17,6 +17,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
       - uses: SebRollen/toml-action@v1.0.1
         id: version
         with:
@@ -27,8 +29,8 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
       - name: setup tauri cli
         run: cargo install tauri-cli
-      - name: setup yarn deps
-        run: yarn
+      - name: setup pnpm deps
+        run: pnpm i
       - name: compile
         run: cargo tauri build
         env:
