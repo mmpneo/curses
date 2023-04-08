@@ -5,6 +5,7 @@ import Schema_Discord, { Discord_State } from "./services/discord/schema";
 import Schema_VRC, { VRC_State }       from "./services/vrc/schema";
 import Schema_TTS, { TTS_State }       from "./services/tts/schema";
 import { customAlphabet, urlAlphabet } from "nanoid";
+import Schema_Translation, { Translation_State } from "./services/translation/schema";
 
 export interface BackendState {
   id: string;
@@ -24,6 +25,7 @@ export interface BackendState {
   services: {
     stt: ServiceState<STT_State>;
     tts: ServiceState<TTS_State>;
+    translation: ServiceState<Translation_State>;
     twitch: ServiceState<Twitch_State>;
     discord: ServiceState<Discord_State>;
     vrc: ServiceState<VRC_State>;
@@ -76,11 +78,12 @@ export const backendSchema: JSONSchemaType<BackendState> = {
         vrc: genServiceSchema(Schema_VRC),
         stt: genServiceSchema(Schema_STT),
         tts: genServiceSchema(Schema_TTS),
+        translation: genServiceSchema(Schema_Translation),
         twitch: genServiceSchema(Schema_Twitch),
         discord: genServiceSchema(Schema_Discord),
       },
       default: {} as any,
-      required: ["vrc", "stt", "tts", "twitch", "discord"],
+      required: ["vrc", "stt", "tts", "translation", "twitch", "discord"],
     },
   },
   additionalProperties: false,
