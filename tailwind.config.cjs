@@ -118,7 +118,11 @@ module.exports = {
     ],
   },
   theme: {
-    extend: {},
+    extend: {
+      transitionProperty: {
+        'spacing': 'margin, padding',
+      }
+    },
   },
   plugins: [require("daisyui")],
 };
