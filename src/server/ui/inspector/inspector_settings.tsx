@@ -1,18 +1,16 @@
-import classNames from "classnames";
+import { useGetState, useUpdateState } from "@/client";
+import { ServiceNetworkState } from "@/types";
+import { getVersion } from '@tauri-apps/api/app';
 import { FC, memo, useEffect, useState } from "react";
 import { RiFileCopyLine, RiSettings2Fill } from "react-icons/ri";
-import { SiDiscord, SiObsstudio, SiPatreon, SiTwitch, SiTwitter } from "react-icons/si";
-import { toast } from "react-toastify";
-import { useSnapshot }                 from "valtio";
-import Inspector                       from "./components";
-import { useGetState, useUpdateState } from "@/client";
-import { ServiceNetworkState }         from "@/types";
-import Dropdown, { useDropdown }       from "../dropdown/Dropdown";
+import { SiDiscord, SiPatreon, SiTwitch, SiTwitter } from "react-icons/si";
+import { useSnapshot } from "valtio";
+import Dropdown from "../dropdown/Dropdown";
 import Tooltip from "../dropdown/Tooltip";
-import { InputBaseText, InputChips, InputDoubleCountainer, InputNetworkStatus, InputSelect, InputShortcut, InputText }   from "./components/input";
-import Logo    from "../logo";
-import ServiceButton                   from "../service-button";
-import { getVersion }                  from '@tauri-apps/api/app';
+import Logo from "../logo";
+import ServiceButton from "../service-button";
+import Inspector from "./components";
+import { InputBaseText, InputChips, InputDoubleCountainer, InputNetworkStatus, InputSelect, InputShortcut, InputText } from "./components/input";
 const themesLight = [
   'light',
   'lofi',
@@ -58,39 +56,6 @@ const options = [
 
 const UI_SCALE_MIN = 0.8;
 const UI_SCALE_MAX = 1.5;
-
-const ObsSetupDropdown: FC = () => {
-  const dropdown = useDropdown()
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [name, setName] = useState("Curse captions");
-  const [port, setPort] = useState("4455");
-  const [password, setPassword] = useState("");
-
-  const handleSetup = async () => {
-    setError("");
-    if (!port || !name)
-      return;
-    setLoading(true);
-    const resp = await window.ApiServer.setupObsScene({ port, password, name });
-    if (!resp) {
-      toast.success("Updated OBS");
-      dropdown.close();
-    }
-    else
-      setError(resp)
-    setLoading(false);
-  }
-
-  return <div className="menu bg-base-100 p-4 w-72 rounded-box flex flex-col space-y-2">
-    <InputText value={name} onChange={e => setName(e.target.value)} label="Source name" />
-    <InputText value={port} onChange={e => setPort(e.target.value)} label="Port" />
-    <InputText type="password" autoComplete="false" value={password} onChange={e => setPassword(e.target.value)} label="Password" />
-    <span className="text-xs opacity-50">New source will be created in the currently active scene</span>
-    {error && <span className="text-xs text-error">{error}</span>}
-    <button onClick={handleSetup} className={classNames("btn btn-sm btn-primary", { loading })}>Confirm</button>
-  </div>
-}
 
 const AddrInput = () => {
   const [v, setV] = useState(window.ApiServer.state.linkAddress);
@@ -162,17 +127,7 @@ const Inspector_Settings: FC = memo(() => {
         { label: "X", value: 1.4 },
       ]} />
 
-      <Inspector.SubHeader>Setup client</Inspector.SubHeader>
-      <Inspector.Description>Create new browser source, paste the link and set window size to {canvas.w}x{canvas.h} pixels</Inspector.Description>
-      <div className="flex items-center space-x-2">
-        <button onClick={window.ApiShared.peer.copyClientLink} className="flex-grow btn btn-sm border-2 gap-2"><RiFileCopyLine /> Copy url</button>
-        <span className="text-sm text-base-content/50 font-medium">or</span>
-        <Tooltip placement="top" className="flex-grow flex flex-col" content="Setup browser source" body={<span><span className="font-medium">Active "obs-websocket"</span> plugin required. <br /> OBS 28.x should have it by default, just enable it!</span>}>
-          <Dropdown className="flex-grow btn btn-sm gap-2" targetOffset={24} placement="right" content={<ObsSetupDropdown />}>
-            <SiObsstudio /> Setup OBS
-          </Dropdown>
-        </Tooltip>
-      </div>
+      
 
       <Inspector.SubHeader>Template</Inspector.SubHeader>
       {author && <span className="text-sm text-secondary font-semibold">Created by {author}</span>}

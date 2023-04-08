@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { AnimatePresence, motion } from "framer-motion";
-import { ButtonHTMLAttributes, FC, memo, PropsWithChildren, useEffect } from "react";
+import { ButtonHTMLAttributes, FC, memo, PropsWithChildren, ReactNode, useEffect } from "react";
 import { RiAddFill, RiChatVoiceFill, RiFolderMusicFill, RiImageFill, RiMessage2Fill, RiSettings2Fill, RiTranslate2, RiUserVoiceFill } from "react-icons/ri";
 import { TbArrowBarToLeft, TbArrowBarToRight, TbTextResize } from "react-icons/tb";
 import { useSnapshot } from "valtio";
@@ -12,6 +12,7 @@ import Dropdown from "./dropdown/Dropdown";
 import Tooltip from "./dropdown/Tooltip";
 import Inspector from "./inspector";
 import { MdExtension } from "react-icons/md";
+import { SiDiscord, SiObsstudio, SiTwitch } from "react-icons/si";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   tooltip: string;
@@ -71,6 +72,13 @@ const ElementMenu: FC<{ id: string, title: string }> = ({ id, title }) => {
   );
 };
 
+const SIdebarDivider: FC<PropsWithChildren<{expand: boolean, icon: ReactNode}>> = ({children, expand, icon}) => {
+  return <div className="flex flex-nowrap items-center text-xs font-semibold opacity-50 w-auto">
+  <div className="flex flex-none w-10 h-6 items-center justify-center text-xl">{icon}</div>
+  <span className={classNames("transition-opacity", expand ? "opacity-100" : "opacity-0")}>{children}</span>
+</div>
+}
+
 const SidebarElementButton: FC<{ id: string }> = memo(({ id }) => {
   const name = useGetState(state => state.elements[id].name);
   const type = useGetState(state => state.elements[id].type);
@@ -104,10 +112,11 @@ const Sidebar: FC = memo(() => {
 
   const sttState = useSnapshot(window.ApiServer.stt.serviceState);
   const ttsState = useSnapshot(window.ApiServer.tts.serviceState);
+  const translationState = useSnapshot(window.ApiServer.translation.serviceState);
 
   return <div className="flex h-full z-20">
     <div className="bg-base-200 flex-none overflow-y-scroll overflow-x-hidden scrollbar-hide">
-      <motion.div transition={{ ease: "anticipate", duration: 0.2 }} initial={{ width: "3.5rem" }} animate={{ width: expand ? "13rem" : "3.5rem" }} className="flex flex-col space-y-2 py-2 px-2">
+      <motion.div transition={{ ease: "anticipate", duration: 0.2 }} initial={{ width: "3.5rem" }} animate={{ width: expand ? "13rem" : "3.5rem" }} className="flex flex-col space-y-1 py-2 px-2">
         <button className="w-full btn btn-ghost border-none justify-start min-h-fit h-auto flex-nowrap whitespace-nowrap px-0 gap-1 overflow-hidden" onClick={switchExpand}>
           <span className={classNames("flex-none w-10 h-8 items-center justify-center text-lg text-base-content/50 swap swap-flip", { "swap-active": expand })}>
             <TbArrowBarToLeft className="swap-on" />
@@ -117,13 +126,25 @@ const Sidebar: FC = memo(() => {
         </button>
         <SideBarButton status={sttState.status} tab={{ tab: Services.stt }} tooltip="Speech to Text"><RiUserVoiceFill /></SideBarButton>
         <SideBarButton status={ttsState.status} tab={{ tab: Services.tts }} tooltip="Text to Speech"><RiChatVoiceFill /></SideBarButton>
-        <SideBarButton disabled tab={{ tab: Services.translation }} tooltip="Translation\WIP"><RiTranslate2 /></SideBarButton>
-        <SideBarButton tab={{ tab: Services.vrc }} tooltip="VRChat chatbox"><RiMessage2Fill /></SideBarButton>
-        <SideBarButton tab={{ tab: "integrations" }} tooltip="Integrations"><MdExtension /></SideBarButton>
+        <SideBarButton status={translationState.status} tab={{ tab: Services.translation }} tooltip="Translation"><RiTranslate2 /></SideBarButton>
         <SideBarButton tab={{ tab: "settings" }} tooltip="Settings & About"><RiSettings2Fill /></SideBarButton>
-        <Divider />
+        <SIdebarDivider expand={expand} icon={<MdExtension className="flex-none" size={14} />}>Integrations</SIdebarDivider>
+        
+        {/* OBS */}
+        {/* Twitch */}
+        {/* Discord */}
+        {/* VRC */}
+        <div className={classNames("flex flex-col transition-spacing space-y-1", expand ? "pl-2" : "pl-0")}>
+          <SideBarButton tab={{ tab: "obs" }} tooltip="OBS Studio"><SiObsstudio /></SideBarButton>
+          <SideBarButton tab={{ tab: Services.twitch }} tooltip="Twitch"><SiTwitch /></SideBarButton>
+          <SideBarButton tab={{ tab: Services.discord }} tooltip="Discord"><SiDiscord /></SideBarButton>
+          <SideBarButton tab={{ tab: Services.vrc }} tooltip="VRChat"><RiMessage2Fill /></SideBarButton>
+        </div>
+        <SIdebarDivider expand={expand} icon={<MdExtension className="flex-none" size={14} />}>Elements</SIdebarDivider>
         {/* <SideBarButton tab={{ tab: "scenes" }} tooltip="Canvas & Scenes"><RiStackFill /></SideBarButton> */}
-        <ElementList />
+        <div className={classNames("flex flex-col space-y-1 transition-spacing", expand ? "pl-2" : "pl-0")}>
+          <ElementList />
+        </div>
         <Dropdown placement="right" content={<AddElementsMenu />}>
           <SideBarButtonBase tooltip="Add element"><RiAddFill /></SideBarButtonBase>
         </Dropdown>
