@@ -55,6 +55,6 @@ export enum TextEventSource {
 }
 
 export type InspectorTabPath = {
-  tab: Services | ElementType | "settings" | "integrations" | "scenes" | "files" | "fonts",
+  tab: Services | ElementType | "settings" | "integrations" | "scenes" | "files" | "fonts" | "obs",
   value?: string
 }

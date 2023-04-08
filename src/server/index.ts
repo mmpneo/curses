@@ -18,6 +18,7 @@ export enum Services {
   tts = "tts",
   translation = "translation",
   twitch = "twitch",
+  discord = "discord",
 }
 
 class ApiServer {
