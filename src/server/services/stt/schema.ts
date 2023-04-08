@@ -11,6 +11,7 @@ export enum STT_Backends {
 export type STT_State = {
   backend: STT_Backends;
   autoStart: boolean;
+  replaceWords: Record<string, string>;
   native: {
     language_group: string;
     language: string;
@@ -26,9 +27,11 @@ export type STT_State = {
     interim: boolean;
   };
   speechly: {
+    device: string;
     key: string;
   }
   deepgram: {
+    device: string;
     language_group: string;
     language: string;
     tier: string;
@@ -44,6 +47,7 @@ const Schema_STT: JSONSchemaType<STT_State> = {
   properties: {
     backend: { type: "string", default: STT_Backends.browser },
     autoStart: { type: "boolean", default: false },
+    replaceWords: { type: "object", default: {}, required: [] },
     native: {
       type: "object",
       properties: {
@@ -57,7 +61,7 @@ const Schema_STT: JSONSchemaType<STT_State> = {
     azure: {
       type: "object",
       properties: {
-        device: { type: "string", default: "" },
+        device: { type: "string", default: "default" },
         language_group: { type: "string", default: "" },
         language: { type: "string", default: "" },
         key: { type: "string", default: "" },
@@ -73,6 +77,7 @@ const Schema_STT: JSONSchemaType<STT_State> = {
     deepgram: {
       type: "object",
       properties: {
+        device: { type: "string", default: "default" },
         language_group: { type: "string", default: "" },
         language: { type: "string", default: "" },
         tier: { type: "string", default: "" },
@@ -81,22 +86,24 @@ const Schema_STT: JSONSchemaType<STT_State> = {
         profanity: { type: "boolean", default: true },
         interim: { type: "boolean", default: true },
       },
-      required: ["language_group", "language", "tier", "key", "punctuate", "profanity", "interim"],
+      required: ["device", "language_group", "language", "tier", "key", "punctuate", "profanity", "interim"],
       default: {} as any,
       additionalProperties: false,
     },
     speechly: {
       type: "object",
       properties: {
+        device: { type: "string", default: "default" },
         key: { type: "string", default: "" },
       },
-      required: ["key"],
+      required: ["device", "key"],
       default: {} as any,
       additionalProperties: false,
     },
   },
   required: [
     "backend",
+    "replaceWords",
     "autoStart",
     "speechly",
     "native",

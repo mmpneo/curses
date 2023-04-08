@@ -2,13 +2,15 @@ import { STT_Backends, STT_State } from "@/server/services/stt/schema";
 import { ServiceNetworkState } from "@/types";
 import { invoke } from "@tauri-apps/api/tauri";
 import { FC } from "react";
-import { RiUserVoiceFill } from "react-icons/ri";
+import { RiCharacterRecognitionFill, RiUserVoiceFill } from "react-icons/ri";
 import { SiGooglechrome, SiMicrosoftedge } from "react-icons/si";
 import { useSnapshot } from "valtio";
 import { azureLanguages, deepGramLangs, nativeLangs } from "../../services/stt/stt_data";
 import ServiceButton from "../service-button";
 import Inspector from "./components";
-import { InputCheckbox, InputMappedGroupSelect, InputSelect, InputText } from "./components/input";
+import { InputCheckbox, InputMapObject, InputMappedGroupSelect, InputSelect, InputText, InputWebAudioInput } from "./components/input";
+import NiceModal from "@ebay/nice-modal-react";
+import Modal from "../Modal";
 
 const Native: FC = () => {
   const pr = useSnapshot(window.ApiServer.state.services.stt.data.native);
@@ -74,6 +76,8 @@ const Azure: FC = () => {
     <InputText label="Key" type="password" value={pr.key} onChange={e => up("key", e.target.value)} />
     <InputText label="Location" value={pr.location} onChange={e => up("location", e.target.value)} />
 
+    <InputWebAudioInput value={pr.device} onChange={e => up("device", e)} label="Input Device"/>
+
     <InputMappedGroupSelect
       labelGroup="Language"
       labelOption="Dialect"
@@ -98,7 +102,7 @@ const Azure: FC = () => {
 
 const Deepgram: FC = () => {
   const pr = useSnapshot(window.ApiServer.state.services.stt.data.deepgram);
-  const handleUpdate = <K extends keyof STT_State["deepgram"]>(key: K, v: STT_State["deepgram"][K]) => window.ApiServer.state.services.stt.data.deepgram[key] = v;
+  const up = <K extends keyof STT_State["deepgram"]>(key: K, v: STT_State["deepgram"][K]) => window.ApiServer.state.services.stt.data.deepgram[key] = v;
 
   const updateLanguage = (value: { group: string, option: string }) => {
     window.ApiServer.state.services.stt.data.deepgram.language       = value.option;
@@ -107,8 +111,9 @@ const Deepgram: FC = () => {
 
   return <>
     <Inspector.SubHeader>Deepgram options</Inspector.SubHeader>
-    <InputText label="Key" type="password" value={pr.key} onChange={e => handleUpdate("key", e.target.value)} />
+    <InputText label="Key" type="password" value={pr.key} onChange={e => up("key", e.target.value)} />
 
+    <InputWebAudioInput value={pr.device} onChange={e => up("device", e)} label="Input Device"/>
     <InputMappedGroupSelect
       labelGroup="Language"
       labelOption="Dialect"
@@ -119,7 +124,7 @@ const Deepgram: FC = () => {
     <InputSelect options={[
       { label: 'Base', value: 'base' },
       { label: 'Enhanced', value: 'enhanced' },
-    ]} label="Quality" value={pr.tier} onValueChange={e => handleUpdate("tier", e)} />
+    ]} label="Quality" value={pr.tier} onValueChange={e => up("tier", e)} />
 
     <span className="text-base-content/60 text-xs">
       Some languages cannot be used with "enhanced" quality option
@@ -127,9 +132,9 @@ const Deepgram: FC = () => {
       <a className="link link-primary link-hover" target="_blank" href="@/server/ui/inspector/server/inspector#language-options">See language table</a>
     </span>
 
-    <InputCheckbox label="Interim result" onChange={e => handleUpdate("interim", e)} value={pr.interim} />
-    <InputCheckbox label="Profanity filter" onChange={e => handleUpdate("profanity", e)} value={pr.profanity} />
-    <InputCheckbox label="Punctuate" onChange={e => handleUpdate("punctuate", e)} value={pr.punctuate} />
+    <InputCheckbox label="Interim result" onChange={e => up("interim", e)} value={pr.interim} />
+    <InputCheckbox label="Profanity filter" onChange={e => up("profanity", e)} value={pr.profanity} />
+    <InputCheckbox label="Punctuate" onChange={e => up("punctuate", e)} value={pr.punctuate} />
   </>
 }
 
@@ -139,9 +144,25 @@ const Speechly: FC = () => {
 
   return <>
     <Inspector.SubHeader>Speechly options</Inspector.SubHeader>
+    <InputWebAudioInput value={pr.device} onChange={e => up("device", e)} label="Input Device"/>
     <InputText label="App ID" type="password" value={pr.key} onChange={e => up("key", e.target.value)} />
   </>
 }
+
+const WordsReplacementModal: FC = () => {
+  const data = useSnapshot(window.ApiServer.state.services.stt);
+  const update = (newMap: Record<string, string>) => window.ApiServer.state.services.stt.data.replaceWords = {...newMap};
+
+  return <Modal.Body width={350}>
+    <Modal.Header>STT Word replacements</Modal.Header>
+    <Modal.Content>
+      <div className="p-4">
+        <InputMapObject keyPlaceholder="Word" valuePlaceholder="Replacement" addLabel="Add word" value={{...data.data.replaceWords}} onChange={e => update(e)} label="" />
+      </div>
+    </Modal.Content>
+  </Modal.Body>
+}
+NiceModal.register('stt-replacements', (props) => <Modal.Base {...props}><WordsReplacementModal /></Modal.Base>);
 
 const Inspector_STT: FC = () => {
   const data = useSnapshot(window.ApiServer.state.services.stt);
@@ -150,11 +171,16 @@ const Inspector_STT: FC = () => {
   const handleStart = (v: boolean) => window.ApiServer.state.services.stt.showActionButton = v;
   const up = <K extends keyof STT_State>(key: K, v: STT_State[K]) => window.ApiServer.patchService("stt", s => s.data[key] = v);
 
+  const handleShowReplacements = () => {
+    NiceModal.show('stt-replacements');
+  }
+
   return <Inspector.Body>
     <Inspector.Header><RiUserVoiceFill /> Speech to Text</Inspector.Header>
     <Inspector.Content>
       <InputCheckbox label="Add to action bar" onChange={handleStart} value={data.showActionButton} />
       <InputCheckbox label="Auto start" value={data.data.autoStart} onChange={e => up("autoStart", e)} />
+      <span className="link link-accent link-hover font-semibold flex items-center gap-2 text-sm" onClick={handleShowReplacements}><RiCharacterRecognitionFill/> Edit word replacements</span>
       <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
         <InputSelect options={[
           { label: "Native", value: STT_Backends.native },
