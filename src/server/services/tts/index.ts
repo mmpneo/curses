@@ -1,7 +1,7 @@
 import { toast } from "react-toastify";
 import { proxy }                                                 from "valtio";
 import { IServiceInterface, ServiceNetworkState, TextEventType } from "@/types";
-import { serviceSubscibeToInput, serviceSubscibeToSource }       from "../../../utils";
+import { replaceSendenceWords, serviceSubscibeToInput, serviceSubscibeToSource }       from "../../../utils";
 import { TTS_Backends }                                          from "./schema";
 import { TTS_AzureService }                                      from "./services/azure";
 import { TTS_NativeService }                                     from "./services/native";
@@ -60,7 +60,7 @@ class Service_TTS implements IServiceInterface {
   }
 
   play(value: string) {
-    this.#serviceInstance?.play(this.#replaceWords(value));
+    this.#serviceInstance?.play(replaceSendenceWords(this.data.replaceWords, value));
   }
 
   start() {

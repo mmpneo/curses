@@ -35,12 +35,28 @@ export function serviceSubscibeToInput<Obj extends object>(baseProxy: Obj, enabl
     lastSub = window.ApiShared.pubsub.subscribeText(TextEventSource.textfield, fn)
 }
 
+export function isObjectVaid(value: Record<string, any>) {
+  return !Object.values(value).some(isEmptyValue)
+}
+
 export function isEmptyValue(value: any) {
   return value === undefined
   || value === null
   || (typeof value === 'object' && Object.keys(value).length === 0) || (typeof value === 'string' && value.trim().length === 0)
 }
 
+
+export function replaceSendenceWords(map: Record<string, string>,sentence: string): string {
+  if (!sentence)
+    return "";
+  return sentence
+    .split(" ")
+    .map((word) => {
+      const cleared = word.replace(/([.,\/#!?$%\^&\*;:{}=\-_`~()\]\[])+$/g, "");
+      return map[cleared] ? word.replace(cleared, map[cleared]) : word;
+    })
+    .join(" ");
+}
 //decode by niklasvh
 // https://github.com/niklasvh/base64-arraybuffer/blob/master/src/index.ts
 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
