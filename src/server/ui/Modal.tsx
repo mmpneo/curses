@@ -16,8 +16,8 @@ const Base = NiceModal.create<PropsWithChildren<{}>>(({ children }) => {
 });
 
 // limit height
-const Body: FC<PropsWithChildren> = ({ children }) => {
-  return <div style={{width: 500}} className="relative bg-base-100 shadow-2xl rounded-box">
+const Body: FC<PropsWithChildren<{width?: number | "auto"}>> = ({ children, width = 500 }) => {
+  return <div style={{width}} className="flex flex-col relative bg-base-100 max-h-[90vh] shadow-2xl rounded-box">
     {children}
   </div>
 }
@@ -28,8 +28,10 @@ const Header: FC<PropsWithChildren> = ({ children }) => {
 
 // scroll
 const Content: FC<PropsWithChildren> = ({ children }) => {
-  return <SimpleBar className="h-96 border-t border-base-300">
-    {children}
-  </SimpleBar>
+  return <div className="flex flex-col overflow-hidden flex-grow border-t border-base-300">
+    <SimpleBar className="h-full">
+      {children}
+    </SimpleBar>
+  </div>
 }
 export default { Base, Body, Header, Content }
