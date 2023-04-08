@@ -66,6 +66,10 @@ class Service_Translation implements IServiceInterface, ITranslationReceiver {
 
   init(): void {
     this.loadAzure();
+
+    if (this.data.autoStart)
+      this.start();
+      
     window.ApiShared.pubsub.subscribeText(
       TextEventSource.stt,
       (e) => e && this.translate(e)

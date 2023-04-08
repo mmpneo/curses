@@ -70,7 +70,8 @@ class Service_STT implements IServiceInterface {
   }
 
   async init() {
-    if (this.data.autoStart)
+    // native is bugged
+    if (this.data.autoStart && this.data.backend !== STT_Backends.native)
       this.start();
   }
 

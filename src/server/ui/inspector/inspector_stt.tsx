@@ -27,6 +27,7 @@ const Native: FC = () => {
       library={nativeLangs} />
     <div className="p-2 border-2 border-error rounded-lg text-xs space-y-2 flex flex-col">
       <span className="font-bold text-error">Experimental. Might be unstable on some PCs.</span>
+      <span className="font-bold text-error">Auto start is disabled.</span>
       <span className="font-bold">How to test</span>
       Just keep it on in the background for 10-15 minutes and say something every minute or two.</div>
   </>
