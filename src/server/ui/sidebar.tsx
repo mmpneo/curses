@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { AnimatePresence, motion } from "framer-motion";
 import { ButtonHTMLAttributes, FC, memo, PropsWithChildren, ReactNode, useEffect } from "react";
-import { RiAddFill, RiChatVoiceFill, RiFolderMusicFill, RiImageFill, RiMessage2Fill, RiSettings2Fill, RiTranslate2, RiUserVoiceFill } from "react-icons/ri";
+import { RiAddFill, RiBrushFill, RiChatVoiceFill, RiFolderMusicFill, RiImageFill, RiMessage2Fill, RiSettings2Fill, RiTranslate2, RiUserVoiceFill } from "react-icons/ri";
 import { TbArrowBarToLeft, TbArrowBarToRight, TbTextResize } from "react-icons/tb";
 import { useSnapshot } from "valtio";
 import { Services } from "../index";
@@ -140,7 +140,7 @@ const Sidebar: FC = memo(() => {
           <SideBarButton tab={{ tab: Services.discord }} tooltip="Discord"><SiDiscord /></SideBarButton>
           <SideBarButton tab={{ tab: Services.vrc }} tooltip="VRChat"><RiMessage2Fill /></SideBarButton>
         </div>
-        <SIdebarDivider expand={expand} icon={<MdExtension className="flex-none" size={14} />}>Elements</SIdebarDivider>
+        <SIdebarDivider expand={expand} icon={<RiBrushFill className="flex-none" size={14} />}>Elements</SIdebarDivider>
         {/* <SideBarButton tab={{ tab: "scenes" }} tooltip="Canvas & Scenes"><RiStackFill /></SideBarButton> */}
         <div className={classNames("flex flex-col space-y-1 transition-spacing", expand ? "pl-2" : "pl-0")}>
           <ElementList />
