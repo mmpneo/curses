@@ -1,6 +1,6 @@
 import {
   ISpeechRecognitionService,
-  SpeechServiceEventBindings
+  SpeechServiceEventBindings,
 } from "../types";
 
 import {
@@ -9,10 +9,10 @@ import {
   CancellationErrorCode,
   PropertyId,
   SpeechConfig,
-  SpeechRecognizer
-}                       from "microsoft-cognitiveservices-speech-sdk";
+  SpeechRecognizer,
+} from "microsoft-cognitiveservices-speech-sdk";
 import { isEmptyValue } from "../../../../utils";
-import { STT_State }    from "../schema";
+import { STT_State } from "../schema";
 
 export class STT_AzureService implements ISpeechRecognitionService {
   constructor(private bindings: SpeechServiceEventBindings) {}
@@ -21,9 +21,13 @@ export class STT_AzureService implements ISpeechRecognitionService {
 
   dispose(): void {}
 
+  get state() {
+    return window.ApiServer.state.services.stt.data.azure;
+  }
+
   start(state: STT_State): void {
     // ignore device for now
-    const {device, ...rest} = state.azure;
+    const { device, ...rest } = this.state;
     if (Object.values(rest).some(isEmptyValue))
       return this.bindings.onStop("Options missing");
 
@@ -59,8 +63,7 @@ export class STT_AzureService implements ISpeechRecognitionService {
     this.#instance.sessionStarted = () => this.bindings.onStart();
     this.#instance.sessionStopped = () => this.bindings.onStop();
     this.#instance.canceled = (r, e) => {
-      if (e.errorCode === CancellationErrorCode.NoError)
-        this.bindings.onStop();
+      if (e.errorCode === CancellationErrorCode.NoError) this.bindings.onStop();
       else this.bindings.onStop(`${CancellationErrorCode[e.errorCode]}`);
     };
 
@@ -73,11 +76,14 @@ export class STT_AzureService implements ISpeechRecognitionService {
   }
 
   stop(): void {
-    this.#instance?.stopContinuousRecognitionAsync(() => {
-      this.#instance?.close();
-      this.bindings.onStop();
-    }, err => {
-      // ignore results
-    });
+    this.#instance?.stopContinuousRecognitionAsync(
+      () => {
+        this.#instance?.close();
+        this.bindings.onStop();
+      },
+      (err) => {
+        // ignore results
+      }
+    );
   }
 }

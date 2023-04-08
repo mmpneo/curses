@@ -14,12 +14,16 @@ export class STT_DeepgramService implements ISpeechRecognitionService {
   private socket?: WebSocket;
   private recorder?: MediaRecorder;
 
+  get state() {
+    return window.ApiServer.state.services.stt.data.deepgram
+  }
+
   start(state: STT_State): void {
 
     if (Object.values(state.deepgram).some(isEmptyValue))
       return this.bindings.onStop("Options missing");
 
-    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+    navigator.mediaDevices.getUserMedia({audio: {deviceId: {exact: this.state.device}}}).then((stream) => {
       this.recorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
       this.socket = new WebSocket(
         `wss://api.deepgram.com/v1/listen?punctuate=${!!state.deepgram.punctuate}&interim_results=${!!state.deepgram.interim}&language=${state.deepgram.language}&tier=${state.deepgram.tier}`,

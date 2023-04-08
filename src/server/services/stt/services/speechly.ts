@@ -17,6 +17,10 @@ export class STT_SpeechlyService implements ISpeechRecognitionService {
 
   dispose(): void {}
 
+  get state() {
+    return window.ApiServer.state.services.stt.data.speechly
+  }
+
   async start(state: STT_State) {
     // ignore device for now
     if (Object.values(state.speechly).some(isEmptyValue))
@@ -41,7 +45,13 @@ export class STT_SpeechlyService implements ISpeechRecognitionService {
     });
 
     this.#microphone = new BrowserMicrophone();
+
     await this.#microphone.initialize();
+    
+    // intercept into speechly's mediaStream initialization
+    this.#microphone.mediaStream?.getAudioTracks().forEach(t => t.stop());
+    this.#microphone.mediaStream = await navigator.mediaDevices.getUserMedia({audio: {deviceId: {exact: this.state.device}}});
+
     if (!this.#microphone.mediaStream)
       return this.bindings.onStop("Error initialising");
     await this.#instance.attach(this.#microphone.mediaStream);

@@ -535,3 +535,23 @@ export const InputNativeAudioOutput: FC<AudioOutputProps> = memo(({ label, value
     options={config?.devices.map(d => ({ ...d, value: d.label })) || []}
     label={label} />
 });
+
+interface AudioOutputProps extends InputBaseProps {
+  value: string,
+  onChange: (value: string) => void
+}
+export const InputWebAudioInput: FC<AudioOutputProps> = memo(({ label, value, onChange }) => {
+  const [devices, setDevices] = useState<InputSelectOption[]>([]);
+
+  useEffect(() => {
+    navigator.mediaDevices.enumerateDevices().then(list => {
+      setDevices(list.filter(d => d.kind === "audioinput").map(d => ({ ...d, label: d.label, value: d.deviceId })));
+    })
+  }, []);
+
+  return <InputSelect
+    value={value}
+    onValueChange={onChange}
+    options={devices || []}
+    label={label} />
+});
