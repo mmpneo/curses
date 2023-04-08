@@ -1,15 +1,15 @@
-import { invoke }                       from "@tauri-apps/api/tauri";
-import { FC, useEffect, useState }      from "react";
-import { RiChatVoiceFill, RiListCheck } from "react-icons/ri";
-import { useSnapshot }                  from "valtio";
-import { InputCheckbox, InputMapObject, InputMappedGroupSelect, InputNativeAudioOutput, InputRange, InputSelect, InputText, InputTextSource }                            from "./components/input";
-import Inspector                        from "./components";
-import ServiceButton                    from "../service-button";
-import { ServiceNetworkState }          from "@/types";
-import { useBackendUpdate }             from "@/utils";
-import { TTS_Backends, TTS_State }      from "@/server/services/tts/schema";
-import { azureVoices, tiktokVoices }    from "../../services/tts/tts_data";
-import {useInspectorTabs}               from "@/server/ui/inspector/components/tabs";
+import { TTS_Backends, TTS_State } from "@/server/services/tts/schema";
+import { ServiceNetworkState } from "@/types";
+import NiceModal from "@ebay/nice-modal-react";
+import { invoke } from "@tauri-apps/api/tauri";
+import { FC, useEffect, useState } from "react";
+import { RiCharacterRecognitionFill, RiChatVoiceFill } from "react-icons/ri";
+import { useSnapshot } from "valtio";
+import { azureVoices, tiktokVoices } from "../../services/tts/tts_data";
+import Modal from "../Modal";
+import ServiceButton from "../service-button";
+import Inspector from "./components";
+import { InputCheckbox, InputMapObject, InputMappedGroupSelect, InputNativeAudioOutput, InputRange, InputSelect, InputText, InputTextSource } from "./components/input";
 
 type WindowsToken = {
   id: string;
@@ -252,63 +252,49 @@ const serviceOptions = [
   // { label: "VoiceVox", value: TTS_Backends.voicevox },
 ]
 
-const TTSInspector: FC = () => {
+const WordsReplacementModal: FC = () => {
   const data = useSnapshot(window.ApiServer.state.services.tts);
-  const up = useBackendUpdate("tts");
-  const state = useSnapshot(window.ApiServer.tts.serviceState);
-  return <>
-    <Inspector.SubHeader>Options</Inspector.SubHeader>
-    <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
-      <InputTextSource label="Source" value={data.data.source} onChange={e => up("source", e)} />
-      <InputCheckbox label="Text field" value={data.data.inputField} onChange={e => up("inputField", e)} />
-      <InputSelect value={data.data.backend} options={serviceOptions} label="Service" onValueChange={e => up("backend", e as TTS_Backends)} />
-    </Inspector.Deactivatable>
-
-    {data.data.backend === TTS_Backends.windows && <Windows />}
-    {data.data.backend === TTS_Backends.azure && <Azure />}
-    {data.data.backend === TTS_Backends.native && <Native />}
-    {data.data.backend === TTS_Backends.tiktok && <TikTok />}
-    {/* {data.data.backend === TTS_Backends.voicevox && <VoiceVox />} */}
-
-    <ServiceButton status={state.status} onStart={() => window.ApiServer.tts.start()} onStop={() => window.ApiServer.tts.stop()} />
-  </>
-}
-const GlobalInspector: FC = () => {
-  const data = useSnapshot(window.ApiServer.state.services.tts);
-  const up = useBackendUpdate("tts");
-
   const update = (newMap: Record<string, string>) => window.ApiServer.state.services.tts.data.replaceWords = {...newMap};
-  return <>
-    <Inspector.SubHeader>Replace words</Inspector.SubHeader>
-    <InputMapObject keyPlaceholder="Word" valuePlaceholder="Replacement" addLabel="Add word" value={{...data.data.replaceWords}} onChange={e => update(e)} label="" />
-  </>
+
+  return <Modal.Body width={350}>
+    <Modal.Header>TTS Word replacements</Modal.Header>
+    <Modal.Content>
+      <div className="p-4">
+        <InputMapObject keyPlaceholder="Word" valuePlaceholder="Replacement" addLabel="Add word" value={{...data.data.replaceWords}} onChange={e => update(e)} label="" />
+      </div>
+    </Modal.Content>
+  </Modal.Body>
 }
+NiceModal.register('tts-replacements', (props) => <Modal.Base {...props}><WordsReplacementModal /></Modal.Base>);
 
 const Inspector_TTS: FC = () => {
   const data = useSnapshot(window.ApiServer.state.services.tts);
   const up = <K extends keyof TTS_State>(key: K, v: TTS_State[K]) => window.ApiServer.patchService("tts", s => s.data[key] = v);
   const handleStart = (v: boolean) => window.ApiServer.state.services.tts.showActionButton = v;
-  const [[tab, direction], handleTab] = useInspectorTabs();
-
-
+  const state = useSnapshot(window.ApiServer.tts.serviceState);
+  const handleShowReplacements = () => {
+    NiceModal.show('tts-replacements');
+  }
 
   return <Inspector.Body>
     <Inspector.Header><RiChatVoiceFill /> Text to Speech</Inspector.Header>
     <Inspector.Content>
       <InputCheckbox label="Add to action bar" value={data.showActionButton} onChange={handleStart} />
       <InputCheckbox label="Auto start" value={data.data.autoStart} onChange={e => up("autoStart", e)} />
-      <Inspector.Tabs>
-        <Inspector.Tab tooltip="Configuration" tooltipBody="Service and text sources" onClick={() => handleTab(0)} active={tab === 0}><RiChatVoiceFill /></Inspector.Tab>
-        <Inspector.Tab tooltip="Word replacements" onClick={() => handleTab(1)} active={tab === 1}><RiListCheck /></Inspector.Tab>
-      </Inspector.Tabs>
-      <Inspector.TabsContent direction={direction} tabKey={tab}>
-        {tab === 0 && <TTSInspector />}
-        {tab === 1 && <GlobalInspector />}
-
-      </Inspector.TabsContent>
+      <span className="link link-accent link-hover font-semibold flex items-center gap-2 text-sm" onClick={handleShowReplacements}><RiCharacterRecognitionFill/> Edit word replacements</span>
+      <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
+        <InputTextSource label="Source" value={data.data.source} onChange={e => up("source", e)} />
+        <InputCheckbox label="Text field" value={data.data.inputField} onChange={e => up("inputField", e)} />
+        <InputSelect value={data.data.backend} options={serviceOptions} label="Service" onValueChange={e => up("backend", e as TTS_Backends)} />
+      </Inspector.Deactivatable>
+      {data.data.backend === TTS_Backends.windows && <Windows />}
+      {data.data.backend === TTS_Backends.azure && <Azure />}
+      {data.data.backend === TTS_Backends.native && <Native />}
+      {data.data.backend === TTS_Backends.tiktok && <TikTok />}
+      {/* {data.data.backend === TTS_Backends.voicevox && <VoiceVox />} */}
+      <ServiceButton status={state.status} onStart={() => window.ApiServer.tts.start()} onStop={() => window.ApiServer.tts.stop()} />
     </Inspector.Content>
   </Inspector.Body>
-
 }
 
 export default Inspector_TTS;
