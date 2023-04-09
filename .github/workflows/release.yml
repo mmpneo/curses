@@ -20,7 +20,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 8.1.1
+          version: 7.28.0
       - uses: SebRollen/toml-action@v1.0.1
         id: version
         with:
