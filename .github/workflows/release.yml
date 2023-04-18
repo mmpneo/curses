@@ -29,12 +29,10 @@ jobs:
       - run: echo ${{steps.version.outputs.value}}
       - name: setup rust
         uses: dtolnay/rust-toolchain@stable
-      - name: setup tauri cli
-        run: cargo install tauri-cli
       - name: setup pnpm deps
         run: pnpm i
       - name: compile
-        run: cargo tauri build
+        run: pnpm tauri build
         env:
           CURSES_TWITCH_CLIENT_ID: ${{secrets.CURSES_TWITCH_CLIENT_ID}}
 
