@@ -35,16 +35,10 @@ class Service_PubSub implements IServiceInterface {
       this.textEventValidator(validated);
       const textEvent = this.applyEmotes(validated as TextEvent);
 
-      // mute external stt sources
+      // redirect stt
       if (topic === "text.stt") {
-        window.ApiServer.stt.updateLastMessage(textEvent.value, textEvent.type === 1);
-        if (window.ApiServer.stt.isMuted()) {
-          // trigger possible pending unmute
-          if (textEvent.type === 0) {
-            window.ApiServer.stt.triggerPendingUnmute();
-          }
-          return;
-        }
+        window.ApiServer.stt.processExternalMessage(textEvent);
+        return;
       }
 
       this.receivePubSub({topic, data: textEvent});

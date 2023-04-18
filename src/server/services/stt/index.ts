@@ -1,4 +1,4 @@
-import { IServiceInterface, ServiceNetworkState, TextEventSource, TextEventType } from "@/types";
+import { IServiceInterface, ServiceNetworkState, TextEvent, TextEventSource, TextEventType } from "@/types";
 import { patchSentence } from "@/utils";
 import { toast } from "react-toastify";
 import { proxy } from "valtio";
@@ -91,6 +91,15 @@ class Service_STT implements IServiceInterface, ISTTReceiver {
       this.#sendFinal("[...]");
       this.updateLastMessage("", false);
     }
+  }
+
+  processExternalMessage(event: Partial<TextEvent>) {
+    if (!("type" in event) || !event.value)
+      return;
+    if (event.type === TextEventType.final)
+      this.#sendFinal(event.value);
+    else
+      this.#sendInterim(event.value);
   }
 
   async #sendFinal(sentence: string) {
