@@ -36,13 +36,16 @@ async fn play_async(data: RpcAudioPlayAsync) -> Result<(), String> {
         let sink = Sink::try_new(&stream_handle).unwrap();
         sink.set_volume(data.volume);
         sink.set_speed(data.rate);
-        let source = Decoder::new(Cursor::new(data.data)).unwrap();
-        sink.append(source);
-        sink.sleep_until_end();
-        Ok(())
+        if let Ok(source) = Decoder::new(Cursor::new(data.data)) {
+            sink.append(source);
+            sink.sleep_until_end();
+            Ok(())
+        } else {
+            Err("Unable to play file".into())
+        }
     }
     else {
-        Err("Invalid device".to_string())
+        Err("Invalid device".into())
     }
 }
 
