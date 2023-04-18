@@ -1,9 +1,9 @@
 import { decodeB64toArrayBuffer, isEmptyValue } from "../../../../utils";
-import { TTS_State }                            from "../schema";
-import { ITTSService, TTSServiceEventBindings } from "../types";
+import { TTS_State } from "../schema";
+import { ITTSReceiver, ITTSService } from "../types";
 
 export class TTS_TikTokService implements ITTSService {
-  constructor(private bindings: TTSServiceEventBindings) {}
+  constructor(private bindings: ITTSReceiver) {}
 
   dispose(): void {}
 

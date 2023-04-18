@@ -1,9 +1,8 @@
-import { isEmptyValue }                         from "../../../../utils";
-import { TTS_State }                            from "../schema";
-import { ITTSService, TTSServiceEventBindings } from "../types";
+import { TTS_State } from "../schema";
+import { ITTSReceiver, ITTSService } from "../types";
 
 export class TTS_NativeService implements ITTSService {
-  constructor(private bindings: TTSServiceEventBindings) {}
+  constructor(private bindings: ITTSReceiver) {}
   #instance?: SpeechSynthesisUtterance;
 
   dispose(): void {}

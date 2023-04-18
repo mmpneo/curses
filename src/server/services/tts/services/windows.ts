@@ -1,10 +1,10 @@
-import { invoke }                               from "@tauri-apps/api/tauri";
-import { isEmptyValue }                         from "../../../../utils";
-import { TTS_State }                            from "../schema";
-import { ITTSService, TTSServiceEventBindings } from "../types";
+import { invoke } from "@tauri-apps/api/tauri";
+import { isEmptyValue } from "../../../../utils";
+import { TTS_State } from "../schema";
+import { ITTSReceiver, ITTSService } from "../types";
 
 export class TTS_WindowsService implements ITTSService {
-  constructor(private bindings: TTSServiceEventBindings) {}
+  constructor(private bindings: ITTSReceiver) {}
 
   dispose(): void {}
 
@@ -12,7 +12,8 @@ export class TTS_WindowsService implements ITTSService {
     return window.ApiServer.state.services.tts.data.windows;
   }
   start(state: TTS_State): void {
-    if (Object.values(this.state).some(isEmptyValue)) return this.bindings.onStop("Options missing");
+    if (Object.values(this.state).some(isEmptyValue))
+      return this.bindings.onStop("Options missing");
     this.bindings.onStart();
   }
   play(value: string): void {

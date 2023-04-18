@@ -1,18 +1,28 @@
-import { toast } from "react-toastify";
-import { proxy }                                                 from "valtio";
 import { IServiceInterface, ServiceNetworkState, TextEventType } from "@/types";
-import { replaceSendenceWords, serviceSubscibeToInput, serviceSubscibeToSource }       from "../../../utils";
-import { TTS_Backends }                                          from "./schema";
-import { TTS_AzureService }                                      from "./services/azure";
-import { TTS_NativeService }                                     from "./services/native";
-import { TTS_TikTokService }                                     from "./services/tiktok";
-import { TTS_WindowsService }                                    from "./services/windows";
+import { toast } from "react-toastify";
+import { proxy } from "valtio";
+import { patchSentence, serviceSubscibeToInput, serviceSubscibeToSource } from "../../../utils";
+import { TTS_Backends } from "./schema";
+import { TTS_AzureService } from "./services/azure";
+import { TTS_NativeService } from "./services/native";
+import { TTS_TikTokService } from "./services/tiktok";
+import { TTS_WindowsService } from "./services/windows";
 import {
-  ITTSService,
-  TTSServiceEventBindings
-}                                                                from "./types";
+  ISTTServiceConstructor,
+  ITTSReceiver,
+  ITTSService
+} from "./types";
 
-class Service_TTS implements IServiceInterface {
+const backends: {
+  [k in TTS_Backends]: ISTTServiceConstructor;
+} = {
+  [TTS_Backends.native]: TTS_NativeService,
+  [TTS_Backends.windows]: TTS_WindowsService,
+  [TTS_Backends.azure]: TTS_AzureService,
+  [TTS_Backends.tiktok]: TTS_TikTokService,
+};
+
+class Service_TTS implements IServiceInterface, ITTSReceiver {
   #serviceInstance?: ITTSService;
 
   serviceState = proxy({
@@ -20,25 +30,24 @@ class Service_TTS implements IServiceInterface {
     error: ""
   });
 
+  get data() {
+    return window.ApiServer.state.services.tts.data;
+  }
+
   async init() {
-    serviceSubscibeToSource(window.ApiServer.state.services.tts.data, "source", data => {
+    serviceSubscibeToSource(this.data, "source", data => {
       if (data?.type === TextEventType.final)
         this.play(data.value);
     });
 
-    serviceSubscibeToInput(window.ApiServer.state.services.tts.data, "inputField", data => {
+    serviceSubscibeToInput(this.data, "inputField", data => {
       if (data?.type === TextEventType.final)
         this.play(data.value);
     });
 
     if (this.data.autoStart)
       this.start();
-  }
-
-  get data() {
-    return window.ApiServer.state.services.tts.data;
-  }
-
+  }  
 
   stop(): void {
     this.#serviceInstance?.stop();
@@ -49,51 +58,36 @@ class Service_TTS implements IServiceInterface {
     this.serviceState.status = value;
   }
 
-  #replaceWords(sentence: string): string {
-    return sentence
-    .split(" ")
-    .map(word => {
-      const cleared = word.replace(/([.,\/#!?$%\^&\*;:{}=\-_`~()\]\[])+$/g, "");
-      return this.data.replaceWords[cleared] ? word.replace(cleared, this.data.replaceWords[cleared]) : word;
-    })
-    .join(" ")
+  onStart(): void {
+    this.#setStatus(ServiceNetworkState.connected);
+  }
+  onStop(error?: string | undefined): void {
+    if (error) {
+      toast(error, { type: "error", autoClose: false });
+      this.serviceState.error = error;
+    }
+    this.#serviceInstance = undefined;
+    this.#setStatus(ServiceNetworkState.disconnected);
+  }
+  onFilePlayRequest(data: ArrayBuffer, options?: Record<string, any> | undefined): void {
   }
 
   play(value: string) {
-    this.#serviceInstance?.play(replaceSendenceWords(this.data.replaceWords, value));
+    const patchedValue = patchSentence(this.data.replaceWords, value).replace(/[<>]/gi, "");
+    if (!patchedValue)
+      return;
+    this.#serviceInstance?.play(patchedValue);
   }
 
   start() {
     this.stop();
     this.serviceState.error = "";
 
-    let bindings: TTSServiceEventBindings = {
-      onStart: () => this.#setStatus(ServiceNetworkState.connected),
-      onStop: (error?: string) => {
-        if (error) {
-          toast(error, { type: "error", autoClose: false });
-          this.serviceState.error = error;
-        }
-        this.#serviceInstance = undefined;
-        this.#setStatus(ServiceNetworkState.disconnected);
-      },
-    };
-
     let backend = this.data.backend;
-    if (backend === TTS_Backends.windows) {
-      this.#serviceInstance = new TTS_WindowsService(bindings);
+    if (!(backend in backends)) {
+      return;
     }
-    if (backend === TTS_Backends.azure) {
-      this.#serviceInstance = new TTS_AzureService(bindings);
-    }
-    if (backend === TTS_Backends.native) {
-      this.#serviceInstance = new TTS_NativeService(bindings);
-    }
-    if (backend === TTS_Backends.tiktok) {
-      this.#serviceInstance = new TTS_TikTokService(bindings);
-    }
-
-    if (!this.#serviceInstance) return;
+    this.#serviceInstance = new backends[backend](this);
     this.#setStatus(ServiceNetworkState.connecting);
     this.#serviceInstance.start(this.data);
   }
