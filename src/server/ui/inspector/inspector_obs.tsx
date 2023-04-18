@@ -60,7 +60,7 @@ const Inspector_OBS: FC = () => {
   return <Inspector.Body>
     <Inspector.Header><SiObsstudio/> OBS Studio</Inspector.Header>
     <Inspector.Content>
-      <Inspector.SubHeader>Setup client</Inspector.SubHeader>
+      <Inspector.SubHeader>Browser source captions</Inspector.SubHeader>
       <Inspector.Description>Create new browser source, paste the link and set window size to {canvas.w}x{canvas.h} pixels</Inspector.Description>
       <button onClick={window.ApiShared.peer.copyClientLink} className="flex-grow btn btn-sm border-2 gap-2"><RiFileCopyLine /> Copy browser source  url</button>
       {/* <div className="flex items-center space-x-2">
@@ -72,25 +72,26 @@ const Inspector_OBS: FC = () => {
         </Tooltip>
       </div> */}
 
-      <Inspector.SubHeader>Websocket Plugin</Inspector.SubHeader>
+      {/* <Inspector.SubHeader>Websocket Plugin</Inspector.SubHeader> */}
+      <Inspector.SubHeader>Native stream captions</Inspector.SubHeader>
+      <Inspector.Description><span><span className="font-medium">"obs-websocket"</span> plugin required. <br /> OBS 28.x should have it by default, just enable it!</span></Inspector.Description>
       <InputCheckbox value={data.wsAutoStart} onChange={e => up("wsAutoStart", e)} label="Connect on start" />
       <InputNetworkStatus label="OBS connection" value={wsState.status} />
-      <InputText type="number" value={data.wsPort} onChange={e => up("wsPort", e.target.value)} label="Port" />
-      <InputText type="password" value={data.wsPassword} onChange={e => up("wsPassword", e.target.value)} label="Password" />
-      <ServiceButton 
-        showError
-        errorLabel="Error. Try recconect"
-        onError={handleStartWs}
-        startLabel="Connect"
-        status={wsState.status}
-        onStart={handleStartWs}
-        onStop={handleStopWs}/>
-
-      <Inspector.SubHeader>Stream captions</Inspector.SubHeader>
-      <InputCheckbox value={data.enable} onChange={e => up("enable", e)} label="Enable captions" />
+      <InputText type="number" value={data.wsPort} onChange={e => up("wsPort", e.target.value)} label="Websocket Port" />
+      <InputText type="password" value={data.wsPassword} onChange={e => up("wsPassword", e.target.value)} label="Websocket Password" />
+      {/* <InputCheckbox value={data.enable} onChange={e => up("enable", e)} label="Enable captions" /> */}
       <InputTextSource value={data.source} onChange={e => up("source", e)} label="Source"/>
       <InputCheckbox value={data.inputField} onChange={e => up("inputField", e)} label="Input field" />
       <InputCheckbox value={data.interim} onChange={e => up("interim", e)} label="Show interim" />
+      <ServiceButton 
+        showError
+        errorLabel="Error. Try recconect"
+        stopLabel="Disconnect"
+        startLabel="Connect"
+        onError={handleStartWs}
+        status={wsState.status}
+        onStart={handleStartWs}
+        onStop={handleStopWs}/>
     </Inspector.Content>
   </Inspector.Body>
 }

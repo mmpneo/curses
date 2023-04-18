@@ -49,8 +49,9 @@ class Service_OBS implements IServiceInterface {
 
   private processTextEvent(data?: TextEvent) {
     if (
-      this.#state.enable 
-      && data?.value
+      // this.#state.enable && 
+      this.wsState.status === ServiceNetworkState.connected &&
+      data?.value
       && (
         data?.type === TextEventType.final ||
         (data?.type === TextEventType.interim && this.#state.interim)
