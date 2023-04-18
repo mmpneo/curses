@@ -53,6 +53,7 @@
     "simplebar-react": "^2.4.3",
     "tailwindcss": "^3.2.7",
     "use-sync-external-store": "^1.2.0",
+    "validator": "^13.9.0",
     "valtio": "^1.10.4",
     "vite-plugin-pwa": "^0.14.4",
     "y-protocols": "^1.0.5",

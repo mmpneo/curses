@@ -59,6 +59,7 @@ specifiers:
   tailwindcss: ^3.2.7
   typescript: ^5.0.4
   use-sync-external-store: ^1.2.0
+  validator: ^13.9.0
   valtio: ^1.10.4
   vite: ^4.2.1
   vite-plugin-pwa: ^0.14.4
@@ -111,6 +112,7 @@ dependencies:
   simplebar-react: 2.4.3_biqbaboplfbrettd7655fr4n2y
   tailwindcss: 3.3.1_postcss@8.4.21
   use-sync-external-store: 1.2.0_react@18.2.0
+  validator: 13.9.0
   valtio: 1.10.4_react@18.2.0
   vite-plugin-pwa: 0.14.7_vite@4.2.1
   y-protocols: 1.0.5
@@ -5322,6 +5324,11 @@ packages:
   /uuid/9.0.0:
     resolution: {integrity: sha512-MXcSTerfPa4uqyzStbRoTgt5XIe3x5+42+q1sDuy3R5MDk66URdLMOZe5aPX/SQd+kuYAh0FdP/pO28IkQyTeg==}
     hasBin: true
+    dev: false
+
+  /validator/13.9.0:
+    resolution: {integrity: sha512-B+dGG8U3fdtM0/aNK4/X8CXq/EcxU2WPrPEkJGslb47qyHsxmbggTWK0yEA4qnYVNF+nxNlN88o14hIcPmSIEA==}
+    engines: {node: '>= 0.10'}
     dev: false
 
   /valtio/1.10.4_react@18.2.0:
