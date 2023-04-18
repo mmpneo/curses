@@ -56,6 +56,7 @@ const Inspector_OBS: FC = () => {
   }
 
   const handleStopWs = () => window.ApiServer.obs.wsDisconnect();
+  const handleCancelWs = () => window.ApiServer.obs.wsCancel();
 
   return <Inspector.Body>
     <Inspector.Header><SiObsstudio/> OBS Studio</Inspector.Header>
@@ -75,7 +76,7 @@ const Inspector_OBS: FC = () => {
       {/* <Inspector.SubHeader>Websocket Plugin</Inspector.SubHeader> */}
       <Inspector.SubHeader>Native stream captions</Inspector.SubHeader>
       <Inspector.Description><span><span className="font-medium">"obs-websocket"</span> plugin required. <br /> OBS 28.x should have it by default, just enable it!</span></Inspector.Description>
-      <InputCheckbox value={data.wsAutoStart} onChange={e => up("wsAutoStart", e)} label="Connect on start" />
+      <InputCheckbox value={data.wsAutoStart} onChange={e => up("wsAutoStart", e)} label="Auto Connect" />
       <InputNetworkStatus label="OBS connection" value={wsState.status} />
       <InputText type="number" value={data.wsPort} onChange={e => up("wsPort", e.target.value)} label="Websocket Port" />
       <InputText type="password" value={data.wsPassword} onChange={e => up("wsPassword", e.target.value)} label="Websocket Password" />
@@ -85,12 +86,13 @@ const Inspector_OBS: FC = () => {
       <InputCheckbox value={data.interim} onChange={e => up("interim", e)} label="Show interim" />
       <ServiceButton 
         showError
-        errorLabel="Error. Try recconect"
+        errorLabel="Error - Try Again"
         stopLabel="Disconnect"
         startLabel="Connect"
         onError={handleStartWs}
         status={wsState.status}
         onStart={handleStartWs}
+        onPending={handleCancelWs}
         onStop={handleStopWs}/>
     </Inspector.Content>
   </Inspector.Body>
