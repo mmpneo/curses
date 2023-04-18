@@ -130,7 +130,7 @@ const Deepgram: FC = () => {
     <span className="text-base-content/60 text-xs">
       Some languages cannot be used with "enhanced" quality option
       <br />
-      <a className="link link-primary link-hover" target="_blank" href="@/server/ui/inspector/server/inspector#language-options">See language table</a>
+      <a className="link link-primary link-hover" target="_blank" href="https://developers.deepgram.com/documentation/features/language/#language-options">See language table</a>
     </span>
 
     <InputCheckbox label="Interim result" onChange={e => up("interim", e)} value={pr.interim} />
