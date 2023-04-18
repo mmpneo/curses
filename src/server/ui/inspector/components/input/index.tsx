@@ -3,7 +3,7 @@ import { useId } from "@floating-ui/react-dom-interactions";
 import classNames from "classnames/bind";
 import { FC, forwardRef, InputHTMLAttributes, memo, PropsWithChildren, ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { RgbaColor, RgbaColorPicker } from "react-colorful";
-import { RiDeleteBack2Fill, RiUpload2Fill, RiKeyboardBoxFill, RiDeleteBin3Fill, RiCheckboxCircleFill } from "react-icons/ri";
+import { RiDeleteBack2Fill, RiUpload2Fill, RiKeyboardBoxFill, RiDeleteBin3Fill, RiCheckboxCircleFill, RiAddCircleFill, RiEdit2Fill, RiRecordCircleFill, RiCloseCircleFill } from "react-icons/ri";
 import { HiChevronDown, HiChevronUp } from "react-icons/hi";
 import FileElement                                                     from "../../../file-element";
 import { FileState, FileType }                                         from "@/client/services/files/schema";
@@ -430,52 +430,93 @@ interface ObjectProps extends InputBaseProps {
   valuePlaceholder?: string,
   addLabel?: string
 }
-export const InputMapObject: FC<ObjectProps> = memo(({ label, onChange, ...rest }) => {
-  const [value, setValue] = useState<ObjectRecord>(rest.value);
+export const InputMapObject: FC<ObjectProps> = memo(({ label, onChange, value, ...rest }) => {
+  const [newKey, setNewKey] = useState<string>("");
+  const [newValue, setNewValue] = useState<string>("");
 
   const handleAdd = () => {
-    if (value[" "])
+    if (!newKey || !newValue || !!value[newKey])
       return;
-    const newVal = produce(value, v => { v[""] = ""; });
-    setValue(newVal);
-    onChange(newVal);
+    setNewKey("");
+    setNewValue("");
+    onChange(produce(value, v => {
+      v[newKey] = newValue;
+    }));
   };
   const handleRemove = (key: string) => {
     const newVal = produce(value, v => { delete v[key]; });
-    setValue(newVal);
     onChange(newVal);
   };
 
-  const handleUpdateKey = (oldKey: string, newKey: string) => {
-    if (newKey.includes(" ") || value[newKey])
-      return;
-    // preserve key order
-    const ent = Object.entries(value).map(([k, v]) => [k === oldKey ? newKey : k, v]);
-    const v = Object.fromEntries(ent);
-    setValue(v);
-    onChange(v);
-  }
-  const handleUpdateValue = (key: string, val: string) => {
-    const newVal = produce(value, v => { v[key] = val; });
-    setValue(newVal);
-    onChange(newVal);
-  }
+  const handleChange = (oldKey: string, [key, val]: [string, string]): boolean => {
+    let newBody = {};
+
+    if (oldKey !== key) {
+      if (key in value)
+        return false
+      // replace record, preserve position
+      newBody = Object.fromEntries(Object.entries(value).map(([k,v]) => oldKey === k ? [key, val] : [k,v]));
+    }
+    else 
+      newBody = produce(value, v => {v[oldKey] = val;});
+    onChange(newBody);
+    return true;
+  };
 
   return <InputContainer vertical label={label}>
     <div className="flex flex-col space-y-2">
-      {!Object.keys(value).length && <div className="h-20 px-4 flex justify-center items-center rounded-md border-2 border-primary/10 border-dashed ">
-        <span className="text-sm font-medium text-center">
-          Nothing here <br /> <span className="text-primary cursor-pointer font-semibold" onClick={handleAdd}>{rest.addLabel || "Add pair"}</span>
-        </span>
-      </div>}
-      {Object.entries(value).map(([key,], i) => <div key={i} className="flex space-x-2">
-        <InputBaseText placeholder={rest.keyPlaceholder || "Key"} value={key} onChange={v => handleUpdateKey(key, v.target.value)} />
-        <InputBaseText placeholder={rest.valuePlaceholder || "Value"} value={value[key]} onChange={v => handleUpdateValue(key, v.target.value)} />
-        <button className="btn btn-sm btn-circle btn-ghost" onClick={() => handleRemove(key)}><RiDeleteBack2Fill /></button>
-      </div>)}
-      {Object.keys(value).length > 0 && <button className="btn btn-sm btn-neutral" onClick={handleAdd}>{rest.addLabel || "Add pair"}</button>}
+      {Object.entries(value).map((pair, i) => <MapRow
+        key={`${i}-${pair[0]}`}
+        onRemove={()=> handleRemove(pair[0])}
+        onChange={(newPair) => handleChange(pair[0], newPair)}
+        keyPlaceholder={rest.keyPlaceholder}
+        valuePlaceholder={rest.valuePlaceholder}
+        keyValue={pair}/>)}
+      <div className="flex space-x-2">
+        <InputBaseText placeholder={rest.keyPlaceholder || "Key"} value={newKey} onChange={e => setNewKey(e.target.value)} />
+        <InputBaseText placeholder={rest.valuePlaceholder || "Value"} value={newValue} onChange={e => setNewValue(e.target.value)} />
+        <Tooltip placement="top" content="Add record"><button className="btn btn-sm btn-circle btn-ghost" onClick={handleAdd}><RiAddCircleFill size={18} /></button></Tooltip>
+      </div>
     </div>
   </InputContainer>
+});
+
+type MapRowProps = {
+  keyValue: [string, string],
+  keyPlaceholder?: string,
+  valuePlaceholder?: string,
+  onRemove: () => void,
+  onChange: (keyValue: [string, string]) => boolean,
+
+}
+const MapRow:FC<MapRowProps> = memo(({keyValue, keyPlaceholder, valuePlaceholder, onRemove, onChange}) => {
+  const [newKey, setNewKey] = useState<string>(keyValue[0]);
+  const [newValue, setNewValue] = useState<string>(keyValue[1]);
+  const [edit, setEdit] = useState(false);
+
+  const handleSave = () => {
+    onChange([newKey, newValue])
+    && setEdit(false);
+  }
+
+  const handleCancel = () => {
+    setEdit(false);
+    setNewKey(keyValue[0]);
+    setNewValue(keyValue[1]);
+  }
+
+  return <div className="flex space-x-2">
+    <InputBaseText disabled={!edit} placeholder={keyPlaceholder || "Key"} value={newKey} onChange={v => setNewKey(v.target.value)} />
+    <InputBaseText disabled={!edit} placeholder={valuePlaceholder || "Value"} value={newValue} onChange={v => setNewValue(v.target.value)} />
+    {edit ? <>
+      <Tooltip placement="top" content="Save"><button className="btn btn-sm btn-circle btn-success" onClick={handleSave}><RiCheckboxCircleFill size={18} /></button></Tooltip>
+      <Tooltip placement="top" content="Cancel"><button className="btn btn-sm btn-circle btn-ghost" onClick={handleCancel}><RiCloseCircleFill size={18} /></button></Tooltip>
+    </> : <>
+      <Tooltip placement="top" content="Edit"><button className="btn btn-sm btn-circle btn-ghost" onClick={() => setEdit(true)}><RiEdit2Fill size={18} /></button></Tooltip>
+      <Tooltip placement="top" content="Delete"><button className="btn btn-sm btn-circle btn-ghost" onClick={onRemove}><RiDeleteBin3Fill size={18} /></button></Tooltip>
+    </>
+    }
+  </div>
 })
 
 interface ShortuctProps extends InputBaseProps {
