@@ -14,6 +14,6 @@ export interface ITTSService {
 }
 
 
-export interface ISTTServiceConstructor {
+export interface ITTSServiceConstructor {
   new (receiver: ITTSReceiver): ITTSService;
 }

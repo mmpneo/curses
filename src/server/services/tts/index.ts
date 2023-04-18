@@ -8,13 +8,13 @@ import { TTS_NativeService } from "./services/native";
 import { TTS_TikTokService } from "./services/tiktok";
 import { TTS_WindowsService } from "./services/windows";
 import {
-  ISTTServiceConstructor,
+  ITTSServiceConstructor,
   ITTSReceiver,
   ITTSService
 } from "./types";
 
 const backends: {
-  [k in TTS_Backends]: ISTTServiceConstructor;
+  [k in TTS_Backends]: ITTSServiceConstructor;
 } = {
   [TTS_Backends.native]: TTS_NativeService,
   [TTS_Backends.windows]: TTS_WindowsService,
