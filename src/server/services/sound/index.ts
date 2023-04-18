@@ -44,20 +44,25 @@ class Service_Sound implements IServiceInterface {
 
     this.#isVoiceClipPlaying = true;
 
-    await invoke<any>("plugin:audio|play_async", {
-      data: {
-        data: Array.from(new Uint8Array(clip.data)),
-        ...clip.options,
-        speed: 1
-      },
-    });
-
-    // play sound
-    this.#isVoiceClipPlaying = false;
-    this.#tryDequeueVoiceClip();
+    try {
+      await invoke<any>("plugin:audio|play_async", {
+        data: {
+          data: Array.from(new Uint8Array(clip.data)),
+          ...clip.options,
+          speed: 1
+        },
+      });
+    } catch (error) {
+      // 
+    } finally {
+      this.#isVoiceClipPlaying = false;
+      this.#tryDequeueVoiceClip();
+    }
   }
 
   enqueueVoiceClip(buffer: ArrayBuffer, options: VoiceClipOptions) {
+    if (!buffer)
+      return;
     this.#voiceClipQueue.push({data: buffer, options});
     this.#tryDequeueVoiceClip();
   }
