@@ -1,19 +1,30 @@
-import { toast } from "react-toastify";
-import { proxy }                                                                  from "valtio";
 import { IServiceInterface, ServiceNetworkState, TextEventSource, TextEventType } from "@/types";
-import { STT_AzureService }                                                       from "./services/azure";
-import { STT_NativeService }                                                     from "./services/native";
-import { STT_DeepgramService }                                                    from "./services/deepgram";
-import { STT_Backends }                                                           from "./schema";
-import {
-  ISpeechRecognitionService,
-  SpeechServiceEventBindings,
-  SttMuteState
-}                                                                                 from "./types";
-import { STT_SpeechlyService }                                                    from "./services/speechly";
 import { patchSentence } from "@/utils";
+import { toast } from "react-toastify";
+import { proxy } from "valtio";
+import { STT_Backends } from "./schema";
+import { STT_AzureService } from "./services/azure";
+import { STT_DeepgramService } from "./services/deepgram";
+import { STT_NativeService } from "./services/native";
+import { STT_SpeechlyService } from "./services/speechly";
+import {
+  ISTTReceiver,
+  ISTTServiceConstructor,
+  ISpeechRecognitionService,
+  SttMuteState
+} from "./types";
 
-class Service_STT implements IServiceInterface {
+const backends: {
+  [k in STT_Backends]?: ISTTServiceConstructor;
+} = {
+  [STT_Backends.native]: STT_NativeService,
+  [STT_Backends.browser]: undefined,
+  [STT_Backends.azure]: STT_AzureService,
+  [STT_Backends.deepgram]: STT_DeepgramService,
+  [STT_Backends.speechly]: STT_SpeechlyService
+};
+
+class Service_STT implements IServiceInterface, ISTTReceiver {
   #serviceInstance?: ISpeechRecognitionService;
 
   #lastMessageState = {
@@ -109,38 +120,36 @@ class Service_STT implements IServiceInterface {
     this.serviceState.status = value;
   }
 
+  onStart(): void {
+    this.#setStatus(ServiceNetworkState.connected);
+  }
+  onStop(error?: string | undefined): void {
+    if (error) {
+      toast(error, { type: "error", autoClose: false });
+      this.serviceState.error = error;
+    }
+    this.#setStatus(ServiceNetworkState.disconnected);
+  }
+  onInterim(value: string): void {
+    this.#sendInterim(value);
+  }
+  onFinal(value: string): void {
+    this.#sendFinal(value);
+  }
+
   start() {
     this.stop();
     this.serviceState.error = "";
 
-    let bindings: SpeechServiceEventBindings = {
-      onStart: () => this.#setStatus(ServiceNetworkState.connected),
-      onStop: (error?: string) => {
-        if (error) {
-          toast(error, { type: "error", autoClose: false });
-          this.serviceState.error = error;
-        }
-        return this.#setStatus(ServiceNetworkState.disconnected);
-      },
-      onInterim: (interim: string) => this.#sendInterim(interim),
-      onFinal: (final: string) => this.#sendFinal(final),
-    };
-
     let backend = this.data.backend;
-    if (backend === STT_Backends.native) {
-      this.#serviceInstance = new STT_NativeService(bindings);
-    }
-    else if (backend === STT_Backends.azure) {
-      this.#serviceInstance = new STT_AzureService(bindings);
-    }
-    else if (backend === STT_Backends.deepgram) {
-      this.#serviceInstance = new STT_DeepgramService(bindings);
-    }
-    else if (backend === STT_Backends.speechly) {
-      this.#serviceInstance = new STT_SpeechlyService(bindings);
+    if (!(backend in backends) || !backends[backend]) {
+      return;
     }
 
-    if (!this.#serviceInstance) return;
+    const serviceConstructor = backends[backend];
+    if (!serviceConstructor)
+      return;
+    this.#serviceInstance = new serviceConstructor(this);
     this.#setStatus(ServiceNetworkState.connecting);
     this.#serviceInstance.start(this.data);
   }

@@ -1,6 +1,6 @@
 import {
-  ISpeechRecognitionService,
-  SpeechServiceEventBindings,
+  ISTTReceiver,
+  ISTTService
 } from "../types";
 
 import {
@@ -14,8 +14,8 @@ import {
 import { isEmptyValue } from "../../../../utils";
 import { STT_State } from "../schema";
 
-export class STT_AzureService implements ISpeechRecognitionService {
-  constructor(private bindings: SpeechServiceEventBindings) {}
+export class STT_AzureService implements ISTTService {
+  constructor(private bindings: ISTTReceiver) {}
 
   #instance?: SpeechRecognizer;
 

@@ -1,14 +1,14 @@
 import {
-  ISpeechRecognitionService,
-  SpeechServiceEventBindings,
+  ISTTReceiver,
+  ISTTService
 } from "../types";
 
-import { isEmptyValue }                              from "../../../../utils";
-import { STT_State }                                 from "../schema";
 import { BrowserClient, BrowserMicrophone, Segment } from "@speechly/browser-client";
+import { isEmptyValue } from "../../../../utils";
+import { STT_State } from "../schema";
 
-export class STT_SpeechlyService implements ISpeechRecognitionService {
-  constructor(private bindings: SpeechServiceEventBindings) {}
+export class STT_SpeechlyService implements ISTTService {
+  constructor(private bindings: ISTTReceiver) {}
 
   #microphone?: BrowserMicrophone;
   #instance?: BrowserClient;

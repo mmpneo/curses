@@ -1,13 +1,12 @@
 import { isEmptyValue } from "@/utils";
 import { STT_State } from "../schema";
 import {
-  ISpeechRecognitionService,
-  SpeechServiceEventBindings,
+  ISTTReceiver,
+  ISTTService
 } from "../types";
 
-export class STT_NativeService implements ISpeechRecognitionService {
-  constructor(private bindings: SpeechServiceEventBindings) {
-  }
+export class STT_NativeService implements ISTTService {
+  constructor(private bindings: ISTTReceiver) {}
   
   #instance?: SpeechRecognition;
   
