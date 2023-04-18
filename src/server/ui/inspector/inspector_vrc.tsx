@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { RiMessage2Fill } from "react-icons/ri";
+import { RiAlertFill, RiMessage2Fill } from "react-icons/ri";
 import { useSnapshot } from "valtio";
 import { InputCheckbox, InputSelect, InputText, InputTextSource }           from "./components/input";
 import Inspector       from "./components";
@@ -45,6 +45,13 @@ const Inspector_VRC: FC = () => {
   return <Inspector.Body>
     <Inspector.Header><RiMessage2Fill /> VRChat Chatbox</Inspector.Header>
     <Inspector.Content>
+      <div className="p-2 border-2 border-primary rounded-lg text-xs flex space-x-2 items-center text-primary">
+        <RiAlertFill className="text-primary" size={24}/>
+        <div className="flex flex-col">
+          <span className="font-bold">Enable OSC in VRChat first</span>
+          <span className="font-medium">Radial Menu <span className="font-bold">»</span> Options <span className="font-bold">»</span> OSC <span className="font-bold">»</span> Enable</span>
+        </div>
+      </div>
       <InputCheckbox label="Enable" value={state.enable} onChange={e => up("enable", e)} />
       <InputTextSource label="Source" value={state.source} onChange={e => up("source", e)} />
       <InputCheckbox label="Text field" value={state.inputField} onChange={e => up("inputField", e)} />
