@@ -11,7 +11,7 @@ import {
   SttMuteState
 }                                                                                 from "./types";
 import { STT_SpeechlyService }                                                    from "./services/speechly";
-import { replaceSendenceWords } from "@/utils";
+import { patchSentence } from "@/utils";
 
 class Service_STT implements IServiceInterface {
   #serviceInstance?: ISpeechRecognitionService;
@@ -83,7 +83,7 @@ class Service_STT implements IServiceInterface {
   }
 
   async #sendFinal(sentence: string) {
-    const value = replaceSendenceWords(this.data.replaceWords, sentence);    
+    const value = patchSentence(this.data.replaceWords, sentence);    
     !this.isMuted() &&
     window.ApiShared.pubsub.publishText(TextEventSource.stt, {
       value,

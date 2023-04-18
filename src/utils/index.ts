@@ -46,13 +46,14 @@ export function isEmptyValue(value: any) {
 }
 
 
-export function replaceSendenceWords(map: Record<string, string>,sentence: string): string {
+export function patchSentence(map: Record<string, string>, sentence: string, removeChars: string[] = []): string {
   if (!sentence)
     return "";
+  
   return sentence
     .split(" ")
     .map((word) => {
-      const cleared = word.replace(/([.,\/#!?$%\^&\*;:{}=\-_`~()\]\[])+$/g, "");
+      const cleared = word.replace(/([.,\/#!?$%\^&\*;:{}<>=\-_`~()\]\[])+$/g, "");
       return map[cleared] ? word.replace(cleared, map[cleared]) : word;
     })
     .join(" ");
