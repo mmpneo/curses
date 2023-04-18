@@ -162,12 +162,12 @@ fn speak(data: RpcWindowsTTSSpeak, state: State<WindowsTTSPlugin>) -> Result<(),
         return Err("Failed to apply voice");
     };
 
-    unsafe {
-        sp_voice
-            .Speak(&data.value.into(), SpeechVoiceSpeakFlags(SVSFDefault.0 | SVSFlagsAsync.0))
-            .unwrap();
+    if let Err(_err) = unsafe {sp_voice.Speak(&data.value.into(), SpeechVoiceSpeakFlags(SVSFDefault.0 | SVSFlagsAsync.0))} {
+        Err("Unable to process text")
     }
-    Ok(())
+    else {
+        Ok(())
+    }
 }
 
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
