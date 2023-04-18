@@ -1,11 +1,12 @@
-import { JSONSchemaType }              from "ajv";
-import Schema_STT, { STT_State }       from "./services/stt/schema";
-import Schema_Twitch, { Twitch_State } from "./services/twitch/schema";
-import Schema_Discord, { Discord_State } from "./services/discord/schema";
-import Schema_VRC, { VRC_State }       from "./services/vrc/schema";
-import Schema_TTS, { TTS_State }       from "./services/tts/schema";
+import { JSONSchemaType } from "ajv";
 import { customAlphabet, urlAlphabet } from "nanoid";
+import Schema_Discord, { Discord_State } from "./services/discord/schema";
+import Schema_OBS, { OBS_State } from "./services/obs/schema";
+import Schema_STT, { STT_State } from "./services/stt/schema";
 import Schema_Translation, { Translation_State } from "./services/translation/schema";
+import Schema_TTS, { TTS_State } from "./services/tts/schema";
+import Schema_Twitch, { Twitch_State } from "./services/twitch/schema";
+import Schema_VRC, { VRC_State } from "./services/vrc/schema";
 
 export interface BackendState {
   id: string;
@@ -29,6 +30,7 @@ export interface BackendState {
     twitch: ServiceState<Twitch_State>;
     discord: ServiceState<Discord_State>;
     vrc: ServiceState<VRC_State>;
+    obs: ServiceState<OBS_State>;
   };
 }
 
@@ -78,6 +80,7 @@ export const backendSchema: JSONSchemaType<BackendState> = {
         vrc: genServiceSchema(Schema_VRC),
         stt: genServiceSchema(Schema_STT),
         tts: genServiceSchema(Schema_TTS),
+        obs: genServiceSchema(Schema_OBS),
         translation: genServiceSchema(Schema_Translation),
         twitch: genServiceSchema(Schema_Twitch),
         discord: genServiceSchema(Schema_Discord),
