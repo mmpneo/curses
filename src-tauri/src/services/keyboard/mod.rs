@@ -43,7 +43,7 @@ impl BgInput {
         // unregister everything
         let mut a = self.active_shortcuts.lock().unwrap();
         for sh in a.iter() {
-            mki::unregister_hotkey(&sh.keys.as_slice());
+            // mki::unregister_hotkey(&sh.keys.as_slice());
         }
         *a = shortcuts.clone();
 
@@ -51,13 +51,13 @@ impl BgInput {
         for sh in shortcuts {
             let tx = self.tx.clone();
             let keys = sh.keys.clone();
-            mki::register_hotkey(&sh.keys.as_slice(), move || {
-                // release every key, so it won't stuck pressed when listener starts
-                for k in &keys {
-                    k.release();
-                }
-                tx.send(format!("shortcut:{}", sh.name.clone())).unwrap();
-            });
+            // mki::register_hotkey(&sh.keys.as_slice(), move || {
+            //     // release every key, so it won't stuck pressed when listener starts
+            //     for k in &keys {
+            //         k.release();
+            //     }
+            //     tx.send(format!("shortcut:{}", sh.name.clone())).unwrap();
+            // });
         }
     }
 }

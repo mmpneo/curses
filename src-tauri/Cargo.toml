@@ -18,9 +18,6 @@ tauri = { version = "1.2", features = ["dialog-all", "fs-all", "global-shortcut-
 tauri-plugin-window-state = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "dev" }
 window-shadows = "0.2.0"
 
-
-mki = "0.2.3"
-
 itertools = "0.10.5"
 rosc = "0.9.1"
 warp = "0.3.3"
@@ -41,7 +38,7 @@ windows = { version = "0.44.0", features = [
 ] }
 clap = { version = "4.0.29", features = ["derive"] }
 local-ip-address = "0.4.9"
-rodio = "0.16.0"
+rodio = "0.17.0"
 reqwest = {version = "0.11.15", features = ["json"] }
 
 [profile.release]
