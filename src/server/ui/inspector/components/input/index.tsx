@@ -36,7 +36,7 @@ export const InputContainer: FC<PropsWithChildren<{ id?: string, vertical?: bool
   </div>
 });
 
-export const InputBaseText: FC<InputHTMLAttributes<HTMLInputElement>> = memo((props: any) => <input {...props} className={cx(styles.clearAppearance, props.className, "field-width input input-bordered overflow-hidden input-sm font-semibold leading-none")} />);
+export const InputBaseText: FC<InputHTMLAttributes<HTMLInputElement> & {fieldWidth?: boolean}> = memo(({fieldWidth = true, ...props}) => <input {...props} className={cx(styles.clearAppearance, props.className, {"field-width": fieldWidth}, "input input-bordered overflow-hidden input-sm font-semibold leading-none")} />);
 
 interface InputTextProps extends InputBaseProps, InputHTMLAttributes<HTMLInputElement> { }
 
@@ -439,9 +439,7 @@ export const InputMapObject: FC<ObjectProps> = memo(({ label, onChange, value, .
       return;
     setNewKey("");
     setNewValue("");
-    onChange(produce(value, v => {
-      v[newKey] = newValue;
-    }));
+    onChange({...value, [newKey]: newValue});
   };
   const handleRemove = (key: string) => {
     const newVal = produce(value, v => { delete v[key]; });
@@ -473,9 +471,9 @@ export const InputMapObject: FC<ObjectProps> = memo(({ label, onChange, value, .
         valuePlaceholder={rest.valuePlaceholder}
         keyValue={pair}/>)}
       <div className="flex space-x-2">
-        <InputBaseText placeholder={rest.keyPlaceholder || "Key"} value={newKey} onChange={e => setNewKey(e.target.value)} />
-        <InputBaseText placeholder={rest.valuePlaceholder || "Value"} value={newValue} onChange={e => setNewValue(e.target.value)} />
-        <Tooltip placement="top" content="Add record"><button className="btn btn-sm btn-circle btn-ghost" onClick={handleAdd}><RiAddCircleFill size={18} /></button></Tooltip>
+        <InputBaseText fieldWidth={false} className="w-full" placeholder={rest.keyPlaceholder || "Key"} value={newKey} onChange={e => setNewKey(e.target.value)} />
+        <InputBaseText fieldWidth={false} className="w-full" placeholder={rest.valuePlaceholder || "Value"} value={newValue} onChange={e => setNewValue(e.target.value)} />
+        <Tooltip placement="top" content="Add record"><button className="btn btn-sm btn-primary btn-outline flex-nowrap whitespace-nowrap gap-1" onClick={handleAdd}><RiAddCircleFill size={18} /> add</button></Tooltip>
       </div>
     </div>
   </InputContainer>
@@ -506,14 +504,14 @@ const MapRow:FC<MapRowProps> = memo(({keyValue, keyPlaceholder, valuePlaceholder
   }
 
   return <div className="flex space-x-2">
-    <InputBaseText disabled={!edit} placeholder={keyPlaceholder || "Key"} value={newKey} onChange={v => setNewKey(v.target.value)} />
-    <InputBaseText disabled={!edit} placeholder={valuePlaceholder || "Value"} value={newValue} onChange={v => setNewValue(v.target.value)} />
+    <InputBaseText fieldWidth={false} className="w-full" disabled={!edit} placeholder={keyPlaceholder || "Key"} value={newKey} onChange={v => setNewKey(v.target.value)} />
+    <InputBaseText fieldWidth={false} className="w-full" disabled={!edit} placeholder={valuePlaceholder || "Value"} value={newValue} onChange={v => setNewValue(v.target.value)} />
     {edit ? <>
       <Tooltip placement="top" content="Save"><button className="btn btn-sm btn-circle btn-success" onClick={handleSave}><RiCheckboxCircleFill size={18} /></button></Tooltip>
       <Tooltip placement="top" content="Cancel"><button className="btn btn-sm btn-circle btn-ghost" onClick={handleCancel}><RiCloseCircleFill size={18} /></button></Tooltip>
     </> : <>
       <Tooltip placement="top" content="Edit"><button className="btn btn-sm btn-circle btn-ghost" onClick={() => setEdit(true)}><RiEdit2Fill size={18} /></button></Tooltip>
-      <Tooltip placement="top" content="Delete"><button className="btn btn-sm btn-circle btn-ghost" onClick={onRemove}><RiDeleteBin3Fill size={18} /></button></Tooltip>
+      <Tooltip placement="top" content="Delete"><button className="btn btn-sm btn-circle btn-ghost text-error" onClick={onRemove}><RiDeleteBin3Fill size={18} /></button></Tooltip>
     </>
     }
   </div>
