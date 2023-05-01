@@ -2,14 +2,14 @@ import { JSONSchemaType } from "ajv";
 
 export type Element_ImageState = {
   fileId: string;
-  styleOpacity: number;
+  styleOpacity: string;
 
   activeFileId: string;
-  activeStyleOpacity: number;
+  activeStyleOpacity: string;
 
   activeEvent: string;
   activeDuration: number;
-  activeTransitionDuration: number;
+  activeTransitionDuration: string;
   styleCss: string;
 };
 
@@ -17,13 +17,13 @@ export const Element_ImageStateSchema: JSONSchemaType<Element_ImageState> = {
   type: "object",
   properties: {
     fileId: { type: "string", default: "" },
-    styleOpacity: { type: "number", default: 1 },
+    styleOpacity: { type: "string", default: "1" },
 
     activeEvent: { type: "string", default: "" },
     activeFileId: { type: "string", default: "" },
-    activeStyleOpacity: { type: "number", default: 1 },
+    activeStyleOpacity: { type: "string", default: "1" },
     activeDuration: { type: "number", default: 100 },
-    activeTransitionDuration: { type: "number", default: 100 },
+    activeTransitionDuration: { type: "string", default: "100" },
 
 
     styleCss: { type: "string", default: "" },
