@@ -15,8 +15,8 @@ class Service_Twitch implements IServiceInterface {
   authProvider?: StaticAuthProvider;
   constructor() {}
 
-  emotes = new TwitchEmotesApi();
-  chat = new TwitchChatApi();
+  emotes!: TwitchEmotesApi;
+  chat!: TwitchChatApi;
 
   liveCheckInterval?: any = null;
 
@@ -35,6 +35,8 @@ class Service_Twitch implements IServiceInterface {
   }
 
   async init() {
+    this.emotes = new TwitchEmotesApi();
+    this.chat = new TwitchChatApi();
     // check live status
     setInterval(() => this.#checkLive(), 8000);
 

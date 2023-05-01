@@ -9,6 +9,8 @@ export type Twitch_State = {
   chatPostSource: TextEventSource,
   chatPostInput: boolean,
   chatReceiveEnable: boolean,
+  emotesEnableReplacements: boolean,
+  emotesReplacements: Record<string, string>,
 };
 
 const Schema_Twitch: JSONSchemaType<Twitch_State> = {
@@ -21,6 +23,8 @@ const Schema_Twitch: JSONSchemaType<Twitch_State> = {
     chatPostSource: { type: "string", default: TextEventSource.stt },
     chatPostInput: { type: "boolean", default: false },
     chatReceiveEnable: { type: "boolean", default: false },
+    emotesReplacements: { type: "object", default: {}, required: [] },
+    emotesEnableReplacements: { type: "boolean", default: true },
   },
   required: [
     "token",
@@ -29,8 +33,9 @@ const Schema_Twitch: JSONSchemaType<Twitch_State> = {
     "chatPostLive",
     "chatPostSource",
     "chatPostInput",
-
     "chatReceiveEnable",
+    "emotesReplacements",
+    "emotesEnableReplacements"
   ],
   default: {},
   additionalProperties: false
