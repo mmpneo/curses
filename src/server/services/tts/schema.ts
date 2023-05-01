@@ -15,6 +15,7 @@ export type TTS_State = {
   backend: TTS_Backends;
   autoStart: boolean;
   replaceWords: Record<string, string>;
+  replaceWordsIgnoreCase: boolean;
   native: {
     voice: string;
     pitch: string;
@@ -60,6 +61,7 @@ const Schema_STT: JSONSchemaType<TTS_State> = {
     source: { type: "string", default: TextEventSource.stt },
     inputField: { type: "boolean", default: true },
     replaceWords: { type: "object", default: {}, required: [] },
+    replaceWordsIgnoreCase: { type: "boolean", default: false },
     native: {
       type: "object",
       properties: {
@@ -136,6 +138,7 @@ const Schema_STT: JSONSchemaType<TTS_State> = {
   },
   required: [
     "replaceWords",
+    "replaceWordsIgnoreCase",
     "backend",
     "autoStart",
     "source",

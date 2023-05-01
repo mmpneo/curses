@@ -152,13 +152,19 @@ const Speechly: FC = () => {
 
 const WordsReplacementModal: FC = () => {
   const data = useSnapshot(window.ApiServer.state.services.stt);
-  const update = (newMap: Record<string, string>) => window.ApiServer.state.services.stt.data.replaceWords = {...newMap};
 
-  return <Modal.Body width={350}>
+  const up = <K extends keyof STT_State>(key: K, v: STT_State[K]) => window.ApiServer.patchService("stt", s => s.data[key] = v);
+
+  return <Modal.Body width={420}>
     <Modal.Header>STT Word replacements</Modal.Header>
     <Modal.Content>
-      <div className="p-4">
-        <InputMapObject keyPlaceholder="Word" valuePlaceholder="Replacement" addLabel="Add word" value={{...data.data.replaceWords}} onChange={e => update(e)} label="" />
+      <div className="p-4 flex flex-col space-y-2">
+        <InputCheckbox label="Ignore letter case" value={data.data.replaceWordsIgnoreCase} onChange={v => up("replaceWordsIgnoreCase", v)}/>
+        {data.data.replaceWordsIgnoreCase && <>
+          <InputCheckbox label="Preserve capitalization" value={data.data.replaceWordsPreserveCase} onChange={v => up("replaceWordsPreserveCase", v)}/>
+          <Inspector.Description>Transfers capitalization of original word to replacement</Inspector.Description>
+        </>}
+        <InputMapObject keyPlaceholder="Word" valuePlaceholder="Replacement" addLabel="Add word" value={{...data.data.replaceWords}} onChange={e => up("replaceWords", e)} label="Dictionary" />
       </div>
     </Modal.Content>
   </Modal.Body>

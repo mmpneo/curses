@@ -45,19 +45,27 @@ export function isEmptyValue(value: any) {
   || (typeof value === 'object' && Object.keys(value).length === 0) || (typeof value === 'string' && value.trim().length === 0)
 }
 
-
-export function patchSentence(map: Record<string, string>, sentence: string, removeChars: string[] = []): string {
-  if (!sentence)
-    return "";
-  
-  return sentence
-    .split(" ")
-    .map((word) => {
-      const cleared = word.replace(/([.,\/#!?$%\^&\*;:{}<>=\-_`~()\]\[])+$/g, "");
-      return map[cleared] ? word.replace(cleared, map[cleared]) : word;
-    })
-    .join(" ");
+export type WordReplacementsCache = {
+  map: Record<string, string>,
+  regexp: RegExp
+  isEmpty: boolean
 }
+
+export function buildWordReplacementsCache(map: Record<string, string>, caseInsensitive: boolean): WordReplacementsCache {
+  let _map = {}
+  if (caseInsensitive) {
+    _map = Object.fromEntries(Object.entries(map).map(([k,v]) => [k.toLowerCase(), v]));
+  }
+  else
+    _map = {...map};
+  let regexp = new RegExp(Object.keys(_map).join("|"), caseInsensitive ? "ig" : "g");
+  return {
+    regexp,
+    map: _map,
+    isEmpty: !Object.keys(_map).length
+  };
+}
+
 //decode by niklasvh
 // https://github.com/niklasvh/base64-arraybuffer/blob/master/src/index.ts
 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';

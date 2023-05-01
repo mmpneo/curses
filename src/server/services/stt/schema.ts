@@ -12,6 +12,8 @@ export type STT_State = {
   backend: STT_Backends;
   autoStart: boolean;
   replaceWords: Record<string, string>;
+  replaceWordsIgnoreCase: boolean;
+  replaceWordsPreserveCase: boolean;
   native: {
     language_group: string;
     language: string;
@@ -48,6 +50,8 @@ const Schema_STT: JSONSchemaType<STT_State> = {
     backend: { type: "string", default: STT_Backends.browser },
     autoStart: { type: "boolean", default: false },
     replaceWords: { type: "object", default: {}, required: [] },
+    replaceWordsIgnoreCase: { type: "boolean", default: false },
+    replaceWordsPreserveCase: { type: "boolean", default: false },
     native: {
       type: "object",
       properties: {
@@ -104,6 +108,8 @@ const Schema_STT: JSONSchemaType<STT_State> = {
   required: [
     "backend",
     "replaceWords",
+    "replaceWordsIgnoreCase",
+    "replaceWordsPreserveCase",
     "autoStart",
     "speechly",
     "native",

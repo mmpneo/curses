@@ -252,13 +252,14 @@ const serviceOptions = [
 
 const WordsReplacementModal: FC = () => {
   const data = useSnapshot(window.ApiServer.state.services.tts);
-  const update = (newMap: Record<string, string>) => window.ApiServer.state.services.tts.data.replaceWords = {...newMap};
+  const up = <K extends keyof TTS_State>(key: K, v: TTS_State[K]) => window.ApiServer.patchService("tts", s => s.data[key] = v);
 
-  return <Modal.Body width={350}>
+  return <Modal.Body width={420}>
     <Modal.Header>TTS Word replacements</Modal.Header>
     <Modal.Content>
       <div className="p-4">
-        <InputMapObject keyPlaceholder="Word" valuePlaceholder="Replacement" addLabel="Add word" value={{...data.data.replaceWords}} onChange={e => update(e)} label="" />
+        <InputCheckbox label="Ignore letter case" value={data.data.replaceWordsIgnoreCase} onChange={v => up("replaceWordsIgnoreCase", v)}/>
+        <InputMapObject keyPlaceholder="Word" valuePlaceholder="Replacement" addLabel="Add word" value={{...data.data.replaceWords}} onChange={e => up("replaceWords", e)} label="" />
       </div>
     </Modal.Content>
   </Modal.Body>

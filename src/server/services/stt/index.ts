@@ -1,7 +1,8 @@
 import { IServiceInterface, ServiceNetworkState, TextEvent, TextEventSource, TextEventType } from "@/types";
-import { patchSentence } from "@/utils";
+import { WordReplacementsCache, buildWordReplacementsCache } from "@/utils";
 import { toast } from "react-toastify";
 import { proxy } from "valtio";
+import { subscribeKey } from "valtio/utils";
 import { STT_Backends } from "./schema";
 import { STT_AzureService } from "./services/azure";
 import { STT_DeepgramService } from "./services/deepgram";
@@ -26,11 +27,13 @@ const backends: {
 
 class Service_STT implements IServiceInterface, ISTTReceiver {
   #serviceInstance?: ISpeechRecognitionService;
-
   #lastMessageState = {
     value: "",
     isInterim: false
   }
+
+  #_wordReplacementsCache!: WordReplacementsCache;
+
   updateLastMessage(value: string, isInterim: boolean) {
     this.#lastMessageState = {value, isInterim};
   }
@@ -80,7 +83,39 @@ class Service_STT implements IServiceInterface, ISTTReceiver {
     }
   }
 
+  updateReplacementsCache() {
+    this.#_wordReplacementsCache = buildWordReplacementsCache(this.data.replaceWords, this.data.replaceWordsIgnoreCase);
+  }
+
+  runReplacements(value: string) {
+    if (this.#_wordReplacementsCache.isEmpty)
+      return value;
+    return value.replace(this.#_wordReplacementsCache.regexp, v => {
+      if (this.data.replaceWordsIgnoreCase) {
+        let _v = v.toLowerCase();
+        if (this.data.replaceWordsPreserveCase) {
+          const isUppercase = v[0] === v[0].toUpperCase();
+          let replacement = this.#_wordReplacementsCache.map[_v];
+          
+          const vCase = isUppercase ? replacement[0].toUpperCase() : replacement[0].toLowerCase();
+          replacement = vCase + replacement.slice(1);
+          return replacement;
+        }
+        else {
+          return this.#_wordReplacementsCache.map[_v];
+        }
+      }
+
+      let _v = this.data.replaceWordsIgnoreCase ? v.toLowerCase() : v;
+      return this.#_wordReplacementsCache.map[_v];
+    });
+  }
+
   async init() {
+    this.updateReplacementsCache();
+    subscribeKey(this.data, "replaceWords", () => this.updateReplacementsCache());
+    subscribeKey(this.data, "replaceWordsIgnoreCase", () => this.updateReplacementsCache());
+    
     // native is bugged
     if (this.data.autoStart && this.data.backend !== STT_Backends.native)
       this.start();
@@ -103,7 +138,7 @@ class Service_STT implements IServiceInterface, ISTTReceiver {
   }
 
   async #sendFinal(sentence: string) {
-    const value = patchSentence(this.data.replaceWords, sentence);    
+    const value = this.runReplacements(sentence);
     !this.isMuted() &&
     window.ApiShared.pubsub.publishText(TextEventSource.stt, {
       value,
@@ -116,7 +151,8 @@ class Service_STT implements IServiceInterface, ISTTReceiver {
     this.triggerPendingUnmute();
   }
 
-  #sendInterim(value: string) {
+  #sendInterim(sentence: string) {
+    const value = this.runReplacements(sentence);
     !this.isMuted() &&
     window.ApiShared.pubsub.publishText(TextEventSource.stt, {
       value,

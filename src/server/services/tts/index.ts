@@ -1,16 +1,17 @@
 import { IServiceInterface, ServiceNetworkState, TextEventType } from "@/types";
+import { WordReplacementsCache, buildWordReplacementsCache, serviceSubscibeToInput, serviceSubscibeToSource } from "@/utils";
 import { toast } from "react-toastify";
 import { proxy } from "valtio";
-import { patchSentence, serviceSubscibeToInput, serviceSubscibeToSource } from "../../../utils";
+import { subscribeKey } from "valtio/utils";
 import { TTS_Backends } from "./schema";
 import { TTS_AzureService } from "./services/azure";
 import { TTS_NativeService } from "./services/native";
 import { TTS_TikTokService } from "./services/tiktok";
 import { TTS_WindowsService } from "./services/windows";
 import {
-  ITTSServiceConstructor,
   ITTSReceiver,
-  ITTSService
+  ITTSService,
+  ITTSServiceConstructor
 } from "./types";
 
 const backends: {
@@ -30,11 +31,29 @@ class Service_TTS implements IServiceInterface, ITTSReceiver {
     error: ""
   });
 
+  #_wordReplacementsCache!: WordReplacementsCache;
+
   get data() {
     return window.ApiServer.state.services.tts.data;
   }
 
+  updateReplacementsCache() {
+    this.#_wordReplacementsCache = buildWordReplacementsCache(this.data.replaceWords, this.data.replaceWordsIgnoreCase);
+  }
+
+  runReplacements(value: string) {
+    if (this.#_wordReplacementsCache.isEmpty)
+      return value;
+    return value.replace(this.#_wordReplacementsCache.regexp, v => {
+      const _v = this.data.replaceWordsIgnoreCase ? v.toLowerCase() : v;
+      return this.#_wordReplacementsCache.map[_v];
+    }).replace(/[<>]/gi, ""); // clear ssml tags
+  }
+
   async init() {
+    this.updateReplacementsCache();
+    subscribeKey(this.data, "replaceWords", () => this.updateReplacementsCache());
+    subscribeKey(this.data, "replaceWordsIgnoreCase", () => this.updateReplacementsCache());
     serviceSubscibeToSource(this.data, "source", data => {
       if (data?.type === TextEventType.final)
         this.play(data.value);
@@ -73,7 +92,7 @@ class Service_TTS implements IServiceInterface, ITTSReceiver {
   }
 
   play(value: string) {
-    const patchedValue = patchSentence(this.data.replaceWords, value).replace(/[<>]/gi, "");
+    const patchedValue = this.runReplacements(value);
     if (!patchedValue)
       return;
     this.#serviceInstance?.play(patchedValue);
