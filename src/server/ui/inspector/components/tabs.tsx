@@ -51,8 +51,8 @@ export const TabsContent: FC<PropsWithChildren<{ tabKey: number | string, direct
     </AnimatePresence>
   </div>
 });
-export const Tabs: FC<PropsWithChildren>                                                                                                      = ({children}) => {
-  return <div className="-mx-1 bg-base-100 px-1 sticky top-0 pt-3 pb-2 z-10 grid grid-cols-6 gap-2 overflow-hidden">
+export const Tabs: FC<PropsWithChildren> = ({children}) => {
+  return <div className="flex justify-center border-b-2 border-neutral border-solid">
     {children}
   </div>
 }
@@ -63,9 +63,8 @@ export const Tab: FC<PropsWithChildren<ButtonHTMLAttributes<HTMLButtonElement> &
   active,
   ...props
 }) => {
-  const colorClasses = active ? "btn-secondary" : "text-base-content bg-neutral/10 hover:bg-neutral/30";
-  return <Tooltip className="relative aspect-square" placement="bottom" content={tooltip} body={tooltipBody}>
-    <button {...props}
-            className={classNames("btn btn-circle text-lg min-h-full border-none w-full h-full", colorClasses)}>{children}</button>
+  const colors = active ? "border-primary text-primary" : "border-transparent text-base-content/60 hover:text-base-content"
+  return <Tooltip className="relative" placement="bottom" content={tooltip} body={tooltipBody}>
+    <button {...props} className={classNames("text-lg min-w-[3rem] flex justify-center p-2 border-b-2 border-solid mb-[-1px] transition-colors", colors)}>{children}</button>
   </Tooltip>
 })
