@@ -9,10 +9,6 @@ import AppConfiguration   from "@/config";
 import ApiShared          from "@/shared";
 import ClientLoadingView from "./client/ui/view_loading";
 
-type NativeFeatures = {
-  background_input: boolean
-}
-
 declare global {
   interface Window {
     Config: AppConfiguration,

@@ -30,7 +30,7 @@ struct NativeFeatures {
 #[command]
 fn get_native_features() -> NativeFeatures {
     NativeFeatures {
-        background_input: false, // background_input: cfg!(background_input)
+        background_input: cfg!(feature="background_input")
     }
 }
 
@@ -84,9 +84,7 @@ fn main() {
         .plugin(services::web::init())
         .plugin(services::audio::init())
         .plugin(services::windows_tts::init())
-        // .plugin(services::translate::init())
-        // #[cfg(background_input)]
-        // .plugin(services::keyboard::init())
+        .plugin(services::keyboard::init())
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

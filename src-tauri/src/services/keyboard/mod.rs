@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::{
     os::raw::c_int,
-    sync::{Arc, Mutex, RwLock},
+    sync::RwLock,
 };
 use tauri::{
     command,
@@ -22,7 +22,6 @@ use windows::Win32::{
 };
 
 struct BgInput {
-    active_shortcuts: Mutex<Vec<HotkeyBinding>>,
     tx: mpsc::UnboundedSender<String>,
     listen_hook_id: RwLock<Option<HHOOK>>,
 }
@@ -37,30 +36,6 @@ enum KeyCommand {
 }
 
 static mut GLOBAL_CALLBACK: Option<Box<dyn FnMut(KeyCommand)>> = None;
-
-impl BgInput {
-    fn rebind_shortcuts(&self, shortcuts: Vec<HotkeyBinding>) {
-        // unregister everything
-        let mut a = self.active_shortcuts.lock().unwrap();
-        for sh in a.iter() {
-            // mki::unregister_hotkey(&sh.keys.as_slice());
-        }
-        *a = shortcuts.clone();
-
-        //save new current
-        for sh in shortcuts {
-            let tx = self.tx.clone();
-            let keys = sh.keys.clone();
-            // mki::register_hotkey(&sh.keys.as_slice(), move || {
-            //     // release every key, so it won't stuck pressed when listener starts
-            //     for k in &keys {
-            //         k.release();
-            //     }
-            //     tx.send(format!("shortcut:{}", sh.name.clone())).unwrap();
-            // });
-        }
-    }
-}
 
 unsafe extern "system" fn raw_callback(code: c_int, param: WPARAM, lpdata: LPARAM) -> LRESULT {
     if code as u32 != HC_ACTION {
@@ -161,25 +136,17 @@ fn stop_tracking(state: State<BgInput>) {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 struct HotkeyBinding {
-    name: String,
-    keys: Vec<mki::Keyboard>,
+    name: String
 }
 
-#[command]
-fn apply_shortcuts(shortcuts: Vec<HotkeyBinding>, state: State<BgInput>) -> Result<(), String> {
-    println!("{:?}", shortcuts);
-    state.rebind_shortcuts(shortcuts);
-    Ok(())
-}
-
+#[cfg(feature="background_input")]
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     let (pubsub_output_tx, mut pubsub_output_rx) = mpsc::unbounded_channel::<String>(); // to js
     Builder::new("keyboard")
-        .invoke_handler(tauri::generate_handler![start_tracking, stop_tracking, apply_shortcuts])
+        .invoke_handler(tauri::generate_handler![start_tracking, stop_tracking])
         .setup(|app| {
             app.manage(BgInput {
                 tx: pubsub_output_tx,
-                active_shortcuts: Mutex::default(),
                 listen_hook_id: RwLock::new(None),
             });
             let handle = app.app_handle();
@@ -193,4 +160,9 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             Ok(())
         })
         .build()
+}
+
+#[cfg(not(feature="background_input"))]
+pub fn init<R: Runtime>() -> TauriPlugin<R> {
+    Builder::new("keyboard").build()
 }

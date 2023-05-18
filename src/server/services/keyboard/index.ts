@@ -34,6 +34,9 @@ class Service_Keyboard implements IServiceInterface {
   });
 
   async init() {
+    if (!window.Config.features.background_input)
+      return;
+      
     this.rebindShortcuts();
 
     // send hotkeys
