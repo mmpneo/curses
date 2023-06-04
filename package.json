@@ -58,7 +58,8 @@
     "vite-plugin-pwa": "^0.14.4",
     "y-protocols": "^1.0.5",
     "y-utility": "^0.1.2",
-    "yjs": "^13.5.52"
+    "yjs": "^13.5.52",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@playwright/test": "^1.30.0",

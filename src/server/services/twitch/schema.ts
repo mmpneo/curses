@@ -1,44 +1,17 @@
-import {JSONSchemaType}    from "ajv";
-import { TextEventSource } from "@/types";
+import { TextEventSource, zodTextEventSource } from "@/types";
+import { zSafe } from "@/utils";
+import { z } from "zod";
 
-export type Twitch_State = {
-  token: string
-  chatEnable: boolean,
-  chatPostEnable: boolean,
-  chatPostLive: boolean,
-  chatPostSource: TextEventSource,
-  chatPostInput: boolean,
-  chatReceiveEnable: boolean,
-  emotesEnableReplacements: boolean,
-  emotesReplacements: Record<string, string>,
-};
+export const Service_Twitch_Schema = z.object({
+  token: zSafe(z.coerce.string(), ""),
+  chatPostSource: zSafe(zodTextEventSource, TextEventSource.stt),
+  chatEnable: zSafe(z.coerce.boolean(), false),
+  chatPostEnable: zSafe(z.coerce.boolean(), false),
+  chatPostLive: zSafe(z.coerce.boolean(), false),
+  chatPostInput: zSafe(z.coerce.boolean(), false),
+  chatReceiveEnable: zSafe(z.coerce.boolean(), false),
+  emotesEnableReplacements: zSafe(z.coerce.boolean(), true),
+  emotesReplacements: zSafe(z.record(z.coerce.string(), z.coerce.string()), {}),
+}).default({});
 
-const Schema_Twitch: JSONSchemaType<Twitch_State> = {
-  type: "object",
-  properties: {
-    token: { type: "string", default: "" },
-    chatEnable: { type: "boolean", default: false },
-    chatPostEnable: { type: "boolean", default: false },
-    chatPostLive: { type: "boolean", default: false },
-    chatPostSource: { type: "string", default: TextEventSource.stt },
-    chatPostInput: { type: "boolean", default: false },
-    chatReceiveEnable: { type: "boolean", default: false },
-    emotesReplacements: { type: "object", default: {}, required: [] },
-    emotesEnableReplacements: { type: "boolean", default: true },
-  },
-  required: [
-    "token",
-    "chatEnable",
-    "chatPostEnable",
-    "chatPostLive",
-    "chatPostSource",
-    "chatPostInput",
-    "chatReceiveEnable",
-    "emotesReplacements",
-    "emotesEnableReplacements"
-  ],
-  default: {},
-  additionalProperties: false
-}
-
-export default Schema_Twitch
+export type Twitch_State = z.infer<typeof Service_Twitch_Schema>;

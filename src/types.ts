@@ -1,6 +1,7 @@
 import { JSONSchemaType } from "ajv";
 import { Services }    from "./server";
 import { ElementType } from "./client/elements/schema";
+import {z} from "zod";
 
 export type MappedGroupDictionary<Options = any> = Record<string, ([string] | [string, string] | [string, string, Options])[]>
 
@@ -53,6 +54,9 @@ export enum TextEventSource {
   stt = "text.stt",
   translation = "text.translation",
 }
+
+
+export const zodTextEventSource = z.nativeEnum(TextEventSource);
 
 export type InspectorTabPath = {
   tab: Services | ElementType | "settings" | "integrations" | "scenes" | "files" | "fonts" | "obs",

@@ -66,6 +66,7 @@ specifiers:
   y-protocols: ^1.0.5
   y-utility: ^0.1.2
   yjs: ^13.5.52
+  zod: ^3.21.4
 
 dependencies:
   '@ebay/nice-modal-react': 1.2.10_biqbaboplfbrettd7655fr4n2y
@@ -118,6 +119,7 @@ dependencies:
   y-protocols: 1.0.5
   y-utility: 0.1.3_yjs@13.5.52
   yjs: 13.5.52
+  zod: 3.21.4
 
 devDependencies:
   '@playwright/test': 1.32.2
@@ -5686,4 +5688,8 @@ packages:
     engines: {node: '>=16.0.0', npm: '>=8.0.0'}
     dependencies:
       lib0: 0.2.73
+    dev: false
+
+  /zod/3.21.4:
+    resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
     dev: false

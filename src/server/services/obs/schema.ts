@@ -1,41 +1,16 @@
-import { JSONSchemaType } from "ajv";
-import { TextEventSource } from "@/types";
+import { TextEventSource, zodTextEventSource } from "@/types";
+import { zSafe } from "@/utils";
+import { z } from "zod";
 
-export type OBS_State = {
-  enable: boolean;
-  source: TextEventSource;
-  inputField: boolean;
-  interim: boolean;
-  wsHost: string;
-  wsAutoStart: boolean;
-  wsPort: string;
-  wsPassword: string;
-};
+export const Service_OBS_Schema = z.object({
+  enable: zSafe(z.coerce.boolean(), false),
+  source: zSafe(zodTextEventSource, TextEventSource.stt),
+  inputField: zSafe(z.coerce.boolean(), false),
+  interim: zSafe(z.coerce.boolean(), false),
+  wsHost: zSafe(z.coerce.string(), ""),
+  wsAutoStart: zSafe(z.coerce.boolean(), false),
+  wsPort: zSafe(z.coerce.string(), ""),
+  wsPassword: zSafe(z.coerce.string(), ""),
+}).default({});
 
-const Schema_OBS: JSONSchemaType<OBS_State> = {
-  type: "object",
-  properties: {
-    enable: { type: "boolean", default: false },
-    source: { type: "string", default: TextEventSource.stt },
-    inputField: { type: "boolean", default: false },
-    interim: { type: "boolean", default: false },
-    wsAutoStart: { type: "boolean", default: false },
-    wsHost: { type: "string", default: "localhost" },
-    wsPort: { type: "string", default: "4455" },
-    wsPassword: { type: "string", default: "" },
-  },
-  required: [
-    "enable",
-    "source",
-    "inputField",
-    "interim",
-    "wsAutoStart",
-    "wsHost",
-    "wsPort",
-    "wsPassword",
-  ],
-  default: {},
-  additionalProperties: false,
-};
-
-export default Schema_OBS;
+export type OBS_State = z.infer<typeof Service_OBS_Schema>

@@ -2,6 +2,7 @@ import difference from "lodash/difference";
 import { subscribeKey }               from "valtio/utils";
 import { BackendState }               from "@/server/schema";
 import { TextEvent, TextEventSource } from "@/types";
+import {z} from "zod";
 
 export function GetArrayDiff(source: string[], target: string[]) {
   const add      = difference(target, source);
@@ -107,3 +108,11 @@ export const decodeB64toArrayBuffer = (base64: string): ArrayBuffer => {
 
   return arraybuffer;
 };
+
+export const zStringNumber = () => z.coerce.number().pipe(z.coerce.string());
+export const zSafe = <zObj extends z.ZodTypeAny, Val extends z.infer<zObj>>(
+  obj: zObj,
+  value: z.util.noUndefined<Val> | (() => z.util.noUndefined<Val>)
+) => obj.default(value).catch(value);
+// need this for zod transition
+export const assertTypes = <A, B extends A>() => {};

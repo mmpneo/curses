@@ -1,25 +1,21 @@
+import { IServiceInterface } from "@/types";
 import { BaseDirectory, createDir, exists, readBinaryFile, writeBinaryFile } from "@tauri-apps/api/fs";
-import Ajv from "ajv";
 import debounce from "lodash/debounce";
-import { proxy, subscribe }            from "valtio";
-import { IServiceInterface }           from "@/types";
-import { backendSchema, BackendState } from "../../schema";
+import { proxy, subscribe } from "valtio";
+import { BackendState, BackendSchema } from "../../schema";
 
 class Service_State implements IServiceInterface {
   state!: BackendState;
 
   async init() {
-    const ajv = new Ajv({ useDefaults: "empty", removeAdditional: true });
-    const validate = ajv.compile(backendSchema);
-
     let data = await this.#load_state();
     const hasData = !!data;
-    // creat new state
+    // create new state
     if (!hasData) {
       data = {};
     }
-    validate(data);
-    this.state = proxy<BackendState>(data as BackendState);
+    
+    this.state = proxy(BackendSchema.parse(data));
     !hasData && this.#save_state();
     subscribe(this.state, () => this.#save_state());
   }

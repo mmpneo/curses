@@ -1,38 +1,15 @@
-import { TextEventSource } from "@/types";
-import {JSONSchemaType}    from "ajv";
+import { TextEventSource, zodTextEventSource } from "@/types";
+import { zSafe } from "@/utils";
+import { z } from "zod";
 
-export type Discord_State = {
-  channelHook: string,
-  channelBotName: string,
-  channelAvatarUrl: string,
-  postEnable: boolean,
-  postWithTwitchLive: boolean,
-  postSource: TextEventSource,
-  postInput: boolean,
-};
+export const Service_Discord_Schema = z.object({
+  channelHook: zSafe(z.coerce.string(), ""),
+  channelBotName: zSafe(z.coerce.string(), ""),
+  channelAvatarUrl: zSafe(z.coerce.string(), ""),
+  postEnable: zSafe(z.coerce.boolean(), false),
+  postWithTwitchLive: zSafe(z.coerce.boolean(), false),
+  postSource: zSafe(zodTextEventSource, TextEventSource.stt),
+  postInput: zSafe(z.coerce.boolean(), false),
+}).default({});
 
-const Schema_Discord: JSONSchemaType<Discord_State> = {
-  type: "object",
-  properties: {
-    channelHook: { type: "string", default: "" },
-    channelBotName: { type: "string", default: "" },
-    channelAvatarUrl: { type: "string", default: "" },
-    postEnable: { type: "boolean", default: false },
-    postWithTwitchLive: { type: "boolean", default: false },
-    postSource: { type: "string", default: TextEventSource.stt },
-    postInput: { type: "boolean", default: false },
-  },
-  required: [
-    "channelHook",
-    "channelBotName",
-    "channelAvatarUrl",
-    "postEnable",
-    "postWithTwitchLive",
-    "postSource",
-    "postInput",
-  ],
-  default: {},
-  additionalProperties: false
-}
-
-export default Schema_Discord
+export type Discord_State = z.infer<typeof Service_Discord_Schema>;

@@ -1,5 +1,6 @@
-import { JSONSchemaType }  from "ajv";
-import { TextEventSource } from "@/types";
+import { TextEventSource, zodTextEventSource } from "@/types";
+import { zSafe, zStringNumber } from "@/utils";
+import { z } from "zod";
 
 export enum TTS_Backends {
   native = "native",
@@ -9,147 +10,48 @@ export enum TTS_Backends {
   // voicevox = "voicevox",
 }
 
-export type TTS_State = {
-  source: TextEventSource;
-  inputField: boolean;
-  backend: TTS_Backends;
-  autoStart: boolean;
-  replaceWords: Record<string, string>;
-  replaceWordsIgnoreCase: boolean;
-  native: {
-    voice: string;
-    pitch: string;
-    rate: string;
-    volume: string;
-  };
-  tiktok: {
-    device: string;
-    voice: string;
-    volume: string;
-    rate: string;
-  };
-  windows: {
-    device: string;
-    voice: string;
-    volume: string;
-    rate: string;
-  };
-  azure: {
-    device: string;
-    language: string;
-    voice: string;
-    voiceStyle: string;
-    voiceRole: string;
+const zodTTS_Backends = z.nativeEnum(TTS_Backends);
 
-    voiceVolume: string;
-    voiceRate: string;
-    voicePitch: string;
-    voiceRange: string;
-    volume: string;
-    rate: string;
+export const Service_TTS_Schema = z.object({
+  source: zSafe(zodTextEventSource, TextEventSource.stt),
+  inputField: zSafe(z.coerce.boolean(), true),
+  backend: zSafe(zodTTS_Backends, TTS_Backends.native),
+  autoStart: zSafe(z.coerce.boolean(), false),
+  replaceWords: zSafe(z.record(z.coerce.string(), z.coerce.string()), {}),
+  replaceWordsIgnoreCase: zSafe(z.coerce.boolean(), true),
+  native: z.object({
+    voice: zSafe(z.coerce.string(), ""),
+    pitch: zSafe(zStringNumber(), "1"),
+    rate: zSafe(zStringNumber(), "1"),
+    volume: zSafe(zStringNumber(), "1"),
+  }).default({}),
+  tiktok: z.object({
+    device: zSafe(z.coerce.string(), ""),
+    voice: zSafe(z.coerce.string(), ""),
+    volume: zSafe(zStringNumber(), "1"),
+    rate: zSafe(zStringNumber(), "1"),
+  }).default({}),
+  windows: z.object({
+    device: zSafe(z.coerce.string(), ""),
+    voice: zSafe(z.coerce.string(), ""),
+    volume: zSafe(zStringNumber(), "1"),
+    rate: zSafe(zStringNumber(), "1"),
+  }).default({}),
+  azure: z.object({
+    device: zSafe(z.coerce.string(), ""),
+    language: zSafe(z.coerce.string(), ""),
+    voice: zSafe(z.coerce.string(), ""),
+    voiceStyle: zSafe(z.coerce.string(), ""),
+    voiceRole: zSafe(z.coerce.string(), ""),
+    voiceVolume: zSafe(z.coerce.string(), "default"),
+    voiceRate: zSafe(z.coerce.string(), "default"),
+    voicePitch: zSafe(z.coerce.string(), "default"),
+    voiceRange: zSafe(z.coerce.string(), "default"),
+    volume: zSafe(zStringNumber(), "1"),
+    rate: zSafe(zStringNumber(), "1"),
+    key: zSafe(z.coerce.string(), ""),
+    location: zSafe(z.coerce.string(), ""),
+  }).default({})
+}).default({});
 
-    key: string;
-    location: string;
-  };
-};
-
-const Schema_STT: JSONSchemaType<TTS_State> = {
-  type: "object",
-  properties: {
-    backend: { type: "string", default: TTS_Backends.windows },
-    autoStart: { type: "boolean", default: false },
-    source: { type: "string", default: TextEventSource.stt },
-    inputField: { type: "boolean", default: true },
-    replaceWords: { type: "object", default: {}, required: [] },
-    replaceWordsIgnoreCase: { type: "boolean", default: false },
-    native: {
-      type: "object",
-      properties: {
-        voice: { type: "string", default: "" },
-        pitch: { type: "string", default: "1" },
-        rate: { type: "string", default: "1" },
-        volume: { type: "string", default: "1" },
-      },
-      required: ["voice", "pitch", "rate", "volume"],
-      default: {} as any,
-      additionalProperties: false,
-    },
-    tiktok: {
-      type: "object",
-      properties: {
-        device: { type: "string", default: "" },
-        voice: { type: "string", default: "" },
-        volume: { type: "string", default: "1" },
-        rate: { type: "string", default: "1" },
-      },
-      required: ["device", "voice", "volume", "rate"],
-      default: {} as any,
-      additionalProperties: false,
-    },
-    windows: {
-      type: "object",
-      properties: {
-        device: { type: "string", default: "" },
-        voice: { type: "string", default: "" },
-        volume: { type: "string", default: "1" },
-        rate: { type: "string", default: "1" },
-      },
-      required: ["device", "voice", "volume", "rate"],
-      default: {} as any,
-      additionalProperties: false,
-    },
-    azure: {
-      type: "object",
-      properties: {
-        device: { type: "string", default: "" },
-        volume: { type: "string", default: "1" },
-        rate: { type: "string", default: "1" },
-        language: { type: "string", default: "" },
-        voice: { type: "string", default: "" },
-        voiceStyle: { type: "string", default: "" },
-        voiceRole: { type: "string", default: "" },
-
-        voiceVolume: { type: "string", default: "default" },
-        voiceRate: { type: "string", default: "default" },
-        voicePitch: { type: "string", default: "default" },
-        voiceRange: { type: "string", default: "default" },
-
-        key: { type: "string", default: "" },
-        location: { type: "string", default: "" },
-      },
-      required: [
-        "device",
-        "volume",
-        "rate",
-        "voiceStyle",
-        "voiceRole",
-        "voiceVolume",
-        "voiceRate",
-        "voiceRange",
-        "voicePitch",
-        "language",
-        "voice",
-        "key",
-        "location",
-      ],
-      default: {} as any,
-      additionalProperties: false,
-    },
-  },
-  required: [
-    "replaceWords",
-    "replaceWordsIgnoreCase",
-    "backend",
-    "autoStart",
-    "source",
-    "inputField",
-    "native",
-    "tiktok",
-    "windows",
-    "azure",
-  ],
-  default: {},
-  additionalProperties: false,
-};
-
-export default Schema_STT;
+export type TTS_State = z.infer<typeof Service_TTS_Schema>

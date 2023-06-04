@@ -1,104 +1,45 @@
-import { JSONSchemaType } from "ajv";
 import { customAlphabet, urlAlphabet } from "nanoid";
-import Schema_Discord, { Discord_State } from "./services/discord/schema";
-import Schema_OBS, { OBS_State } from "./services/obs/schema";
-import Schema_STT, { STT_State } from "./services/stt/schema";
-import Schema_Translation, { Translation_State } from "./services/translation/schema";
-import Schema_TTS, { TTS_State } from "./services/tts/schema";
-import Schema_Twitch, { Twitch_State } from "./services/twitch/schema";
-import Schema_VRC, { VRC_State } from "./services/vrc/schema";
+import { Service_Discord_Schema } from "./services/discord/schema";
+import { Service_OBS_Schema } from "./services/obs/schema";
+import { Service_STT_Schema } from "./services/stt/schema";
+import { Service_Translation_Schema } from "./services/translation/schema";
+import { Service_TTS_Schema } from "./services/tts/schema";
+import { Service_Twitch_Schema } from "./services/twitch/schema";
+import { Service_VRC_Schema } from "./services/vrc/schema";
 
-export interface BackendState {
-  id: string;
-  linkAddress: string;
-  clientTheme: string;
-  uiScale: number;
-  showOverlay: boolean;
-  muteSoundEffects: boolean;
-  showOverlayLogs: boolean;
-  backgroundInputTimer: string;
-  shortcuts: {
-    bgInput: string;
-    start: string;
-    muteMic: string;
-    muteSound: string;
-  };
-  services: {
-    stt: ServiceState<STT_State>;
-    tts: ServiceState<TTS_State>;
-    translation: ServiceState<Translation_State>;
-    twitch: ServiceState<Twitch_State>;
-    discord: ServiceState<Discord_State>;
-    vrc: ServiceState<VRC_State>;
-    obs: ServiceState<OBS_State>;
-  };
+import { zSafe, zStringNumber } from "@/utils";
+import { z } from "zod";
+
+const zodServiceSchemaFactory = <Data extends z.ZodDefault<z.AnyZodObject>>(schema: Data) => {
+  return z.object({
+    showActionButton: zSafe(z.coerce.boolean(), false),
+    data: schema
+  });
 }
 
-type ServiceState<Data = any> = {
-  showActionButton: boolean;
-  data: Data;
-};
-
-const genServiceSchema = <T>(
-  schema: JSONSchemaType<T>
-): JSONSchemaType<ServiceState<T>> =>
-  ({
-    type: "object",
-    properties: {
-      showActionButton: { type: "boolean", default: false },
-      data: schema,
-    },
-    default: {},
-    required: ["showActionButton", "data"],
-  } as JSONSchemaType<ServiceState<T>>);
-
-export const backendSchema: JSONSchemaType<BackendState> = {
-  type: "object",
-  properties: {
-    id: { type: "string", default: customAlphabet(urlAlphabet, 42)() },
-    linkAddress: { type: "string", default: "" },
-    clientTheme: { type: "string", default: "curses" },
-    uiScale: { type: "number", default: 1 },
-    showOverlay: { type: "boolean", default: false },
-    muteSoundEffects: { type: "boolean", default: false },
-    showOverlayLogs: { type: "boolean", default: false },
-    backgroundInputTimer: { type: "string", default: "5000" },
-    shortcuts: {
-      type: "object",
-      properties: {
-        bgInput: { type: "string", default: "" },
-        muteMic: { type: "string", default: "" },
-        muteSound: { type: "string", default: "" },
-        start: { type: "string", default: "" },
-      },
-      default: {} as any,
-      required: ["bgInput", "muteMic", "muteSound", "start"],
-    },
-    services: {
-      type: "object",
-      properties: {
-        vrc: genServiceSchema(Schema_VRC),
-        stt: genServiceSchema(Schema_STT),
-        tts: genServiceSchema(Schema_TTS),
-        obs: genServiceSchema(Schema_OBS),
-        translation: genServiceSchema(Schema_Translation),
-        twitch: genServiceSchema(Schema_Twitch),
-        discord: genServiceSchema(Schema_Discord),
-      },
-      default: {} as any,
-      required: ["vrc", "stt", "tts", "translation", "twitch", "discord"],
-    },
-  },
-  additionalProperties: false,
-  required: [
-    "id",
-    "linkAddress",
-    "uiScale",
-    "showOverlay",
-    "muteSoundEffects",
-    "showOverlayLogs",
-    "clientTheme",
-    "backgroundInputTimer",
-    "services",
-  ],
-};
+export const BackendSchema = z.object({
+  id: zSafe(z.string(), () => customAlphabet(urlAlphabet, 42)()),
+  linkAddress: zSafe(z.string(), ""),
+  clientTheme: zSafe(z.string(), "curses"),
+  uiScale: zSafe(z.number(), 1),
+  showOverlay: zSafe(z.coerce.boolean(), false),
+  muteSoundEffects: zSafe(z.coerce.boolean(), false),
+  showOverlayLogs: zSafe(z.coerce.boolean(), false),
+  backgroundInputTimer: zSafe(zStringNumber(), "5000"),
+  shortcuts: z.object({
+    bgInput: zSafe(z.string(), ""),
+    start: zSafe(z.string(), ""),
+    muteMic: zSafe(z.string(), ""),
+    muteSound: zSafe(z.string(), ""),
+  }).default({}),
+  services: z.object({
+    vrc: zodServiceSchemaFactory(Service_VRC_Schema).default({}),
+    stt: zodServiceSchemaFactory(Service_STT_Schema).default({}),
+    tts: zodServiceSchemaFactory(Service_TTS_Schema).default({}),
+    translation: zodServiceSchemaFactory(Service_Translation_Schema).default({}),
+    twitch: zodServiceSchemaFactory(Service_Twitch_Schema).default({}),
+    discord: zodServiceSchemaFactory(Service_Discord_Schema).default({}),
+    obs: zodServiceSchemaFactory(Service_OBS_Schema).default({}),
+  }).default({})
+}).default({});
+export type BackendState = z.infer<typeof BackendSchema>;

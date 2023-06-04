@@ -1,4 +1,5 @@
-import { JSONSchemaType } from "ajv";
+import { zSafe, zStringNumber } from "@/utils";
+import { z } from "zod";
 
 export enum STT_Backends {
   native = "native",
@@ -8,116 +9,42 @@ export enum STT_Backends {
   speechly = "speechly",
 }
 
-export type STT_State = {
-  backend: STT_Backends;
-  autoStart: boolean;
-  replaceWords: Record<string, string>;
-  replaceWordsIgnoreCase: boolean;
-  replaceWordsPreserveCase: boolean;
-  native: {
-    language_group: string;
-    language: string;
-  },
-  azure: {
-    device: string;
-    language_group: string;
-    language: string;
-    key: string;
-    location: string;
-    profanity: string;
-    silenceTimeout: string;
-    interim: boolean;
-  };
-  speechly: {
-    device: string;
-    key: string;
-  }
-  deepgram: {
-    device: string;
-    language_group: string;
-    language: string;
-    tier: string;
-    key: string;
-    punctuate: boolean;
-    profanity: boolean;
-    interim: boolean;
-  };
-};
+export const zodSTT_Backends = z.nativeEnum(STT_Backends);
 
-const Schema_STT: JSONSchemaType<STT_State> = {
-  type: "object",
-  properties: {
-    backend: { type: "string", default: STT_Backends.browser },
-    autoStart: { type: "boolean", default: false },
-    replaceWords: { type: "object", default: {}, required: [] },
-    replaceWordsIgnoreCase: { type: "boolean", default: false },
-    replaceWordsPreserveCase: { type: "boolean", default: false },
-    native: {
-      type: "object",
-      properties: {
-        language_group: { type: "string", default: "" },
-        language: { type: "string", default: "" },
-      },
-      required: ["language_group", "language"],
-      default: {} as any,
-      additionalProperties: false,
-    },
-    azure: {
-      type: "object",
-      properties: {
-        device: { type: "string", default: "default" },
-        language_group: { type: "string", default: "" },
-        language: { type: "string", default: "" },
-        key: { type: "string", default: "" },
-        location: { type: "string", default: "" },
-        profanity: { type: "string", default: "masked" },
-        silenceTimeout: { type: "string", default: "20" },
-        interim: { type: "boolean", default: true },
-      },
-      required: ["device", "language_group", "language", "key", "location", "profanity", "silenceTimeout", "interim"],
-      default: {} as any,
-      additionalProperties: false,
-    },
-    deepgram: {
-      type: "object",
-      properties: {
-        device: { type: "string", default: "default" },
-        language_group: { type: "string", default: "" },
-        language: { type: "string", default: "" },
-        tier: { type: "string", default: "" },
-        key: { type: "string", default: "" },
-        punctuate: { type: "boolean", default: true },
-        profanity: { type: "boolean", default: true },
-        interim: { type: "boolean", default: true },
-      },
-      required: ["device", "language_group", "language", "tier", "key", "punctuate", "profanity", "interim"],
-      default: {} as any,
-      additionalProperties: false,
-    },
-    speechly: {
-      type: "object",
-      properties: {
-        device: { type: "string", default: "default" },
-        key: { type: "string", default: "" },
-      },
-      required: ["device", "key"],
-      default: {} as any,
-      additionalProperties: false,
-    },
-  },
-  required: [
-    "backend",
-    "replaceWords",
-    "replaceWordsIgnoreCase",
-    "replaceWordsPreserveCase",
-    "autoStart",
-    "speechly",
-    "native",
-    "azure",
-    "deepgram",
-  ],
-  default: {},
-  additionalProperties: false,
-};
+export const Service_STT_Schema = z.object({
+  backend: zSafe(zodSTT_Backends, STT_Backends.native),
+  autoStart: zSafe(z.coerce.boolean(), false),
+  replaceWords: zSafe(z.record(z.coerce.string(), z.coerce.string()), {}),
+  replaceWordsIgnoreCase: zSafe(z.coerce.boolean(), false),
+  replaceWordsPreserveCase: zSafe(z.coerce.boolean(), false),
+  native: z.object({
+    language_group: zSafe(z.coerce.string(), ""),
+    language: zSafe(z.coerce.string(), ""),
+  }).default({}),
+  azure: z.object({
+    device: zSafe(z.coerce.string(), "default"),
+    language_group: zSafe(z.coerce.string(), ""),
+    language: zSafe(z.coerce.string(), ""),
+    key: zSafe(z.coerce.string(), ""),
+    location: zSafe(z.coerce.string(), ""),
+    profanity: zSafe(z.coerce.string(), "masked"),
+    silenceTimeout: zSafe(zStringNumber(), "20"),
+    interim: zSafe(z.coerce.boolean(), true),
+  }).default({}),
+  speechly: z.object({
+    device: zSafe(z.coerce.string(), ""),
+    key: zSafe(z.coerce.string(), ""),
+  }).default({}),
+  deepgram: z.object({
+    device: zSafe(z.coerce.string(), "default"),
+    language_group: zSafe(z.coerce.string(), ""),
+    language: zSafe(z.coerce.string(), ""),
+    tier: zSafe(z.coerce.string(), ""),
+    key: zSafe(z.coerce.string(), ""),
+    punctuate: zSafe(z.coerce.boolean(), true),
+    profanity: zSafe(z.coerce.boolean(), true),
+    interim: zSafe(z.coerce.boolean(), true),
+  }).default({})
+}).default({});
 
-export default Schema_STT;
+export type STT_State = z.infer<typeof Service_STT_Schema>;
