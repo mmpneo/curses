@@ -1,5 +1,6 @@
-import { JSONSchemaType } from "ajv";
-import { TextEventSource } from "../../../types";
+import { zSafe, zStringNumber } from "@/utils";
+import z from "zod";
+import { TextEventSource, zodTextEventSource } from "../../../types";
 
 export enum FontCase {
   lowercase = "lowercase",
@@ -7,281 +8,115 @@ export enum FontCase {
   inherit = "inherit",
 }
 
+const FontCaseSchema = z.nativeEnum(FontCase);
+
 export enum FlexAlign {
   start = "start",
   center = "center",
   end = "end",
 }
+const FlexAlignSchema = z.nativeEnum(FlexAlign);
 
-export type Element_TextState = {
-  previewMode: boolean;
+export const Element_TextStateSchemaN = z.object({
+  previewMode: zSafe(z.boolean(), false),
   // text
-  textFontSize: string;
-  textFontFamily: string;
-  textFontWeight: string;
-  textCase: FontCase;
-  textLineHeight: string;
-  textColor: string;
-  textColorInterim: string;
-  textShadowX: string;
-  textShadowY: string;
-  textShadowZ: string;
-  textShadowColor: string;
-  textStroke: string;
-  textStrokeColor: string;
-  textAlignH: FlexAlign;
-  textAlignV: FlexAlign;
-  textProfanityMask: string;
-  textProfanityColor: string;
-  textProfanityInterimColor: string;
+  textCase: zSafe(FontCaseSchema, FontCase.inherit),
+  textFontFamily: zSafe(z.string(), "Outfit"),
+  textFontSize: zSafe(zStringNumber(), "22"),
+  textFontWeight: zSafe(zStringNumber(), "500"),
+  textLineHeight: zSafe(zStringNumber(), "1.2"),
+  textColor: zSafe(z.string(), "rgba(255,255,255,1)"),
+  textColorInterim: zSafe(z.string(), "rgba(255,255,255,0.7)"),
+  textShadowX: zSafe(zStringNumber(), "0"),
+  textShadowY: zSafe(zStringNumber(), "0"),
+  textShadowZ: zSafe(zStringNumber(), "0"),
+  textShadowColor: zSafe(z.string(), "rgba(0,0,0,0.5)"),
+  textStroke: zSafe(zStringNumber(), "0"),
+  textStrokeColor: zSafe(z.string(), "rgba(0,0,0,1)"),
+  textAlignH: zSafe(FlexAlignSchema, FlexAlign.start),
+  textAlignV: zSafe(FlexAlignSchema, FlexAlign.start),
+  textProfanityMask: zSafe(z.string(), "[redacted]"),
+  textProfanityColor: zSafe(z.string(), "rgba(255,255,255,1)"),
+  textProfanityInterimColor: zSafe(z.string(), "rgba(255,255,255,1)"),
 
   //box
   //bgType - 9slice | solid
   //bgImage - url
   //bgImageFillType - cover | fit
-  boxBackgroundType: "solid" | "slice"
-  boxColor: string;
-  boxImageFileId: string;
+  boxBackgroundType: zSafe(z.enum(["solid", "slice"]), "solid"),
+  boxColor: zSafe(z.string(), "rgba(0,0,0,0.5)"),
+  boxImageFileId: zSafe(z.string(), ""),
 
-  boxSliceTileSize: string;
-  boxSliceTop: string;
-  boxSliceRight: string;
-  boxSliceBottom: string;
-  boxSliceLeft: string;
+  boxSliceTileSize: zSafe(zStringNumber(), "10"),
+  boxSliceTop: zSafe(zStringNumber(), "10"),
+  boxSliceRight: zSafe(zStringNumber(), "10"),
+  boxSliceBottom: zSafe(zStringNumber(), "10"),
+  boxSliceLeft: zSafe(zStringNumber(), "10"),
 
   //box
-  boxPadding: string;
-  boxScrollPaddingTop: string;
-  boxScrollPaddingRight: string;
-  boxScrollPaddingBottom: string;
-  boxScrollPaddingLeft: string;
-  boxAutoWidth: boolean;
-  boxAutoHeight: boolean;
-  boxAlignH: FlexAlign;
-  boxAlignV: FlexAlign;
-  boxBorderRadius: string;
-  boxBorderWidth: string;
-  boxBorderColor: string;
+  boxPadding: zSafe(zStringNumber(), "10"),
+  boxScrollPaddingTop: zSafe(zStringNumber(), "0"),
+  boxScrollPaddingRight: zSafe(zStringNumber(), "0"),
+  boxScrollPaddingBottom: zSafe(zStringNumber(), "0"),
+  boxScrollPaddingLeft: zSafe(zStringNumber(), "0"),
+  boxAutoWidth: zSafe(z.boolean(), false),
+  boxAutoHeight: zSafe(z.boolean(), true),
+  boxAlignH: zSafe(FlexAlignSchema, FlexAlign.center),
+  boxAlignV: zSafe(FlexAlignSchema, FlexAlign.end),
+  boxBorderRadius: zSafe(zStringNumber(), "5"),
+  boxBorderWidth: zSafe(zStringNumber(), "0"),
+  boxBorderColor: zSafe(z.string(), "rgba(0,0,0,0)"),
 
   //animation
-  animateEnable: boolean;
-  animateDelayChar: number;
-  animateDelayWord: number;
-  animateDelaySentence: number;
-  animateScroll: boolean;
-  animateEvent: boolean;
+  animateEnable: zSafe(z.boolean(), false),
+  animateDelayChar: zSafe(z.coerce.number(), 100),
+  animateDelayWord: zSafe(z.coerce.number(), 100),
+  animateDelaySentence: zSafe(z.coerce.number(), 100),
+  animateScroll: zSafe(z.boolean(), true),
+  animateEvent: zSafe(z.boolean(), false),
 
   //sources
-  sourceMain: TextEventSource;
-  sourceInterim: boolean;
-  sourceInputField: boolean;
+  sourceMain: zSafe(zodTextEventSource, TextEventSource.stt),
+  sourceInterim: zSafe(z.boolean(), true),
+  sourceInputField: zSafe(z.boolean(), true),
 
   //behaviour
-  behaviorClearTimer: number; // clear after...
-  behaviorClearDelay: number; // Use this to clear text after some animation
-  behaviorLastSentence: boolean; // Show only the last sentence
-  behaviorBreakLine: boolean; // Start every input from a new line
+  behaviorClearTimer: zSafe(z.number(), 5000), // clear after...
+  behaviorClearDelay: zSafe(z.number(), 200), // Use this to clear text after some animation
+  behaviorLastSentence: zSafe(z.boolean(), false), // Show only the last sentence
+  behaviorBreakLine: zSafe(z.boolean(), false), // Start every input from a new line
 
   //sound
-  soundEnable: boolean;
-  soundFile: string;
-  soundFileNewSentence: string;
-  soundFileOnShow: string;
-  soundFileOnHide: string;
-  soundVolume: number;
+  soundEnable: zSafe(z.boolean(), false),
+  soundFile: zSafe(z.string(), ""),
+  soundFileNewSentence: zSafe(z.string(), ""),
+  soundFileOnShow: zSafe(z.string(), ""),
+  soundFileOnHide: zSafe(z.string(), ""),
+  soundVolume: zSafe(z.coerce.number(), 1),
   // sound effects
-  soundDetuneMin: number;
-  soundDetuneMax: number;
-  soundPlaybackMin: number;
-  soundPlaybackMax: number;
+  soundDetuneMin: zSafe(z.coerce.number(), 0),
+  soundDetuneMax: zSafe(z.coerce.number(), 0),
+  soundPlaybackMin: zSafe(z.coerce.number(), 1),
+  soundPlaybackMax: zSafe(z.coerce.number(), 1),
 
   // particles
-  particlesEnable: boolean;
-  particlesSpriteFileIdFirst: string
-  particlesSpriteFileIdSecond: string
-  particlesSpriteFileIdThird: string
-  particlesCountMin: string
-  particlesCountMax: string
-  particlesDurationMin: string
-  particlesDurationMax: string
-  particlesDirectionXMin: string
-  particlesDirectionXMax: string
-  particlesDirectionYMin: string
-  particlesDirectionYMax: string
-  particlesScaleMin: string
-  particlesScaleMax: string
-  particlesRotationMin: string
-  particlesRotationMax: string
+  particlesEnable: zSafe(z.boolean(), false),
+  particlesSpriteFileIdFirst: zSafe(z.string(), ""),
+  particlesSpriteFileIdSecond: zSafe(z.string(), ""),
+  particlesSpriteFileIdThird: zSafe(z.string(), ""),
+  particlesCountMin: zSafe(zStringNumber(), "5"),
+  particlesCountMax: zSafe(zStringNumber(), "5"),
+  particlesDurationMin: zSafe(zStringNumber(), "200"),
+  particlesDurationMax: zSafe(zStringNumber(), "200"),
+  particlesDirectionXMin: zSafe(zStringNumber(), "20"),
+  particlesDirectionXMax: zSafe(zStringNumber(), "50"),
+  particlesDirectionYMin: zSafe(zStringNumber(), "10"),
+  particlesDirectionYMax: zSafe(zStringNumber(), "50"),
+  particlesScaleMin: zSafe(zStringNumber(), "1"),
+  particlesScaleMax: zSafe(zStringNumber(), "1"),
+  particlesRotationMin: zSafe(zStringNumber(), "-100"),
+  particlesRotationMax: zSafe(zStringNumber(), "100"),
 
   //css
-  css: string;
-};
-
-export const Element_TextStateSchema: JSONSchemaType<Element_TextState> = {
-  type: "object",
-  properties: {
-    previewMode: { type: "boolean", default: false },
-    textFontSize: { type: "string", default: "22" },
-    textFontFamily: { type: "string", default: "Outfit" },
-    textFontWeight: { type: "string", default: "500" },
-    textCase: { type: "string", default: FontCase.inherit },
-    textLineHeight: { type: "string", default: "1.2" },
-    textColor: { type: "string", default: "rgba(255,255,255,1)" },
-    textColorInterim: { type: "string", default: "rgba(255,255,255,0.7)" },
-    textShadowX: { type: "string", default: "0" },
-    textShadowY: { type: "string", default: "0" },
-    textShadowZ: { type: "string", default: "0" },
-    textShadowColor: { type: "string", default: "rgba(0,0,0,0.5)" },
-    textStroke: { type: "string", default: "0" },
-    textStrokeColor: { type: "string", default: "rgba(255,255,255,0)" },
-    textAlignH: { type: "string", default: FlexAlign.start },
-    textAlignV: { type: "string", default: FlexAlign.start },
-    textProfanityMask: { type: "string", default: "[redacted]" },
-    textProfanityColor: { type: "string", default: "rgba(255,255,255,1)" },
-    textProfanityInterimColor: { type: "string", default: "rgba(255,255,255,1)" },
-
-    boxBackgroundType: { type: "string", default: "solid" },
-    boxColor: { type: "string", default: "rgba(0,0,0,0.5)" },
-    boxImageFileId: { type: "string", default: "rgba(0,0,0,0.5)" },
-    boxSliceTileSize: { type: "string", default: "10" },
-    boxSliceTop: { type: "string", default: "10" },
-    boxSliceRight: { type: "string", default: "10" },
-    boxSliceBottom: { type: "string", default: "10" },
-    boxSliceLeft: { type: "string", default: "10" },
-    boxPadding: { type: "string", default: "10" },
-    boxScrollPaddingTop: { type: "string", default: "0" },
-    boxScrollPaddingRight: { type: "string", default: "0" },
-    boxScrollPaddingBottom: { type: "string", default: "0" },
-    boxScrollPaddingLeft: { type: "string", default: "0" },
-    boxAutoWidth: { type: "boolean", default: false },
-    boxAutoHeight: { type: "boolean", default: true },
-    boxAlignH: { type: "string", default: FlexAlign.center },
-    boxAlignV: { type: "string", default: FlexAlign.end },
-    boxBorderRadius: { type: "string", default: "5" },
-    boxBorderWidth: { type: "string", default: "0" },
-    boxBorderColor: { type: "string", default: "rgba(0,0,0,0)" },
-
-    animateEnable: { type: "boolean", default: false },
-    animateDelayChar: { type: "number", default: 100 },
-    animateDelayWord: { type: "number", default: 100 },
-    animateDelaySentence: { type: "number", default: 100 },
-    animateScroll: { type: "boolean", default: true },
-    animateEvent: { type: "boolean", default: false },
-
-    sourceMain: { type: "string", default: TextEventSource.stt },
-    sourceInterim: { type: "boolean", default: true },
-    sourceInputField: { type: "boolean", default: true },
-
-    behaviorClearTimer: { type: "number", default: 5000 },
-    behaviorClearDelay: { type: "number", default: 200 },
-    behaviorLastSentence: { type: "boolean", default: false },
-    behaviorBreakLine: { type: "boolean", default: false },
-    
-    soundEnable: { type: "boolean", default: false },
-    soundFile: { type: "string", default: "" },
-    soundFileNewSentence: { type: "string", default: "" },
-    soundFileOnShow: { type: "string", default: "" },
-    soundFileOnHide: { type: "string", default: "" },
-    soundVolume: { type: "number", default: 1 },
-    soundDetuneMin: { type: "number", default: 0 },
-    soundDetuneMax: { type: "number", default: 0 },
-    soundPlaybackMin: { type: "number", default: 1 },
-    soundPlaybackMax: { type: "number", default: 1 },
-    
-    particlesEnable: { type: "boolean", default: false },
-    particlesSpriteFileIdFirst: { type: "string", default: "" },
-    particlesSpriteFileIdSecond: { type: "string", default: "" },
-    particlesSpriteFileIdThird: { type: "string", default: "" },
-    particlesCountMin: { type: "string", default: "5" },
-    particlesCountMax: { type: "string", default: "5" },
-    particlesDurationMin: { type: "string", default: "200" },
-    particlesDurationMax: { type: "string", default: "200" },
-    particlesDirectionXMin: { type: "string", default: "20" },
-    particlesDirectionXMax: { type: "string", default: "50" },
-    particlesDirectionYMin: { type: "string", default: "10" },
-    particlesDirectionYMax: { type: "string", default: "50" },
-    particlesScaleMin: { type: "string", default: "1" },
-    particlesScaleMax: { type: "string", default: "1" },
-    particlesRotationMin: { type: "string", default: "-100" },
-    particlesRotationMax: { type: "string", default: "100" },
-
-    css: { type: "string", default: "" },
-  },
-  additionalProperties: false,
-  default: {},
-  required: [
-    "previewMode",
-    "textFontSize",
-    "textFontFamily",
-    "textFontWeight",
-    "textCase",
-    "textLineHeight",
-    "textColor",
-    "textColorInterim",
-    "textShadowX",
-    "textShadowY",
-    "textShadowZ",
-    "textShadowColor",
-    "textStroke",
-    "textStrokeColor",
-    "textAlignH",
-    "textAlignV",
-    "textProfanityMask",
-    "boxBackgroundType",
-    "boxColor",
-    "boxImageFileId",
-    "boxSliceTileSize",
-    "boxSliceTop",
-    "boxSliceRight",
-    "boxSliceBottom",
-    "boxSliceLeft",
-    "boxPadding",
-    "boxScrollPaddingTop",
-    "boxScrollPaddingRight",
-    "boxScrollPaddingBottom",
-    "boxScrollPaddingLeft",
-    "boxAutoWidth",
-    "boxAutoHeight",
-    "boxAlignH",
-    "boxAlignV",
-    "boxBorderRadius",
-    "boxBorderWidth",
-    "boxBorderColor",
-    "animateEnable",
-    "animateDelayChar",
-    "animateDelayWord",
-    "animateDelaySentence",
-    "animateScroll",
-    "animateEvent",
-    "sourceMain",
-    "sourceInterim",
-    "sourceInputField",
-    "behaviorClearTimer",
-    "behaviorClearDelay",
-    "behaviorLastSentence",
-    "behaviorBreakLine",
-    "soundEnable",
-    "soundFile",
-    "soundVolume",
-    "soundDetuneMin",
-    "soundDetuneMax",
-    "soundPlaybackMin",
-    "soundPlaybackMax",
-    "particlesSpriteFileIdFirst",
-    "particlesSpriteFileIdSecond",
-    "particlesSpriteFileIdThird",
-    "particlesCountMin",
-    "particlesCountMax",
-    "particlesDurationMin",
-    "particlesDurationMax",
-    "particlesDirectionXMin",
-    "particlesDirectionXMax",
-    "particlesDirectionYMin",
-    "particlesDirectionYMax",
-    "particlesScaleMin",
-    "particlesScaleMax",
-    "particlesRotationMin",
-    "particlesRotationMax",
-    "css",
-  ],
-};
+  css: zSafe(z.string(), ""),
+}).default({});

@@ -1,27 +1,8 @@
-import { JSONSchemaType } from "ajv";
-import * as Y from "yjs";
-export type SceneState = {
-  id: string;
-  name: string;
-  bindOBS: boolean;
-  bindOBSName: string;
-};
-export function createSceneState({ id, name, bindOBS, bindOBSName }: SceneState) {
-  return new Y.Map([
-    ["id", id],
-    ["name", name],
-    ["bindOBS", bindOBS],
-    ["bindOBSName", bindOBSName],
-  ]);
-}
-export const sceneStateSchema: JSONSchemaType<SceneState> = {
-  type: "object",
-  properties: {
-    id: {type: "string", default: ""},
-    name: {type: "string", default: "Unnamed scene"},
-    bindOBS: {type: "boolean", default: false},
-    bindOBSName: {type: "string", default: "Some obs scene"},
-  },
-  required:   ["id", "name", "bindOBS", "bindOBSName"],
-  additionalProperties: false
-}
+import z from "zod";
+import { zSafe } from "@/utils";
+
+export const SceneStateSchema = z.object({
+  id: z.string(),
+  name: zSafe(z.string(), "Unnamed scene"),
+});
+export type SceneState = z.infer<typeof SceneStateSchema>;

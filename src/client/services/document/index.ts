@@ -1,19 +1,18 @@
 import { IServiceInterface } from "@/types";
-import * as Y                from "yjs";
+import { open, save } from "@tauri-apps/api/dialog";
 import {
-  exists,
-  writeBinaryFile,
-  readBinaryFile,
-  createDir,
   BaseDirectory,
+  createDir,
+  exists,
+  readBinaryFile,
+  writeBinaryFile,
 } from "@tauri-apps/api/fs";
-import { save, open } from "@tauri-apps/api/dialog";
-import { bind, Binder } from "immer-yjs";
-import { toast }                                              from "react-toastify";
-import { createDocumentState, documentSchema, DocumentState } from "../../schema";
-import debounce                                               from "lodash/debounce";
-import Ajv             from "ajv";
+import { Binder, bind } from "immer-yjs";
+import debounce from "lodash/debounce";
+import { toast } from "react-toastify";
+import * as Y from "yjs";
 import { ElementType } from "../../elements/schema";
+import { DocumentSchema, DocumentState } from "../../schema";
 
 class Service_Document implements IServiceInterface {
   #file: Y.Doc = new Y.Doc();
@@ -31,56 +30,75 @@ class Service_Document implements IServiceInterface {
     return this.#file;
   }
 
-  #documentValidator: any;
+  createNewState() {
+    this.patch(state => {
+      const newState = DocumentSchema.parse({});
+      let k: keyof DocumentState;
+      for (k in newState)
+        this.#patchField(state, newState, k);
+    });
+    const canvas = this.fileBinder.get().canvas;
+    // add default text element
+    const eleWidth = canvas.w - 100;
+    window.ApiClient.elements.addElement(ElementType.text, "main", {
+      w: eleWidth,
+      h: 65,
+      x: (canvas.w - eleWidth) / 2,
+      y: (canvas.h - 65) / 2,
+      r: 0
+    });
+  }
+  
+  // i hate this
+  #patchField<Key extends keyof DocumentState>(og: DocumentState, patch: DocumentState, key: Key) {
+    og[key] = patch[key];
+  }
+
+  patchState(immerState: DocumentState, newState: DocumentState){
+    // trigger immer-yjs generator
+    let k: keyof DocumentState;
+    for (k in newState)
+      this.#patchField(immerState, newState, k);
+    // remove fields
+    for (let k in immerState) {
+      if (!(k in newState))
+        delete immerState[k as keyof DocumentState]
+    }
+  }
 
   async init() {
-    const ajv = new Ajv({
-      strict: true,
-      useDefaults: "empty",
-      removeAdditional: true,
-    });
-    this.#documentValidator = ajv.compile(documentSchema);
-
     this.#file.getArray<Uint8Array>("files");
-    this.fileBinder = bind<any>(this.#file.getMap("template"));
+    this.fileBinder = bind<DocumentState>(this.#file.getMap("template"));
+    
     if (window.Config.isClient()) {
       // wait for initial push from server
       await new Promise((res, rej) => {
         this.#file.once("update", res);
       });
-    } else {
-      const loadState = await this.loadDocument();
-      if (loadState) {
-        Y.applyUpdate(this.#file, loadState);
+      return;
+    }
 
-        window.ApiClient.document.patch((state) => {
-          // validate root state
-          this.#documentValidator(state);
-        });
-      } else {
-        // create new template
-        const template = this.#file.getMap("template");
-        this.#file.transact(() => {
-          createDocumentState(template);
-          this.saveDocument();
-
-        });
-
-        const canvas = this.fileBinder.get().canvas;
-        // add default text element
-        const eleWidth = canvas.w - 100;
-        window.ApiClient.elements.addElement(ElementType.text, "main", {
-          w: eleWidth,
-          h: 65,
-          x: (canvas.w - eleWidth) / 2,
-          y: (canvas.h - 65) / 2,
-          r: 0
-        });
-      }
-      this.#file.on("update", () => {
-        this.saveDocument();
+    const loadState = await this.loadDocument();
+    if (loadState) {
+      Y.applyUpdate(this.#file, loadState);
+      this.patch((state) => {
+        const patchState = DocumentSchema.safeParse(state);
+        if (patchState.success) {
+          this.patchState(state, patchState.data);
+        }
+        else {
+          toast.error("Invalid template");
+          this.createNewState();
+        }
       });
     }
+    else {
+      this.createNewState();
+    }
+    this.saveDocument();
+    this.#file.on("afterTransaction", (e) => {
+      this.saveDocument();
+    });
   }
 
   async importDocument() {
@@ -95,20 +113,23 @@ class Service_Document implements IServiceInterface {
     if (!path || Array.isArray(path)) return;
     const data = await readBinaryFile(path);
     const tempDoc = new Y.Doc();
-
+    let binder: Binder<DocumentState> = bind<DocumentState>(tempDoc.getMap("template"));
     try {
-      // check YJS
+      // try import and patch state
       Y.applyUpdate(tempDoc, data);
-      // check state
-      this.#documentValidator(tempDoc.getMap("template").toJSON());
-      await this.#saveDocumentNative(tempDoc);
-
-      // restart app
-      window.location.reload();
-
-      // replace file
+      tempDoc.transact(() => {
+        binder.update(state => {
+          const patchState = DocumentSchema.safeParse(state);
+          if (patchState.success) {
+            this.patchState(state, patchState.data);
+            this.#saveDocumentNative(tempDoc).then(() => window.location.reload())
+          }
+          else
+            toast.error("Invalid template");
+        })
+      });
     } catch (error) {
-      toast.error("The template wasn't imported because it's invalid");
+      toast.error("Invalid template");
     }
   }
   async exportDocument(authorName: string) {
@@ -138,23 +159,20 @@ class Service_Document implements IServiceInterface {
   }
 
   async loadDocument(): Promise<Uint8Array | undefined> {
-    // todo support web
-    if (window.Config.isWeb() || window.Config.isClient()) {
+    if (window.Config.isClient()) {
       return;
     }
 
     const bExists = await exists("user/template", {
       dir: BaseDirectory.AppData,
     });
-    if (bExists) {
-      try {
-        const data = await readBinaryFile("user/template", {
-          dir: BaseDirectory.AppData,
-        });
-        return data;
-      } catch (error) {
-        toast("Error loading template", { type: "error" });
-      }
+    if (bExists) try {
+      const data = await readBinaryFile("user/template", {
+        dir: BaseDirectory.AppData,
+      });
+      return data;
+    } catch (error) {
+      toast("Error loading template", { type: "error" });
     }
   }
 
@@ -166,11 +184,10 @@ class Service_Document implements IServiceInterface {
     await writeBinaryFile("user/template", data, {dir: BaseDirectory.AppData});
   }
 
-  saveDocument = debounce(async () => {
-    //todo localstorage support
-    if (window.Config.isClient() || window.Config.isWeb())
+  saveDocument = debounce(() => {
+    if (window.Config.isClient())
       return;
-    await this.#saveDocumentNative(this.#file);
+    this.#saveDocumentNative(this.#file);
   }, 2000);
 
   patch(patchFn: (state: DocumentState) => void) {

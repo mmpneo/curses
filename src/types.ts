@@ -1,7 +1,6 @@
-import { JSONSchemaType } from "ajv";
-import { Services }    from "./server";
+import z from "zod";
 import { ElementType } from "./client/elements/schema";
-import {z} from "zod";
+import { Services } from "./server";
 
 export type MappedGroupDictionary<Options = any> = Record<string, ([string] | [string, string] | [string, string, Options])[]>
 
@@ -21,6 +20,8 @@ export enum TextEventType {
   interim,
 }
 
+const TextEventTypeSchema = z.nativeEnum(TextEventType);
+
 export type BaseEvent<Data = unknown> = {
   topic: string,
   data?: Data
@@ -28,25 +29,14 @@ export type BaseEvent<Data = unknown> = {
 
 export type PartialWithRequired<T, K extends keyof T> = Pick<T, K> & Partial<T>;
 
-export type TextEvent = {
-  type: TextEventType;
-  value: string;
-  //<wordIndex, url>
-  emotes: Record<number, string>
-  textFieldType: "textField" | "twitchChat"
-};
+export const TextEventSchema = z.object({
+  type: TextEventTypeSchema,
+  value: z.string().default(""),
+  emotes: z.record(z.number(), z.string()).default({}),
+  textFieldType: z.enum(["textField", "twitchChat"])
+});
 
-export const TextEvent_Schema: JSONSchemaType<TextEvent> = {
-  type:       "object",
-  properties: {
-    type: {type: "number", default: TextEventType.final},
-    value: {type: "string", default: ""},
-    textFieldType: {type: "string", default: "", nullable: true} as any, // fucking over it,
-    emotes: {type: "object", additionalProperties: true, required: []},
-  },
-  additionalProperties: false,
-  required:   ["type", "value"]
-}
+export type TextEvent = z.infer<typeof TextEventSchema>;
 
 export enum TextEventSource {
   any = "text",
@@ -55,7 +45,7 @@ export enum TextEventSource {
   translation = "text.translation",
 }
 
-
+// todo rename
 export const zodTextEventSource = z.nativeEnum(TextEventSource);
 
 export type InspectorTabPath = {

@@ -1,65 +1,29 @@
-import Ajv from "ajv";
-import { nanoid }                    from "nanoid";
-import { IServiceInterface }                      from "@/types";
-import {ElementState, ElementType, TransformRect} from "./schema";
-import { Element_ImageStateSchema }               from "./image/schema";
-import { Element_TextStateSchema } from "./text/schema";
+import { IServiceInterface } from "@/types";
+import { nanoid } from "nanoid";
+import { ElementSceneStateFactory, ElementType, TransformRect, UnionElementStateSchema } from "./schema";
 
 class Service_Elements implements IServiceInterface {
-  constructor() {
-    this.#ajv = new Ajv({
-      strict: false,
-      useDefaults: "empty",
-      removeAdditional: true,
-    });
-  }
-  #ajv!: Ajv;
+  constructor() {}
 
-  init(): void {
+  init(): void {}
 
-    const validator_text = this.#ajv.compile(Element_TextStateSchema);
-    const validator_image = this.#ajv.compile(Element_ImageStateSchema);
+  addElementToScene(id: string, sceneId = "main") {
     window.ApiClient.document.patch(state => {
-      const elements = state.elements
-      Object.values(elements).forEach(element => {
-        Object.values(element.scenes).forEach(elementScene => {
-          if (element.type === ElementType.text) {
-            validator_text(elementScene.data);
-          }
-          else if (element.type === ElementType.image) {
-            validator_image(elementScene.data);
-          }
-        });
-      });
-    });
+      if (!(id in state.elements))
+        return;
+      state.elements[id].scenes[sceneId] = ElementSceneStateFactory(state.elements[id].type).parse({});
+    })
   }
 
-  validateElements() {
-
-  }
-
-  addElement(type: ElementType, sceneId: string = "main", rect?: TransformRect) {
-    let data = {};
-
-    if (type === ElementType.text) {
-      const validator = this.#ajv.compile(Element_TextStateSchema);
-      validator(data);
-    }
-
+  addElement(type: ElementType, sceneId: string = "main" , rect?: TransformRect) {
     window.ApiClient.document.patch((state) => {
-      const id = nanoid();
+      let id = nanoid();
+      while (id in state.elements) {
+        id = nanoid();
+      }
       state.elementsIds.push(id);
-      state.elements[id] = {
-        id,
-        type,
-        name: `Element - ${type}`,
-        scenes: {
-          [sceneId]: {
-            rect: rect || { x: 100, y: 100, w: 100, h: 100, r: 0 },
-            data,
-          },
-        },
-      } as ElementState;
+      state.elements[id] = UnionElementStateSchema.parse({id, type});
+      state.elements[id].scenes[sceneId] = ElementSceneStateFactory(state.elements[id].type).parse({rect});
     });
   }
 

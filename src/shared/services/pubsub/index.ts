@@ -1,11 +1,10 @@
+import { BaseEvent, IServiceInterface, PartialWithRequired, ServiceNetworkState, TextEvent, TextEventSchema, TextEventSource } from "@/types";
+import { listen } from '@tauri-apps/api/event';
 import { invoke } from "@tauri-apps/api/tauri";
-import { listen } from '@tauri-apps/api/event'
 import PubSub from "pubsub-js";
-import { proxyMap }                                                                                                                            from "valtio/utils";
-import { BaseEvent, IServiceInterface, PartialWithRequired, ServiceNetworkState, TextEvent, TextEventSource, TextEventType, TextEvent_Schema } from "@/types";
-import Ajv, { ValidateFunction }                                                                                                               from "ajv";
-import { proxy } from "valtio";
 import { toast } from "react-toastify";
+import { proxy } from "valtio";
+import { proxyMap } from "valtio/utils";
 
 type RegisteredEvent = {
   label: string;
@@ -15,11 +14,7 @@ type RegisteredEvent = {
 
 class Service_PubSub implements IServiceInterface {
   constructor() {}
-
   #socket?: WebSocket;
-  #ajv!: Ajv;
-  textEventValidator!: ValidateFunction<TextEvent>;
-
   serviceState = proxy({
     state: ServiceNetworkState.disconnected
   });
@@ -31,10 +26,11 @@ class Service_PubSub implements IServiceInterface {
       const {topic, data}: BaseEvent = JSON.parse(stringEvent);
       if (typeof data !== "object")
         return;
-      const validated = data;
-      this.textEventValidator(validated);
-      const textEvent = this.applyEmotes(validated as TextEvent);
-
+      const validated = TextEventSchema.safeParse(data);
+      if (!validated.success)
+        return;
+      
+      const textEvent = this.applyEmotes(validated.data);
       // redirect stt
       if (topic === "text.stt") {
         window.ApiServer.stt.processExternalMessage(textEvent);
@@ -54,12 +50,6 @@ class Service_PubSub implements IServiceInterface {
   unregisterEvent = (event: RegisteredEvent) => this.registeredEvents.delete(event.value);
 
   async init() {
-    this.#ajv = new Ajv({
-      strict: false,
-      useDefaults: "empty",
-      removeAdditional: true,
-    });
-    this.textEventValidator = this.#ajv.compile(TextEvent_Schema);
     window.Config.isServer() && listen('pubsub', (event) => {
       this.consumePubSubMessage(event.payload as string);
     })

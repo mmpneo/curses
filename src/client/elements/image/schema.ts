@@ -1,45 +1,14 @@
-import { JSONSchemaType } from "ajv";
+import { zSafe, zStringNumber } from "@/utils";
+import z from "zod";
 
-export type Element_ImageState = {
-  fileId: string;
-  styleOpacity: string;
-
-  activeFileId: string;
-  activeStyleOpacity: string;
-
-  activeEvent: string;
-  activeDuration: number;
-  activeTransitionDuration: string;
-  styleCss: string;
-};
-
-export const Element_ImageStateSchema: JSONSchemaType<Element_ImageState> = {
-  type: "object",
-  properties: {
-    fileId: { type: "string", default: "" },
-    styleOpacity: { type: "string", default: "1" },
-
-    activeEvent: { type: "string", default: "" },
-    activeFileId: { type: "string", default: "" },
-    activeStyleOpacity: { type: "string", default: "1" },
-    activeDuration: { type: "number", default: 100 },
-    activeTransitionDuration: { type: "string", default: "100" },
-
-
-    styleCss: { type: "string", default: "" },
-  },
-  additionalProperties: false,
-  default: {},
-  required: [
-    "fileId",
-    "styleOpacity",
-
-    "activeEvent",
-    "activeFileId",
-    "activeStyleOpacity",
-    "activeDuration",
-    "activeTransitionDuration",
-
-    "styleCss"
-  ],
-};
+export const Element_ImageStateSchemaN = z.object({
+  fileId: zSafe(z.string(), ""),
+  styleOpacity: zSafe(zStringNumber(), "1"),
+  activeFileId: zSafe(z.string(), ""),
+  activeStyleOpacity: zSafe(z.string(), "1"),
+  activeEvent: zSafe(z.string(), ""),
+  activeDuration: zSafe(z.number(), 100),
+  activeTransitionDuration: zSafe(zStringNumber(), "100"),
+  styleCss: zSafe(z.string(), ""),
+}).default({});
+export type Element_ImageState = z.infer<typeof Element_ImageStateSchemaN>;
