@@ -14,6 +14,10 @@ type NativeFeatures = {
   background_input: boolean
 }
 
+type InitialData = {
+  scene: string
+}
+
 type ClientNetwork = {
   serverId: string;
   host: string;
@@ -28,6 +32,7 @@ type ServerNetwork = {
 class AppConfiguration {
   mode: AppMode            = AppMode.server;
   platform: AppPlatform    = AppPlatform.app;
+  clientInitialState?: InitialData;
   features: NativeFeatures = {
     background_input: false
   }
