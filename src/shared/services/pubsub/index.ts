@@ -6,6 +6,8 @@ import { toast } from "react-toastify";
 import { proxy } from "valtio";
 import { proxyMap } from "valtio/utils";
 
+// todo move event to zod
+
 type RegisteredEvent = {
   label: string;
   description?: string;
@@ -92,15 +94,18 @@ class Service_PubSub implements IServiceInterface {
     window.ApiShared.peer.broadcast(msg);
   }
 
-  publishText(topic: TextEventSource, textData: PartialWithRequired<TextEvent, "type" | "value">) {
+  publish(topic: string, data: any) {
     if (window.Config.isClient())
       return;
+      let msg = {topic, data};
+      this.#publishLocally(msg);
+      this.#publishPeers(msg);
+      this.#publishPubSub(msg);
+      this.#publishLink(msg);
+  }
+  publishText(topic: TextEventSource, textData: PartialWithRequired<TextEvent, "type" | "value">) {
     let data = this.applyEmotes(textData);
-    let msg = {topic, data};
-    this.#publishLocally(msg);
-    this.#publishPeers(msg);
-    this.#publishPubSub(msg);
-    this.#publishLink(msg);
+    this.publish(topic, data);
   }
 
   public unsubscribe(key?: string) {
