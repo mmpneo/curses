@@ -17,9 +17,9 @@ export default defineConfig({
         skipWaiting: true
       },
       injectRegister: null,
-      // devOptions: {
-      //   enabled: true
-      // },
+      devOptions: {
+        enabled: false
+      },
     }),
   ],
 
