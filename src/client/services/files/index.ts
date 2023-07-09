@@ -156,7 +156,7 @@ class Service_Files implements IServiceInterface {
       },
       image: {
         name: "Images",
-        extensions: ["jpeg", "png", "gif", "webp"],
+        extensions: ["jpeg", "jpg", "png", "gif", "webp"],
       },
       audio: {
         name: "Sounds",
