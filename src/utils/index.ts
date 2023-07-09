@@ -3,6 +3,7 @@ import { subscribeKey }               from "valtio/utils";
 import { BackendState }               from "@/server/schema";
 import { TextEvent, TextEventSource } from "@/types";
 import {z} from "zod";
+import { useSnapshot } from "valtio";
 
 export function GetArrayDiff(source: string[], target: string[]) {
   const add      = difference(target, source);
@@ -12,6 +13,11 @@ export function GetArrayDiff(source: string[], target: string[]) {
 
 export const useBackendUpdate = <Servicekey extends keyof BackendState["services"]>(serviceKey: Servicekey) => {
   return (key: keyof BackendState["services"][Servicekey]["data"], value: any) => window.ApiServer.patchService(serviceKey, s => {(s.data as any)[key] = value})
+}
+
+export function useUpdateElement<SchemaType extends object>(id: string) {
+  const {activeScene} = useSnapshot(window.ApiClient.scenes.state);
+  return <K extends keyof SchemaType>(k: K, v: SchemaType[K]) => window.ApiClient.elements.updateField<SchemaType, K>(id, activeScene, k, v);
 }
 
 // allows to dynamically switch text source
