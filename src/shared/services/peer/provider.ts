@@ -4,11 +4,11 @@ import {decoding, encoding}                                                     
 import {messageYjsSyncStep1, messageYjsSyncStep2, readSyncMessage, readUpdate, writeUpdate} from 'y-protocols/sync'
 import {nanoid}      from "nanoid";
 import { BaseEvent } from "@/types";
-export class PeerjsProvider {
+
+export class PeerjsProvider extends EventTarget {
   constructor(
     private document: Doc,
-    private onStatusChange: (connected: boolean) => void
-  ) {}
+  ) {super();}
 
   #peer?: Peer;
   private peers: { [id: string]: DataConnection } = {};
@@ -27,15 +27,17 @@ export class PeerjsProvider {
       path:   'peer',
       secure: false,
       debug: 0});
-    this.#peer.on("open", () => this.onStatusChange(true));
+    this.#peer.on("open", () => {});
     this.#peer.on("connection", clientConn => {
-      this.onStatusChange(true);
       console.log("connected client", clientConn);
       this.peers[clientConn.connectionId] = clientConn;
-      clientConn.on("open", () => clientConn.send(this.serializeUpdate(encodeStateAsUpdate(this.document))));
+      clientConn.on("open", () => {
+        this.dispatchEvent(new CustomEvent("on_client_connected", {detail: clientConn.connectionId}))
+        clientConn.send(this.serializeUpdate(encodeStateAsUpdate(this.document)));
+      });
       clientConn.on("close", () => delete this.peers[clientConn.connectionId]);
     });
-    this.#peer.on("disconnected", () => this.onStatusChange(false));
+    this.#peer.on("disconnected", () => {});
   }
 
   // restart client app
@@ -70,9 +72,7 @@ export class PeerjsProvider {
         // try again
         hostConn.on("close", () => this.tryReconnectClient());
         hostConn.on("data", handleData => this.readMessage(new Uint8Array(handleData as ArrayBuffer)));
-        hostConn.on("open", () => {
-          resolve("connected");
-        });
+        hostConn.on("open", () => resolve("connected"));
       });
       this.#peer.on("error", () => this.tryReconnectClient());
     })
@@ -102,28 +102,43 @@ export class PeerjsProvider {
       try {
         const topicStr = decoding.readVarString(decoder);
         const dataStr = decoding.readVarString(decoder);
-        window.ApiShared.pubsub.publishLocally({topic: topicStr, data: JSON.parse(dataStr)});
+        this.dispatchEvent(new CustomEvent("on_event_received", {
+          detail: {topic: topicStr, data: JSON.parse(dataStr)}
+        }));
       } catch (error) {console.error(error)}
     }
   }
 
-  serializeUpdate (update: Uint8Array) {
+  serializeUpdate(update: Uint8Array) {
     const encoder = encoding.createEncoder()
     encoding.writeVarUint(encoder, 0)
     writeUpdate(encoder, update);
     return encoding.toUint8Array(encoder);
   }
 
-  broadcastPubSub (msg: BaseEvent) {
+  serializeEvent(msg: BaseEvent) {
     try {
       const encoder = encoding.createEncoder();
       encoding.writeVarInt(encoder, 1);
       encoding.writeVarString(encoder, msg.topic);
       encoding.writeVarString(encoder, JSON.stringify(msg.data));
-      this.broadcastUpdate(encoding.toUint8Array(encoder));
+      return encoding.toUint8Array(encoder);
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
+  }
+
+  broadcastPubSubSingle(clientId: string, msg: BaseEvent) {
+    if (!(clientId in this.peers))
+      return;
+      
+    const serialized = this.serializeEvent(msg);
+    this.peers[clientId].send(serialized);
+  }
+
+  broadcastPubSub(msg: BaseEvent) {
+    const serialized = this.serializeEvent(msg);
+    serialized && this.broadcastUpdate(serialized);
   }
 
   private broadcastUpdate(uint8Array: Uint8Array) {

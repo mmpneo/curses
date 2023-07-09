@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { AnimatePresence, motion } from "framer-motion";
-import { ButtonHTMLAttributes, FC, memo, PropsWithChildren, ReactNode, useEffect } from "react";
-import { RiAddFill, RiBrushFill, RiChatVoiceFill, RiFolderMusicFill, RiImageFill, RiMessage2Fill, RiSettings2Fill, RiTranslate2, RiUserVoiceFill } from "react-icons/ri";
+import { ButtonHTMLAttributes, FC, memo, PropsWithChildren, ReactNode, useEffect, useMemo } from "react";
+import { RiAddFill, RiBrushFill, RiChatVoiceFill, RiFolderMusicFill, RiImageFill, RiMessage2Fill, RiSettings2Fill, RiStackFill, RiTranslate2, RiUserVoiceFill } from "react-icons/ri";
 import { TbArrowBarToLeft, TbArrowBarToRight, TbTextResize } from "react-icons/tb";
 import { useSnapshot } from "valtio";
 import { Services } from "../index";
@@ -59,15 +59,18 @@ const AddElementsMenu: FC = () => {
 };
 
 const ElementMenu: FC<{ id: string, title: string }> = ({ id, title }) => {
-  const handleRemove = () => {
-    window.ApiClient.elements.removeElement(id);
+  const {activeScene} = useSnapshot(window.ApiClient.scenes.state);
+  const elementScenes = useGetState(state => state.elements[id]?.scenes);
+  const canRemoveFromScene = activeScene in elementScenes && Object.keys(elementScenes).length > 1;
+  const handleRemoveFromScene = () => {
+    if (canRemoveFromScene)
+      window.ApiClient.elements.removeElementFromScene(id, activeScene);
   }
   return (
     <ul className="dropdown p-2">
       <li className="menu-title"><span>{title}</span></li>
-      <li><button onClick={() => handleRemove()}>Remove element</button></li>
-      {/* <li><button>Add to scene</button></li>
-      <li><button>Remove from scene</button></li> */}
+      <li><button onClick={() => window.ApiClient.elements.removeElement(id)}>Remove element</button></li>
+      <li className={classNames({disabled: !canRemoveFromScene})}><button onClick={handleRemoveFromScene}>Remove from scene</button></li>
     </ul>
   );
 };
@@ -129,11 +132,6 @@ const Sidebar: FC = memo(() => {
         <SideBarButton status={translationState.status} tab={{ tab: Services.translation }} tooltip="Translation"><RiTranslate2 /></SideBarButton>
         <SideBarButton tab={{ tab: "settings" }} tooltip="Settings & About"><RiSettings2Fill /></SideBarButton>
         <SIdebarDivider expand={expand} icon={<MdExtension className="flex-none" size={14} />}>Integrations</SIdebarDivider>
-        
-        {/* OBS */}
-        {/* Twitch */}
-        {/* Discord */}
-        {/* VRC */}
         <div className={classNames("flex flex-col transition-spacing space-y-1", expand ? "pl-2" : "pl-0")}>
           <SideBarButton tab={{ tab: "obs" }} tooltip="OBS Studio"><SiObsstudio /></SideBarButton>
           <SideBarButton tab={{ tab: Services.twitch }} tooltip="Twitch"><SiTwitch /></SideBarButton>
@@ -141,8 +139,8 @@ const Sidebar: FC = memo(() => {
           <SideBarButton tab={{ tab: Services.vrc }} tooltip="VRChat"><RiMessage2Fill /></SideBarButton>
         </div>
         <SIdebarDivider expand={expand} icon={<RiBrushFill className="flex-none" size={14} />}>Elements</SIdebarDivider>
-        {/* <SideBarButton tab={{ tab: "scenes" }} tooltip="Canvas & Scenes"><RiStackFill /></SideBarButton> */}
         <div className={classNames("flex flex-col space-y-1 transition-spacing", expand ? "pl-2" : "pl-0")}>
+          <SideBarButton tab={{ tab: "scenes" }} tooltip="Scenes"><RiStackFill /></SideBarButton>
           <ElementList />
         </div>
         <Dropdown placement="right" content={<AddElementsMenu />}>

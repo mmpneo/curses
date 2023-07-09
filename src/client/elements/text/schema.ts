@@ -47,6 +47,12 @@ export const Element_TextStateSchemaN = z.object({
   boxColor: zSafe(z.string(), "rgba(0,0,0,0.5)"),
   boxImageFileId: zSafe(z.string(), ""),
 
+  boxShadowX: zSafe(zStringNumber(), "0"),
+  boxShadowY: zSafe(zStringNumber(), "0"),
+  boxShadowZ: zSafe(zStringNumber(), "0"),
+  boxShadowSpread: zSafe(zStringNumber(), "0"),
+  boxShadowColor: zSafe(z.string(), "rgba(0,0,0,0)"),
+
   boxSliceTileSize: zSafe(zStringNumber(), "10"),
   boxSliceTop: zSafe(zStringNumber(), "10"),
   boxSliceRight: zSafe(zStringNumber(), "10"),
@@ -120,3 +126,5 @@ export const Element_TextStateSchemaN = z.object({
   //css
   css: zSafe(z.string(), ""),
 }).default({});
+
+export type Element_TextState = z.infer<typeof Element_TextStateSchemaN>;

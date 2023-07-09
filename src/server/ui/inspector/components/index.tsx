@@ -1,8 +1,10 @@
-import {FC, memo, PropsWithChildren, useId} from "react";
+import {FC, memo, PropsWithChildren, useId, useState} from "react";
 import SimpleBar                            from "simplebar-react";
 import classNames                           from "classnames";
 import {AnimatePresence, motion}            from "framer-motion";
 import {Tab, Tabs, TabsContent}             from "@/server/ui/inspector/components/tabs";
+import { useSnapshot } from "valtio";
+import { useGetState } from "@/client";
 
 const TabAnimation: FC<PropsWithChildren>                              = ({children}) => {
   const id = useId();
@@ -65,7 +67,27 @@ export const Deactivatable: FC<PropsWithChildren<{ active: boolean }>> = ({activ
 
 export const Deleted: FC = () => {
   return <div className="w-full h-full flex bg-red items-center justify-center">Deleted</div>
-
 }
 
-export default { Body, Header, SubHeader, Description, Content, Deactivatable, TabsContent, Tabs, Tab, Switchable, Deleted };
+export const AddToScene: FC<{id: string}> = ({id}) => {
+  const elementScenes = useGetState(state => state.elements[id]?.scenes);
+  const {activeScene} = useSnapshot(window.ApiClient.scenes.state)
+  const [selectedScene, setSelectedScene] = useState<string>("main");
+
+  const sceneOptions = Object.keys(elementScenes).map((sceneId) => ({
+    label: window.ApiClient.scenes.scenes[sceneId].name, 
+    value: sceneId}));
+
+  return <div className="flex flex-col space-y-3">
+    <Description><span>Element is not in <span className="font-semibold">{window.ApiClient.scenes.scenes[activeScene].name}</span>. Select the scene from which you want to copy element state.</span></Description>
+    {sceneOptions.map(scene =>
+      <label className="group flex space-x-2 items-center" key={scene.value}>
+        <input type="radio" name="font" value={scene.value} checked={selectedScene === scene.value} onChange={e => setSelectedScene(e.target.value)} className="radio radio-sm radio-primary" />
+        <span className="group-hover:opacity-100 opacity-70 text-sm font-semibold">{scene.label}</span>
+      </label>
+    )}
+  <button disabled={!selectedScene} onClick={() => window.ApiClient.elements.addElementToScene(id, activeScene, selectedScene)} className="btn btn-sm btn-primary">Confirm</button>
+  </div>
+}
+
+export default { Body, Header, SubHeader, Description, Content, Deactivatable, TabsContent, Tabs, Tab, Switchable, Deleted, AddToScene };

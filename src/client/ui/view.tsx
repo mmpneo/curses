@@ -1,11 +1,13 @@
 import { FC, memo }        from "react";
 import { useGetState }     from "../index";
 import { ElementInstance } from "./element-instance";
+import { useSnapshot } from "valtio";
 
 export const ElementSimpleTransform: FC<{ id: string }> = memo(({ id }) => {
-  const rect = useGetState(state => state.elements[id].scenes["main"].rect);
+  const {activeScene} = useSnapshot(window.ApiClient.scenes.state);
+  const rect = useGetState(state => state.elements[id].scenes[activeScene]?.rect);
   return <div
-    className="absolute"
+    className="absolute transition-all duration-100"
     style={{
       width: rect?.w || 0,
       height: rect?.h || 0,

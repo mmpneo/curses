@@ -1,8 +1,9 @@
 import classNames from "classnames";
 import produce from "immer";
 import { nanoid } from "nanoid";
-import { createContext, FC, memo, PropsWithChildren, useCallback, useEffect, useRef, useState } from "react";
+import { FC, memo, PropsWithChildren, useCallback, useEffect, useRef, useState } from "react";
 import { useMeasure, useTimeoutFn } from "react-use";
+import { useSnapshot } from "valtio";
 import { useGetState } from "../..";
 import { TextEvent, TextEventSource, TextEventType } from "../../../types";
 import { Element_TextState } from "./schema";
@@ -12,7 +13,8 @@ import { elementStyle } from "./style";
 
 const Element_Text: FC<{ id: string }> = memo(({ id }) => {
   const isRunning = useRef(false);
-  const state: Element_TextState = useGetState(state => state.elements[id].scenes["main"].data);
+  const {activeScene} = useSnapshot(window.ApiClient.scenes.state);
+  const state = useGetState(state => (state.elements[id].scenes[activeScene].data as Element_TextState));
   const stateRef = useRef<Element_TextState>({} as Element_TextState);
   stateRef.current = state;
 
@@ -212,6 +214,7 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
       justify-content: start;
       width: ${state.boxAutoWidth ? 'auto' : '100%'};
       height: ${state.boxAutoHeight ? 'auto' : '100%'};
+      box-shadow: ${state.boxShadowX}px ${state.boxShadowY}px ${state.boxShadowZ}px ${state.boxShadowSpread}px ${state.boxShadowColor};
       
       padding: ${state.boxScrollPaddingTop}px ${state.boxScrollPaddingRight}px ${state.boxScrollPaddingBottom}px ${state.boxScrollPaddingLeft}px;
       

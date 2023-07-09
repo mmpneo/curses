@@ -7,11 +7,29 @@ class Service_Elements implements IServiceInterface {
 
   init(): void {}
 
-  addElementToScene(id: string, sceneId = "main") {
+  updateField<SchemaType, Key extends keyof SchemaType>(id: string, sceneId: string, key: Key, value: SchemaType[Key]) {
+    window.ApiClient.document.patch(state => {
+      if (!(id in state.elements) || !(sceneId in state.elements[id].scenes))
+        return;
+      (state.elements[id].scenes[sceneId].data as SchemaType)[key] = value;
+    });
+  }
+
+  addElementToScene(id: string, sceneId = "main", copyFrom = "main") {
     window.ApiClient.document.patch(state => {
       if (!(id in state.elements))
         return;
-      state.elements[id].scenes[sceneId] = ElementSceneStateFactory(state.elements[id].type).parse({});
+      if (copyFrom in state.elements[id].scenes)
+        state.elements[id].scenes[sceneId] = {...state.elements[id].scenes[copyFrom]}
+      else
+        state.elements[id].scenes[sceneId] = ElementSceneStateFactory(state.elements[id].type).parse({});
+    })
+  }
+  removeElementFromScene(id: string, sceneId: string) {
+    window.ApiClient.document.patch(state => {
+      if (!(id in state.elements) || !(sceneId in state.elements[id].scenes))
+        return;
+      delete state.elements[id].scenes[sceneId];
     })
   }
 

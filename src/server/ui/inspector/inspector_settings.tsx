@@ -1,4 +1,4 @@
-import { useGetState, useUpdateState } from "@/client";
+import { useGetState } from "@/client";
 import { ServiceNetworkState } from "@/types";
 import { getVersion } from '@tauri-apps/api/app';
 import { FC, memo, useEffect, useState } from "react";
@@ -10,7 +10,7 @@ import Tooltip from "../dropdown/Tooltip";
 import Logo from "../logo";
 import ServiceButton from "../service-button";
 import Inspector from "./components";
-import { InputBaseText, InputChips, InputDoubleCountainer, InputNetworkStatus, InputSelect, InputShortcut, InputText } from "./components/input";
+import { InputChips, InputNetworkStatus, InputSelect, InputShortcut, InputText } from "./components/input";
 const themesLight = [
   'light',
   'lofi',
@@ -78,9 +78,7 @@ const ExportMenu: FC = () => {
 const Inspector_Settings: FC = memo(() => {
   const { clientTheme, uiScale, backgroundInputTimer } = useSnapshot(window.ApiServer.state);
   const { state: linkStatus } = useSnapshot(window.ApiShared.pubsub.serviceState);
-  const canvas = useGetState(state => state.canvas);
   const author = useGetState(state => state.author);
-  const updateState = useUpdateState();
 
   const [version, setVersion] = useState("")
   useEffect(() => {
@@ -131,10 +129,6 @@ const Inspector_Settings: FC = memo(() => {
 
       <Inspector.SubHeader>Template</Inspector.SubHeader>
       {author && <span className="text-sm text-secondary font-semibold">Created by {author}</span>}
-      <InputDoubleCountainer label="Canvas Size">
-        <InputBaseText value={canvas?.w} onChange={e => updateState(state => { state.canvas.w = parseFloat(e.target.value) })} type="number" />
-        <InputBaseText value={canvas?.h} onChange={e => updateState(state => { state.canvas.h = parseFloat(e.target.value) })} type="number" />
-      </InputDoubleCountainer>
       <div className="flex items-center space-x-2">
         <button onClick={() => window.ApiClient.document.importDocument()} className="flex-grow btn btn-sm gap-2"><RiFileCopyLine /> Import</button>
         <Dropdown className="flex-grow btn btn-sm gap-2" targetOffset={24} placement="right" content={<ExportMenu />}>

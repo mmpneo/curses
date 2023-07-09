@@ -2,13 +2,15 @@ import { FC }                          from "react";
 import { useGetState, useUpdateState } from "@/client";
 import { InputBaseText, InputDoubleCountainer }                           from "./input";
 import {TransformRect}                 from "@/client/elements/schema";
+import { useSnapshot } from "valtio";
 
 const TransformInput: FC<{id: string}> = ({id}) => {
-  const rect = useGetState(state => state.elements[id].scenes["main"].rect);
+  const {activeScene} = useSnapshot(window.ApiClient.scenes.state);
+  const rect = useGetState(state => state.elements[id].scenes[activeScene]?.rect);
   const update = useUpdateState();
 
   const handleUpdate = (key: keyof TransformRect, value: string) => update(state => {
-    state.elements[id].scenes["main"].rect[key] = parseFloat(value);
+    state.elements[id].scenes[activeScene].rect[key] = parseFloat(value);
   });
 
   return <>

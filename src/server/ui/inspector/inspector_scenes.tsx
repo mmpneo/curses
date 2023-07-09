@@ -1,24 +1,35 @@
-import { FC }                                                                              from "react";
-import Inspector                                                                           from "./components";
-import { useGetState, useUpdateState }                                                     from "@/client";
-import { InputBaseText, InputCheckbox, InputDoubleCountainer, InputText }                                                                               from "./components/input";
-import { RiCheckboxBlankCircleLine, RiCheckboxCircleFill, RiDeleteBack2Fill, RiStackFill } from "react-icons/ri";
-import classNames                                                                          from "classnames";
-import { SceneState }                                                                      from "@/client/services/scenes/schema";
+import { useGetState, useUpdateState } from "@/client";
+import { SceneState } from "@/client/services/scenes/schema";
+import { FC } from "react";
+import { RiAddCircleFill, RiMore2Fill, RiStackFill } from "react-icons/ri";
+import { useSnapshot } from "valtio";
+import Dropdown from "../dropdown/Dropdown";
+import Tooltip from "../dropdown/Tooltip";
+import Inspector from "./components";
+import { InputBaseText, InputDoubleCountainer } from "./components/input";
+
+const SceneMenu: FC<{ id: string }> = ({ id }) => {
+  return (
+    <ul className="dropdown p-2">
+      <li className="menu-title"><span>Scene</span></li>
+      <li><button onClick={() => window.ApiClient.scenes.duplicateScene(id)}>Duplicate scene</button></li>
+      <li><button onClick={() => window.ApiClient.scenes.deleteScene(id)}>Remove scene</button></li>
+    </ul>
+  );
+};
 
 const Scene: FC<{ data: SceneState }> = ({ data }) => {
-  const defaultScene = useGetState(state => state.activeScene);
+  const {activeScene} = useSnapshot(window.ApiClient.scenes.state);
   const update = useUpdateState();
-  return <div className="group flex flex-col border space-y-2 px-3 py-2 bg-base-200 rounded-md border-neutral/10">
-    <InputText label="Name" value={data.name} onChange={e => update(state => { state.scenes[data.id].name = e.target.value })} />
-    <InputCheckbox label="Bind to OBS" value={data.bindOBS} onChange={e => update(state => { state.scenes[data.id].bindOBS = e })} />
-    {data.bindOBS && <InputText label="OBS scene name" value={data.bindOBSName} onChange={e => update(state => { state.scenes[data.id].bindOBSName = e.target.value })} />}
-    <div className="flex justify-end space-x-2">
-      <button className={classNames("btn btn-sm gap-2", defaultScene === data.id ? "btn-success" : "btn-ghost")} onClick={() => window.ApiClient.scenes.setActive(data.id)}>
-        {defaultScene === data.id ? <RiCheckboxCircleFill className="text-lg" /> : <RiCheckboxBlankCircleLine className="text-lg" />}
-        Active</button>
-      <button disabled={data.id === "main"} className="btn btn-sm gap-2 btn-error" onClick={() => window.ApiClient.scenes.deleteScene(data.id)}><RiDeleteBack2Fill /> Delete</button>
-    </div>
+
+  return <div className="flex items-center space-x-2">
+    <Tooltip className="flex items-center" placement="top" content={`Activate`}>
+      <input type="radio" name="font" value={data.id} checked={data.id === activeScene} onChange={e => window.ApiClient.scenes.setActive(e.target.value)} className="radio radio-sm radio-primary" />
+    </Tooltip>
+    <InputBaseText disabled={data.id === 'main'} fieldWidth={false} className="w-full" value={data.name} onChange={e => update(state => { state.scenes[data.id].name = e.target.value })} />
+    {data.id !== 'main' && <Dropdown placement="right" content={<SceneMenu id={data.id} />}>
+      <button className="btn btn-sm btn-ghost btn-circle flex-nowrap whitespace-nowrap gap-1"><RiMore2Fill/></button>
+    </Dropdown>}
   </div>
 }
 
@@ -40,7 +51,7 @@ const Inspector_Scenes: FC = () => {
 
       <Inspector.SubHeader>Scenes</Inspector.SubHeader>
       {scenes && Object.keys(scenes).map((sceneId) => <Scene key={sceneId} data={scenes[sceneId]} />)}
-      <button className="btn btn-sm" onClick={() => window.ApiClient.scenes.addScene("New scene")}>Create scene</button>
+      <button className="btn btn-sm gap-2" onClick={() => window.ApiClient.scenes.addScene()}><RiAddCircleFill /> Add scene</button>
     </Inspector.Content>
   </Inspector.Body>
 }

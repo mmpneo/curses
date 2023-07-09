@@ -4,9 +4,11 @@ import { useEffectOnce } from "react-use";
 import { useGetState } from "../..";
 import { StyleToEventController } from "../utils";
 import { Element_ImageState } from "./schema";
+import { useSnapshot } from "valtio";
 
 const Element_Image: FC<{ id: string }> = memo(({ id }) => {
-  const state: Element_ImageState = useGetState(state => state.elements[id].scenes["main"].data);
+  const {activeScene} = useSnapshot(window.ApiClient.scenes.state);
+  const state = useGetState(state => (state.elements[id].scenes[activeScene].data as Element_ImageState));
   const attributeController = useRef<StyleToEventController>();
 
   const [attributes, setAttributes] = useState<Record<string, string>>({})

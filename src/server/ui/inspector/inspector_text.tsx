@@ -1,4 +1,7 @@
-import { FC, memo, useState } from "react";
+import { useGetState } from "@/client";
+import { Element_TextState, FlexAlign, FontCase } from "@/client/elements/text/schema";
+import { useUpdateElement } from "@/utils";
+import { FC, memo, useMemo, useState } from "react";
 import { BsStars, BsTextareaResize } from "react-icons/bs";
 import { GrTextAlignCenter, GrTextAlignLeft, GrTextAlignRight } from "react-icons/gr";
 import { IoIosRadio } from "react-icons/io";
@@ -6,20 +9,18 @@ import { RiAlignBottom, RiAlignTop, RiAlignVertically, RiFileCopyLine, RiFontSiz
 import { SiCsswizardry } from "react-icons/si";
 import { TbTextResize } from "react-icons/tb";
 import { VscSettings } from "react-icons/vsc";
-import { useCopyToClipboard }                     from "react-use";
-import { useGetState, useUpdateState } from "@/client";
-import { InputBaseText, InputCheckbox, InputChips, InputCode, InputColor, InputContainer, InputDoubleCountainer, InputFile, InputFont, InputRange, InputSelect, InputText, InputTextSource }                           from "./components/input";
-import Inspector      from "./components";
-import NameInput                                  from "./components/name-input";
-import TransformInput                             from "./components/transform-input";
-import { Element_TextState, FlexAlign, FontCase } from "@/client/elements/text/schema";
+import { useCopyToClipboard } from "react-use";
+import { useSnapshot } from "valtio";
+import Inspector from "./components";
+import { InputBaseText, InputCheckbox, InputChips, InputCode, InputColor, InputContainer, InputDoubleCountainer, InputFile, InputFont, InputRange, InputSelect, InputText, InputTextSource } from "./components/input";
+import NameInput from "./components/name-input";
+import TransformInput from "./components/transform-input";
+import { ElementSceneState } from "@/client/elements/schema";
 
 const SourceInspector: FC<{ id: string }> = ({ id }) => {
-  const data: Element_TextState = useGetState(state => state.elements[id].scenes["main"].data);
-  const update = useUpdateState();
-  const up = <K extends keyof Element_TextState>(key: K, v: Element_TextState[K]) => update(state => {
-    state.elements[id].scenes["main"].data[key] = v;
-  });
+  const {activeScene} = useSnapshot(window.ApiClient.scenes.state);
+  const data: Element_TextState = useGetState(state => state.elements[id]?.scenes[activeScene].data as Element_TextState);
+  const up = useUpdateElement<Element_TextState>(id);
 
   return <>
     <Inspector.SubHeader>Source</Inspector.SubHeader>
@@ -31,11 +32,9 @@ const SourceInspector: FC<{ id: string }> = ({ id }) => {
 }
 
 const TextInspector: FC<{ id: string }> = ({ id }) => {
-  const data = useGetState(state => state.elements[id].scenes["main"].data);
-  const update = useUpdateState();
-  const up = <K extends keyof Element_TextState>(key: K, v: Element_TextState[K]) => update(state => {
-    state.elements[id].scenes["main"].data[key] = v;
-  });
+  const {activeScene} = useSnapshot(window.ApiClient.scenes.state);
+  const data: Element_TextState = useGetState(state => state.elements[id]?.scenes[activeScene].data as Element_TextState);
+  const up = useUpdateElement<Element_TextState>(id);
 
   return <>
     <Inspector.SubHeader>Font</Inspector.SubHeader>
@@ -66,8 +65,6 @@ const TextInspector: FC<{ id: string }> = ({ id }) => {
 
     <InputText label="Line Height" step="0.1" type="number" value={data.textLineHeight} onChange={e => up("textLineHeight", e.target.value)} />
 
-    {/* <Inspector.SubHeader>Font Color</Inspector.SubHeader> */}
-
     <Inspector.SubHeader>Shadow</Inspector.SubHeader>
     <InputDoubleCountainer label="Position">
       <InputBaseText value={data.textShadowX} onChange={e => up("textShadowX", e.target.value)} type="number" />
@@ -77,17 +74,15 @@ const TextInspector: FC<{ id: string }> = ({ id }) => {
     <InputColor label="Color" value={data.textShadowColor} onChange={e => up("textShadowColor", e)} />
 
     <Inspector.SubHeader>Outline</Inspector.SubHeader>
-    <InputText label="Size" min="0" step="1" type="number" value={data.textStroke} onChange={e => up("textStroke", e.target.value)} />
+    <InputText label="Size" min="0" step="0.1" type="number" value={data.textStroke} onChange={e => up("textStroke", e.target.value)} />
     <InputColor label="Color" value={data.textStrokeColor} onChange={e => up("textStrokeColor", e)} />
   </>
 }
 
 const BoxInspector: FC<{ id: string }> = ({ id }) => {
-  const data: Element_TextState = useGetState(state => state.elements[id].scenes["main"].data);
-  const update = useUpdateState();
-  const up = <K extends keyof Element_TextState>(key: K, v: Element_TextState[K]) => update(state => {
-    state.elements[id].scenes["main"].data[key] = v;
-  });
+  const {activeScene} = useSnapshot(window.ApiClient.scenes.state);
+  const data: Element_TextState = useGetState(state => state.elements[id]?.scenes[activeScene].data as Element_TextState);
+  const up = useUpdateElement<Element_TextState>(id);
 
   return <>
     <Inspector.SubHeader>Box</Inspector.SubHeader>
@@ -117,6 +112,15 @@ const BoxInspector: FC<{ id: string }> = ({ id }) => {
       <InputBaseText value={data.boxScrollPaddingLeft} onChange={e => up("boxScrollPaddingLeft", e.target.value)} type="number" />
       <InputBaseText value={data.boxScrollPaddingRight} onChange={e => up("boxScrollPaddingRight", e.target.value)} type="number" />
     </InputDoubleCountainer>
+
+    <Inspector.SubHeader>Shadow</Inspector.SubHeader>
+    <InputDoubleCountainer label="Position">
+      <InputBaseText value={data.boxShadowX} onChange={e => up("boxShadowX", e.target.value)} type="number" />
+      <InputBaseText value={data.boxShadowY} onChange={e => up("boxShadowY", e.target.value)} type="number" />
+    </InputDoubleCountainer>
+    <InputText label="Blur" type="number" value={data.boxShadowZ} onChange={e => up("boxShadowZ", e.target.value)} />
+    <InputText label="Spread" type="number" value={data.boxShadowSpread} onChange={e => up("boxShadowZ", e.target.value)} />
+    <InputColor label="Color" value={data.boxShadowColor} onChange={e => up("boxShadowColor", e)} />
 
     <Inspector.SubHeader>Background</Inspector.SubHeader>
     <InputSelect options={[
@@ -150,13 +154,11 @@ const BoxInspector: FC<{ id: string }> = ({ id }) => {
 }
 
 const BehaviourInspector: FC<{ id: string }> = ({ id }) => {
-  const data = useGetState(state => state.elements[id].scenes["main"].data);
-  const update = useUpdateState();
-  const [, copyToClipboard] = useCopyToClipboard();
+  const {activeScene} = useSnapshot(window.ApiClient.scenes.state);
+  const data: Element_TextState = useGetState(state => state.elements[id]?.scenes[activeScene].data as Element_TextState);
+  const up = useUpdateElement<Element_TextState>(id);
 
-  const up = <K extends keyof Element_TextState>(key: K, v: Element_TextState[K]) => update(state => {
-    state.elements[id].scenes["main"].data[key] = v;
-  });
+  const [, copyToClipboard] = useCopyToClipboard();
 
   const handleCopyCss = () => {
     const style = `[event-element-${id}-100] {}`
@@ -186,11 +188,9 @@ const BehaviourInspector: FC<{ id: string }> = ({ id }) => {
 }
 
 const EffectsInspector: FC<{ id: string }> = ({ id }) => {
-  const data: Element_TextState = useGetState(state => state.elements[id].scenes["main"].data);
-  const update = useUpdateState();
-  const up = <K extends keyof Element_TextState>(key: K, v: Element_TextState[K]) => update(state => {
-    state.elements[id].scenes["main"].data[key] = v;
-  });
+  const {activeScene} = useSnapshot(window.ApiClient.scenes.state);
+  const data: Element_TextState = useGetState(state => state.elements[id]?.scenes[activeScene].data as Element_TextState);
+  const up = useUpdateElement<Element_TextState>(id);
 
   return <>
     <Inspector.SubHeader>Audio</Inspector.SubHeader>
@@ -255,27 +255,23 @@ const EffectsInspector: FC<{ id: string }> = ({ id }) => {
 }
 
 const CssInspector: FC<{ id: string }> = ({ id }) => {
-  const data: Element_TextState = useGetState(state => state.elements[id].scenes["main"].data);
-  const update = useUpdateState();
-  const up = <K extends keyof Element_TextState>(key: K, v: Element_TextState[K]) => update(state => {
-    state.elements[id].scenes["main"].data[key] = v;
-  });
+  const {activeScene} = useSnapshot(window.ApiClient.scenes.state);
+  const data: Element_TextState = useGetState(state => state.elements[id]?.scenes[activeScene].data as Element_TextState);
+  const up = useUpdateElement<Element_TextState>(id);
   return <>
     <Inspector.SubHeader>CSS style</Inspector.SubHeader>
     <InputCode language="css" label="CSS" value={data.css} onChange={e => up("css", e || "")} />
   </>
 }
 
-
 const Inspector_ElementText: FC<{ id: string }> = memo(({ id }) => {
-  const data: Element_TextState = useGetState(state => state.elements[id]?.scenes["main"].data);
-  const update = useUpdateState();
-
-  const up = <K extends keyof Element_TextState>(key: K, v: Element_TextState[K]) => update(state => {
-    state.elements[id].scenes["main"].data[key] = v;
-  });
+  const {activeScene} = useSnapshot(window.ApiClient.scenes.state);
+  const data = useGetState(state => state.elements[id]?.scenes as Record<string, ElementSceneState<Element_TextState>>);
+  const up = useUpdateElement<Element_TextState>(id);
 
   const [[tab, direction], setTab] = useState<[number, number]>([1, 0]);
+
+  const isInScene = useMemo(() => data && activeScene in data, [activeScene, data]);
 
   const handleTab = (v: number) => {
     setTab([v, Math.sign(v - tab)]);
@@ -286,9 +282,9 @@ const Inspector_ElementText: FC<{ id: string }> = memo(({ id }) => {
 
   return <Inspector.Body>
     <Inspector.Header><TbTextResize /> <NameInput id={id} /></Inspector.Header>
-    <Inspector.Content>
+    {isInScene && <Inspector.Content>
       <TransformInput id={id} />
-      <InputCheckbox label="Preview design" value={data.previewMode} onChange={e => up("previewMode", e)} />
+      <InputCheckbox label="Preview design" value={data[activeScene]?.data?.previewMode} onChange={e => up("previewMode", e)} />
       <Inspector.Tabs>
         <Inspector.Tab tooltip="Text source" tooltipBody="Where should we get the text from" onClick={() => handleTab(0)} active={tab === 0}><IoIosRadio /></Inspector.Tab>
         <Inspector.Tab tooltip="Text" tooltipBody="Colors, size, shadow, stroke" onClick={() => handleTab(1)} active={tab === 1}><RiFontSize /></Inspector.Tab>
@@ -305,7 +301,10 @@ const Inspector_ElementText: FC<{ id: string }> = memo(({ id }) => {
         {tab === 4 && <EffectsInspector id={id} />}
         {tab === 5 && <CssInspector id={id} />}
       </Inspector.TabsContent>
-    </Inspector.Content>
+    </Inspector.Content>}
+    {!isInScene && <Inspector.Content>
+      <Inspector.AddToScene id={id} />
+    </Inspector.Content>}
   </Inspector.Body>
 })
 Inspector_ElementText.displayName = "Inspector_ElementText";

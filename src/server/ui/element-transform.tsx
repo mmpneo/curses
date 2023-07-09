@@ -10,7 +10,8 @@ const Knob: FC<{ className: string }> = ({ className }) => {
 }
 
 export const ElementEditorTransform: FC<{ id: string }> = memo(({ id }) => {
-  const rect = useGetState(state => state.elements[id].scenes["main"].rect);
+  const {activeScene} = useSnapshot(window.ApiClient.scenes.state);
+  const rect = useGetState(state => state.elements[id].scenes[activeScene]?.rect);
   const { tab, show } = useSnapshot(window.ApiServer.ui.sidebarState);
   const update = useUpdateState();
 
@@ -24,20 +25,27 @@ export const ElementEditorTransform: FC<{ id: string }> = memo(({ id }) => {
 
   const handleDrag = (_e: any, data: DraggableData) => {
     selected && update(state => {
-      state.elements[id].scenes["main"].rect.x = Math.round(data.x);
-      state.elements[id].scenes["main"].rect.y = Math.round(data.y);
+      if (state.elements[id].scenes[activeScene]) {
+        state.elements[id].scenes[activeScene].rect.x = Math.round(data.x);
+        state.elements[id].scenes[activeScene].rect.y = Math.round(data.y);
+      }
     });
   }
   const handleResize = (_e: MouseEvent | TouchEvent, _dir: unknown, elementRef: HTMLElement, _delta: ResizableDelta, position: Position) => {
     selected && update(state => {
-      state.elements[id].scenes["main"].rect.x = Math.round(position.x);
-      state.elements[id].scenes["main"].rect.y = Math.round(position.y);
-      state.elements[id].scenes["main"].rect.w = Math.round(elementRef.offsetWidth);
-      state.elements[id].scenes["main"].rect.h = Math.round(elementRef.offsetHeight);
+      if (state.elements[id].scenes[activeScene]) {
+        state.elements[id].scenes[activeScene].rect.x = Math.round(position.x);
+        state.elements[id].scenes[activeScene].rect.y = Math.round(position.y);
+        state.elements[id].scenes[activeScene].rect.w = Math.round(elementRef.offsetWidth);
+        state.elements[id].scenes[activeScene].rect.h = Math.round(elementRef.offsetHeight);
+      }
     });
   }
 
-  return <Rnd className={classNames("group", { "z-50": selected })}
+  if (!rect)
+    return null;
+
+  return <Rnd className={classNames("group", { "transition-all duration-100": !selected, "z-50": selected })}
     size={{
       width: rect?.w || 100,
       height: rect?.h || 100
