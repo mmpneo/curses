@@ -11,8 +11,6 @@ export type TextSentenceData = {
   state: Element_TextState
 }
 
-export const boxCtx = createContext({});
-
 export const sentenceCtx = createContext<{
   data: TextSentenceData,
   onActivity: (rect?: DOMRect) => void,

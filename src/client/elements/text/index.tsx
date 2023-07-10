@@ -8,7 +8,7 @@ import { useGetState } from "../..";
 import { TextEvent, TextEventSource, TextEventType } from "../../../types";
 import { Element_TextState } from "./schema";
 import TextSentence, { TextSentenceTest } from "./sentence";
-import { boxCtx, sentenceCtx, TextSentenceData } from "./shared";
+import { sentenceCtx, TextSentenceData } from "./shared";
 import { elementStyle } from "./style";
 
 const Element_Text: FC<{ id: string }> = memo(({ id }) => {
@@ -34,7 +34,7 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
     setActive(false);
 
     // play hide sound
-    if (stateRef.current.soundFileOnHide) {
+    if (stateRef.current.soundEnable && stateRef.current.soundFileOnHide) {
       window.ApiClient.sound.playFile(stateRef.current.soundFileOnHide, {volume: stateRef.current.soundVolume ?? 1,});
     }
 
@@ -57,14 +57,14 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
       setSentences(v => [...v, nextSentence]);
     }
 
-    if (stateRef.current.soundFileNewSentence && sentencesRef.current.length) {
+    if (stateRef.current.soundEnable && stateRef.current.soundFileNewSentence && sentencesRef.current.length) {
       window.ApiClient.sound.playFile(stateRef.current.soundFileNewSentence, {volume: stateRef.current.soundVolume ?? 1,});
     }
 
     setActive(true);
 
     // play show sound
-    if (stateRef.current.soundFileOnShow)
+    if (stateRef.current.soundEnable && stateRef.current.soundFileOnShow)
       window.ApiClient.sound.playFile(stateRef.current.soundFileOnShow, {volume: stateRef.current.soundVolume ?? 1});
 
     isRunning.current = true;
@@ -160,6 +160,17 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
     else
       startClearTimer();
   }, [state.behaviorClearTimer]);
+
+  useEffect(() => {
+    if (state.animateEnable && sentencesRef.current.at(-1)?.interim) {
+      setSentences(state => {
+        const l = [...state];
+        l.pop()
+        return l;
+      });
+      onComplete();
+    }
+  }, [state.animateEnable]);
 
   const onActivity = (rect?: DOMRect) => {
     // play sound
@@ -322,11 +333,9 @@ const BoxElement: FC<PropsWithChildren<any>> = memo(({ children, ...boxProps }) 
       element && scrollRef(element);
       (boxRef.current as any) = element;
     }}>
-      <boxCtx.Provider value={{}}>
-        <span ref={textRef} className="text-container">
-          {children}
-        </span>
-      </boxCtx.Provider>
+      <span ref={textRef} className="text-container">
+        {children}
+      </span>
     </div>
   </div>
 })
