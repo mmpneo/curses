@@ -71,6 +71,8 @@ const LazyServerView = React.lazy(() => import("./server/ui/editor-view"));
   // else
   //   renderView(<LazyServerView/>);
 
+  // always load client api
+  await window.ApiClient.init();
 
   // load server api only in app
   if (window.Config.isServer()) {
@@ -79,8 +81,6 @@ const LazyServerView = React.lazy(() => import("./server/ui/editor-view"));
     await window.ApiServer.init();
   }
 
-  // always load client api
-  await window.ApiClient.init();
 
   if (window.Config.isServer())
     document.documentElement.className = "host";
