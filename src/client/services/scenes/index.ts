@@ -66,7 +66,6 @@ class Service_Scenes implements IServiceInterface {
       this.state.activeScene = "main";
 
     window.ApiClient.document.patch((state) => {
-      console.log(JSON.parse(JSON.stringify(state)))
       if (id in state.scenes)
         delete state.scenes[id];
       for (const elementKey in state.elements) {
