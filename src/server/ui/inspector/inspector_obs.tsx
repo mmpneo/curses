@@ -6,11 +6,10 @@ import { RiFileCopyLine } from "react-icons/ri";
 import { SiObsstudio } from "react-icons/si";
 import { toast } from "react-toastify";
 import { useSnapshot } from "valtio";
-import Dropdown, { useDropdown } from "../dropdown/Dropdown";
-import Tooltip from "../dropdown/Tooltip";
-import Inspector from "./components";
-import { InputCheckbox, InputNetworkStatus, InputText, InputTextSource } from "./components/input";
+import { useDropdown } from "../dropdown/Dropdown";
 import ServiceButton from "../service-button";
+import Inspector from "./components";
+import { InputCheckbox, InputMapObject, InputNetworkStatus, InputText, InputTextSource } from "./components/input";
 
 const ObsSetupDropdown: FC = () => {
   const dropdown = useDropdown();
@@ -73,17 +72,12 @@ const Inspector_OBS: FC = () => {
         </Tooltip>
       </div> */}
 
-      {/* <Inspector.SubHeader>Websocket Plugin</Inspector.SubHeader> */}
-      <Inspector.SubHeader>Native stream captions</Inspector.SubHeader>
+      <Inspector.SubHeader>Connection</Inspector.SubHeader>
       <Inspector.Description><span><span className="font-medium">"obs-websocket"</span> plugin required. <br /> OBS 28.x should have it by default, just enable it!</span></Inspector.Description>
       <InputCheckbox value={data.wsAutoStart} onChange={e => up("wsAutoStart", e)} label="Auto Connect" />
       <InputNetworkStatus label="OBS connection" value={wsState.status} />
       <InputText type="number" value={data.wsPort} onChange={e => up("wsPort", e.target.value)} label="Websocket Port" />
       <InputText type="password" value={data.wsPassword} onChange={e => up("wsPassword", e.target.value)} label="Websocket Password" />
-      {/* <InputCheckbox value={data.enable} onChange={e => up("enable", e)} label="Enable captions" /> */}
-      <InputTextSource value={data.source} onChange={e => up("source", e)} label="Source"/>
-      <InputCheckbox value={data.inputField} onChange={e => up("inputField", e)} label="Input field" />
-      <InputCheckbox value={data.interim} onChange={e => up("interim", e)} label="Show interim" />
       <ServiceButton 
         showError
         errorLabel="Error - Try Again"
@@ -94,6 +88,18 @@ const Inspector_OBS: FC = () => {
         onStart={handleStartWs}
         onPending={handleCancelWs}
         onStop={handleStopWs}/>
+      <Inspector.SubHeader>Native stream captions</Inspector.SubHeader>
+      {/* <InputCheckbox value={data.enable} onChange={e => up("enable", e)} label="Enable captions" /> */}
+      <InputCheckbox value={data.captionsEnable} onChange={e => up("captionsEnable", e)} label="Enable" />
+      <InputTextSource value={data.source} onChange={e => up("source", e)} label="Source"/>
+      <InputCheckbox value={data.inputField} onChange={e => up("inputField", e)} label="Input field" />
+      <InputCheckbox value={data.interim} onChange={e => up("interim", e)} label="Show interim" />
+
+      <Inspector.SubHeader>Scenes</Inspector.SubHeader>
+      <Inspector.Description>Automatically change curses scene to match active obs scene</Inspector.Description>
+      <InputCheckbox value={data.scenesEnable} onChange={e => up("scenesEnable", e)} label="Enable" />
+      <InputText value={data.scenesFallback} onChange={e => up("scenesFallback", e.target.value)} label="Fallback scene"/>
+      <InputMapObject keyPlaceholder="OBS name" valuePlaceholder="Scene" addLabel="Add word" value={{...data.scenesMap}} onChange={e => up("scenesMap", e)} label="Scenes map" />
     </Inspector.Content>
   </Inspector.Body>
 }

@@ -4,17 +4,13 @@ import {
   TextEvent,
   TextEventType,
 } from "@/types";
-import OBSWebSocket, { OBSWebSocketError } from "obs-websocket-js";
+import OBSWebSocket, { EventSubscription, OBSWebSocketError } from "obs-websocket-js";
 import { toast } from "react-toastify";
 import { proxy } from "valtio";
 import {
   serviceSubscibeToInput,
   serviceSubscibeToSource,
 } from "../../../utils";
-
-async function sleep(time: number) {
-  return new Promise((res) => setTimeout(res, time));
-}
 
 class Service_OBS implements IServiceInterface {
   private wsInstance!: OBSWebSocket;
@@ -30,12 +26,39 @@ class Service_OBS implements IServiceInterface {
 
   async init() {
     this.wsInstance = new OBSWebSocket();
-    
+    this.wsInstance.on("Identified", () => this.wshandleConnected());
+    this.wsInstance.on("CurrentProgramSceneChanged", e => this.trySwitchScene(e.sceneName));
+
     serviceSubscibeToSource(this.#state, "source", e => this.processTextEvent(e));
     serviceSubscibeToInput(this.#state, "inputField", e => this.processTextEvent(e));
 
     if (this.#state.wsAutoStart)
-      this.wsConnect();
+      await this.wsConnect();
+
+  }
+
+  private trySwitchScene(obsSceneName?: string) {
+    if (!this.#state.scenesEnable)
+      return;
+    function trySwitchScene(sceneName: string) {
+      const scene = Object.values(window.ApiClient.scenes.scenes).find(f => f.name === sceneName);
+      scene && window.ApiShared.pubsub.publish("scenes:change", scene.id);
+    }
+    
+    if (obsSceneName && obsSceneName in this.#state.scenesMap) {
+      trySwitchScene(this.#state.scenesMap[obsSceneName])
+    }
+    else if (this.#state.scenesFallback)
+      trySwitchScene(this.#state.scenesFallback);
+  }
+
+  private async wshandleConnected() {
+    if (this.#state.scenesEnable) try {
+      const currentScene = await this.wsInstance.call("GetCurrentProgramScene");
+      this.trySwitchScene(currentScene.currentProgramSceneName);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   private processTextEvent(data?: TextEvent) {
@@ -61,15 +84,15 @@ class Service_OBS implements IServiceInterface {
   }
 
   private wsHandleDisconnect(e: OBSWebSocketError) {
-    // auto reconnect
-    if (e.code === 1006) {
+    console.log(e.code)
+    if (e.code === 1006 || e.code === 1001) {
       if (this.wsRequestCancelToken) {
         this.wsRequestCancelToken = false;
         this.wsState.status = ServiceNetworkState.disconnected;
       }
       else {
         if (this.#state.wsAutoStart)
-          this.wsConnect();
+          this.wsConnect().catch();
         else {
           this.wsState.status = ServiceNetworkState.disconnected;
           this.toastError(e);
@@ -94,7 +117,9 @@ class Service_OBS implements IServiceInterface {
     try {
       this.wsInstance.disconnect();
       this.wsInstance.removeAllListeners("ConnectionClosed");
-      await this.wsInstance.connect(`ws://127.0.0.1:${this.#state.wsPort}`,this.#state.wsPassword);
+      await this.wsInstance.connect(`ws://127.0.0.1:${this.#state.wsPort}`,this.#state.wsPassword, {
+        eventSubscriptions: EventSubscription.All | EventSubscription.Scenes
+      });
       this.wsState.status = ServiceNetworkState.connected;
       this.wsInstance.addListener("ConnectionClosed", e => this.wsHandleDisconnect(e));
     } catch (e: any) {
