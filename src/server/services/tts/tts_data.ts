@@ -324,7 +324,6 @@ export const azureVoices: MappedGroupDictionary<{
   ],
 };
 
-
 export const tiktokVoices = [
   {value: "en_us_001", label: "En US Female"},
   {value: "en_us_006", label: "En US Male 1"},
@@ -368,6 +367,41 @@ export const tiktokVoices = [
   {value: "en_us_stitch", label: "Stitch"},
   {value: "en_us_stormtrooper", label: "Stormtrooper"},
   {value: "en_us_rocket", label: "Rocket"},
+
+  {value: "en_male_funny", label: "Funny"},
+  {value: "en_female_emotional", label: "Emotional"},
+  {value: "en_male_narration", label: "Narrator"},
+  {value: "en_male_wizard", label: "Wizard"},
+  {value: "en_female_ht_f08_halloween", label: "Halloween"},
+  {value: "en_female_madam_leota", label: "Madam Leota"},
+  {value: "en_male_ghosthost", label: "Ghost Host"},
+  {value: "en_male_pirate", label: "Pirate"},
+  {value: "en_female_samc", label: "Empathetic"},
+  {value: "en_male_cody", label: "Serious"},
+  {value: "en_female_grandma", label: "Grandma"},
+  {value: "en_male_grinch", label: "Grinch"},
+  {value: "en_male_santa", label: "Santa"},
+  {value: "en_male_cupid", label: "Cupid"},
+
+  // Funny
+  // Emotional
+  // Narrator
+  // Wizard
+  // Halloween
+  // Madam Leota
+  // Ghost Host
+  // Pirate
+  // Empathetic
+
+  // Serious
+  // Grandma
+
+  // Joker
+  // Goblin
+
+  // Grinch
+  // Santa
+  // Cupid
 
   {value: "en_female_f08_salut_damour", label: "Alto"},
   {value: "en_male_m03_lobby", label: "Tenor"},
