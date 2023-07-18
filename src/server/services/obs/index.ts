@@ -33,7 +33,7 @@ class Service_OBS implements IServiceInterface {
     serviceSubscibeToInput(this.#state, "inputField", e => this.processTextEvent(e));
 
     if (this.#state.wsAutoStart)
-      await this.wsConnect();
+      this.wsConnect();
 
   }
 
@@ -84,7 +84,6 @@ class Service_OBS implements IServiceInterface {
   }
 
   private wsHandleDisconnect(e: OBSWebSocketError) {
-    console.log(e.code)
     if (e.code === 1006 || e.code === 1001) {
       if (this.wsRequestCancelToken) {
         this.wsRequestCancelToken = false;
