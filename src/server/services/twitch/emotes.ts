@@ -110,8 +110,6 @@ class TwitchEmotesApi {
     await Load_BTTV_GLOBAL().then(resp => this.addEmotes(resp));
     await Load_7TV_CHANNEL(id).then(resp => this.addEmotes(resp));
     await Load_7TV_GLOBAL().then(resp => this.addEmotes(resp));
-
-    console.log(this.dictionaryLowerCase)
   }
 
   dispose() {
