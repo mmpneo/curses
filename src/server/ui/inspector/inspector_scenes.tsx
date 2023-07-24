@@ -13,7 +13,7 @@ const SceneMenu: FC<{ id: string }> = ({ id }) => {
     <ul className="dropdown p-2">
       <li className="menu-title"><span>Scene</span></li>
       <li><button onClick={() => window.ApiClient.scenes.duplicateScene(id)}>Duplicate scene</button></li>
-      <li><button onClick={() => window.ApiClient.scenes.deleteScene(id)}>Remove scene</button></li>
+      {id !== 'main' && <li><button onClick={() => window.ApiClient.scenes.deleteScene(id)}>Remove scene</button></li>}
     </ul>
   );
 };
@@ -27,9 +27,9 @@ const Scene: FC<{ data: SceneState }> = ({ data }) => {
       <input type="radio" name="font" value={data.id} checked={data.id === activeScene} onChange={e => window.ApiClient.scenes.setActive(e.target.value)} className="radio radio-sm radio-primary" />
     </Tooltip>
     <InputBaseText disabled={data.id === 'main'} fieldWidth={false} className="w-full" value={data.name} onChange={e => update(state => { state.scenes[data.id].name = e.target.value })} />
-    {data.id !== 'main' && <Dropdown placement="right" content={<SceneMenu id={data.id} />}>
+    <Dropdown placement="right" content={<SceneMenu id={data.id} />}>
       <button className="btn btn-sm btn-ghost btn-circle flex-nowrap whitespace-nowrap gap-1"><RiMore2Fill/></button>
-    </Dropdown>}
+    </Dropdown>
   </div>
 }
 
