@@ -15,7 +15,7 @@ export const Service_OBS_Schema = z.object({
   interim: zSafe(z.coerce.boolean(), false),
 
   scenesEnable: zSafe(z.coerce.boolean(), false),
-  scenesFallback: zSafe(z.string(), ""),
+  scenesFallback: zSafe(z.string(), "Main"),
   scenesMap: zSafe(z.record(z.string(), z.string()), {}),
 }).default({});
 
