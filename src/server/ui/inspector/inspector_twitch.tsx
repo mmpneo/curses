@@ -96,6 +96,7 @@ const Inspector_Twitch: FC = () => {
           <span className="link link-accent link-hover font-semibold text-xs" onClick={handleShowEmotes}>Show emotes</span> | <span className="link link-accent link-hover font-semibold text-xs" onClick={handleShowEmotesMapper}>Remap emotes</span>
         </span>
         <InputCheckbox label="Enable emotes in captions" value={pr.emotesEnableReplacements} onChange={e => up("emotesEnableReplacements", e)} />
+        <InputCheckbox label="Case sensitive" value={pr.emotesCaseSensitive} onChange={e => up("emotesCaseSensitive", e)} />
       </Inspector.Switchable>
     </Inspector.Content>
   </Inspector.Body>
