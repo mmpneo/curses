@@ -4,12 +4,13 @@ import NiceModal from "@ebay/nice-modal-react";
 import { invoke } from "@tauri-apps/api/tauri";
 import { FC, useEffect, useState } from "react";
 import { RiCharacterRecognitionFill, RiChatVoiceFill } from "react-icons/ri";
-import { useSnapshot } from "valtio";
+import { proxy, useSnapshot } from "valtio";
 import { azureVoices, tiktokVoices } from "../../services/tts/tts_data";
 import Modal from "../Modal";
 import ServiceButton from "../service-button";
 import Inspector from "./components";
-import { InputCheckbox, InputMapObject, InputMappedGroupSelect, InputNativeAudioOutput, InputRange, InputSelect, InputText, InputTextSource } from "./components/input";
+import { InputCheckbox, InputMapObject, InputMappedGroupSelect, InputNativeAudioOutput, InputRange, InputSelect, InputSelectOption, InputText, InputTextSource } from "./components/input";
+import classNames from "classnames";
 
 type WindowsToken = {
   id: string;
@@ -242,11 +243,63 @@ const VoiceVox: FC = () => {
   </>
 }
 
+const uberduckVoices = proxy<{value: InputSelectOption[]}>({
+  value: []
+});
+
+const UberDuck: FC = () => {
+  const data = useSnapshot(window.ApiServer.state.services.tts.data.uberduck);
+  const state = useSnapshot(window.ApiServer.tts.serviceState);
+  const handleUpdate = <K extends keyof TTS_State["uberduck"]>(key: K, v: TTS_State["uberduck"][K]) => window.ApiServer.patchService("tts", s => s.data.uberduck[key] = v);
+  const {value: voices} = useSnapshot(uberduckVoices);
+  const [loadingVoices, setLoadingVoices] = useState(false);
+
+  const loadVoices = () => {
+    if (!data.api_key || !data.secret_key)
+      return;
+    setLoadingVoices(true);
+    invoke("plugin:uberduck_tts|get_voices", {auth: {
+      api_key: data.api_key,
+      secret_key: data.secret_key,
+    }}).then(res => {
+      if (Array.isArray(res))
+        uberduckVoices.value = res.map(v => ({value: v.voicemodel_uuid, label: v.display_name}));
+    }).finally(() => setLoadingVoices(false));
+  }
+
+  useEffect(() => {
+    if (!voices.length)
+      loadVoices();
+  }, []);
+  return <>
+    <Inspector.SubHeader>Uberduck options</Inspector.SubHeader>
+    <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
+      <InputNativeAudioOutput label="Audio Output" value={data.device} onChange={e => handleUpdate("device", e)} />
+      <InputText label="API Key" value={data.api_key} onChange={e => handleUpdate("api_key", e.target.value)} />
+      <InputText label="Secret" type="password" value={data.secret_key} onChange={e => handleUpdate("secret_key", e.target.value)} />
+      <Inspector.Description>
+        <span className="text-base-content/60 text-xs mt-2">
+          Voices can be loaded only with valid API key and secret.<br/>
+          Preview available voices at <a className="link link-primary link-hover" target="_blank" href="https://app.uberduck.ai/speak#mode=tts-reference&voice=zwf">app.uberduck.ai</a>
+        </span>
+      </Inspector.Description>
+      <InputSelect
+        value={data.voice}
+        onValueChange={e => handleUpdate("voice", e)}
+        options={voices as InputSelectOption[]}
+        label="Voice" />
+      <button onClick={loadVoices} className={classNames("btn btn-xs disabled", {loading: loadingVoices, "btn-disabled": !data.api_key || !data.secret_key})}>{loadingVoices ? "Updating voices" : "Reload voices"}</button>
+      <InputRange value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} label={`Volume (${data.volume})`} step="0.05" min="0" max="1" />
+    </Inspector.Deactivatable>
+  </>
+}
+
 const serviceOptions = [
   { label: "Native", value: TTS_Backends.native },
   { label: "Windows", value: TTS_Backends.windows },
   { label: "Azure", value: TTS_Backends.azure },
   { label: "TikTok", value: TTS_Backends.tiktok },
+  { label: "Uberduck", value: TTS_Backends.uberduck },
   // { label: "VoiceVox", value: TTS_Backends.voicevox },
 ]
 
@@ -290,6 +343,7 @@ const Inspector_TTS: FC = () => {
       {data.data.backend === TTS_Backends.azure && <Azure />}
       {data.data.backend === TTS_Backends.native && <Native />}
       {data.data.backend === TTS_Backends.tiktok && <TikTok />}
+      {data.data.backend === TTS_Backends.uberduck && <UberDuck />}
       {/* {data.data.backend === TTS_Backends.voicevox && <VoiceVox />} */}
       <ServiceButton status={state.status} onStart={() => window.ApiServer.tts.start()} onStop={() => window.ApiServer.tts.stop()} />
     </Inspector.Content>
