@@ -34,16 +34,21 @@
 </p>
 
 # Features
-- **OBS Captions customization**: Colors, fonts, shadows, background textures, text typing animation, sound effects, particle effects and raw CSS for all your needs
+- **OBS Captions customization**: Colors, fonts, shadows, background textures, text typing animation, sound effects, particle effects and CSS
+- **Native OBS stream captions**
 - **Google Fonts**: more than 1000 free fonts for OBS captions
 - **Speech to Text**: [Microsoft Azure](https://azure.microsoft.com/en-au/products/cognitive-services/speech-to-text/), [Speechly](https://www.speechly.com/), [Deepgram](https://deepgram.com/), WebSpeechApi(Chrome and Edge)
-- **Text to Speech**: [Microsoft Azure](https://azure.microsoft.com/en-us/products/cognitive-services/text-to-speech/), TikTok, Windows Api (SAPI), WebSpeechApi
+- **Text to Speech**: [Microsoft Azure](https://azure.microsoft.com/en-us/products/cognitive-services/text-to-speech/), [Uberduck](https://uberduck.ai/), TikTok, Windows Api (SAPI), WebSpeechApi
 - **VRChat**: [KillFrenzy Avatar text](https://github.com/killfrenzy96/KillFrenzyAvatarText), vrchat's chatbox
 - **Twitch**: 
   - Use 7TV/FFZ/BTTV emotes in OBS captions
   - Post your STT to chat 
   - Use your chat messages as a source for captions and TTS
+  - native captions
 - **Discord**: Send your STT to specified channel
+- **Scenes**:
+  - Save multiple designs and freely switch between them
+  - Automatically switch design when OBS changes scene
 
 # Community
 For help, feature requests, bug reports, release notifications, design templates [Join Discord](https://discord.gg/Sw6pw8fGYS)
@@ -68,5 +73,3 @@ Paste the link and change window size to match app's canvas size (default is 500
 - [ ] STT - Vosk
 - [ ] STT - OpenAI Whisper
 - [ ] TTS - VoiceVox
-- [ ] Twitch - auto reply to events (subs, follow) 
-- [ ] Twitch - change app properties on redeems (text color, tts voice etc.)
