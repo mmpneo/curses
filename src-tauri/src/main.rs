@@ -84,6 +84,7 @@ fn main() {
         .plugin(services::web::init())
         .plugin(services::audio::init())
         .plugin(services::windows_tts::init())
+        .plugin(services::uberduck_tts::init())
         .plugin(services::keyboard::init())
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -8,6 +8,7 @@ import { TTS_AzureService } from "./services/azure";
 import { TTS_NativeService } from "./services/native";
 import { TTS_TikTokService } from "./services/tiktok";
 import { TTS_WindowsService } from "./services/windows";
+import { TTS_UberduckService } from "./services/uberduck";
 import {
   ITTSReceiver,
   ITTSService,
@@ -21,6 +22,7 @@ const backends: {
   [TTS_Backends.windows]: TTS_WindowsService,
   [TTS_Backends.azure]: TTS_AzureService,
   [TTS_Backends.tiktok]: TTS_TikTokService,
+  [TTS_Backends.uberduck]: TTS_UberduckService,
 };
 
 class Service_TTS implements IServiceInterface, ITTSReceiver {
