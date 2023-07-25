@@ -14,7 +14,7 @@
     "@floating-ui/react-dom-interactions": "^0.13.3",
     "@radix-ui/react-select": "^1.2.1",
     "@speechly/browser-client": "^2.6.2",
-    "@tauri-apps/api": "^1.2.0",
+    "@tauri-apps/api": "^1.4.0",
     "@twurple/api": "^6.1.1",
     "@twurple/auth": "^6.1.1",
     "@twurple/chat": "^6.1.1",
@@ -61,7 +61,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.30.0",
-    "@tauri-apps/cli": "^1.2.3",
+    "@tauri-apps/cli": "^1.4.0",
     "@types/animejs": "^3.1.6",
     "@types/lodash": "^4.14.189",
     "@types/node": "^18.7.10",
