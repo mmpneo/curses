@@ -1,7 +1,7 @@
 import NiceModal from "@ebay/nice-modal-react";
 import { useId } from "@floating-ui/react-dom-interactions";
 import classNames from "classnames/bind";
-import { FC, forwardRef, InputHTMLAttributes, memo, PropsWithChildren, ReactNode, useCallback, useEffect, useRef, useState } from "react";
+import { ChangeEvent, FC, forwardRef, InputHTMLAttributes, memo, PropsWithChildren, ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { RgbaColor, RgbaColorPicker } from "react-colorful";
 import { RiDeleteBack2Fill, RiUpload2Fill, RiKeyboardBoxFill, RiDeleteBin3Fill, RiCheckboxCircleFill, RiAddCircleFill, RiEdit2Fill, RiRecordCircleFill, RiCloseCircleFill } from "react-icons/ri";
 import { HiChevronDown, HiChevronUp } from "react-icons/hi";
@@ -36,7 +36,18 @@ export const InputContainer: FC<PropsWithChildren<{ id?: string, vertical?: bool
   </div>
 });
 
-export const InputBaseText: FC<InputHTMLAttributes<HTMLInputElement> & {fieldWidth?: boolean}> = memo(({fieldWidth = true, ...props}) => <input {...props} className={cx(styles.clearAppearance, props.className, {"field-width": fieldWidth}, "input input-bordered overflow-hidden input-sm font-semibold leading-none")} />);
+export const InputBaseText: FC<InputHTMLAttributes<HTMLInputElement> & {fieldWidth?: boolean}> = ({value, onChange, fieldWidth = true, ...props}) => {
+  const [internalValue, setInternalValue] = useState(value);
+  useEffect(() => {
+    if (value !== internalValue)
+      setInternalValue(value);
+  }, [value])
+  const updateVal = (val: ChangeEvent<HTMLInputElement>) => {
+    setInternalValue(val.target.value);
+    onChange?.(val);
+  };
+  return <input {...props} value={internalValue} onChange={updateVal} className={cx(styles.clearAppearance, props.className, { "field-width": fieldWidth }, "input input-bordered overflow-hidden input-sm font-semibold leading-none")} />;
+};
 
 interface InputTextProps extends InputBaseProps, InputHTMLAttributes<HTMLInputElement> { }
 
@@ -563,7 +574,6 @@ interface AudioOutputProps extends InputBaseProps {
 }
 export const InputNativeAudioOutput: FC<AudioOutputProps> = memo(({ label, value, onChange }) => {
   const [config, setConfig] = useState<WindowsConfig>();
-
   useEffect(() => {
     invoke<WindowsConfig>("plugin:windows_tts|get_voices").then(setConfig);
   }, []);
