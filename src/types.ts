@@ -33,7 +33,7 @@ export const TextEventSchema = z.object({
   type: TextEventTypeSchema,
   value: z.string().default(""),
   emotes: z.record(z.number(), z.string()).default({}),
-  textFieldType: z.enum(["textField", "twitchChat"])
+  textFieldType: z.enum(["textField", "twitchChat"]).nullish()
 });
 
 export type TextEvent = z.infer<typeof TextEventSchema>;
