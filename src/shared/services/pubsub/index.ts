@@ -39,7 +39,9 @@ class Service_PubSub implements IServiceInterface {
         return;
       }
 
-      this.receivePubSub({topic, data: textEvent});
+      const msg = {topic, data: textEvent};
+      this.publishLocally(msg);
+      this.#publishPeers(msg);
     } catch (error) {
       // just ignore invalid messages
     }
@@ -71,15 +73,7 @@ class Service_PubSub implements IServiceInterface {
       return data;
   }
 
-  receivePubSub(msg: BaseEvent) {
-    this.#publishLocally(msg);
-    this.#publishPeers(msg);
-  }
-
-  publishLocally(msg: BaseEvent) {
-    this.#publishLocally(msg);
-  }
-  #publishLocally({topic, data}: BaseEvent) {
+  publishLocally({topic, data}: BaseEvent) {
     PubSub.publishSync(topic, data);
   }
   #publishPubSub(msg: BaseEvent) {
@@ -98,7 +92,7 @@ class Service_PubSub implements IServiceInterface {
     if (window.Config.isClient())
       return;
       let msg = {topic, data};
-      this.#publishLocally(msg);
+      this.publishLocally(msg);
       this.#publishPeers(msg);
       this.#publishPubSub(msg);
       this.#publishLink(msg);
