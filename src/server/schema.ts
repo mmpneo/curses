@@ -24,6 +24,7 @@ export const BackendSchema = z.object({
   uiScale: zSafe(z.number(), 1),
   uiLanguage: zSafe(z.string(), "en"),
   showOverlay: zSafe(z.coerce.boolean(), false),
+  showLogs: zSafe(z.coerce.boolean(), false),
   muteSoundEffects: zSafe(z.coerce.boolean(), false),
   showOverlayLogs: zSafe(z.coerce.boolean(), false),
   backgroundInputTimer: zSafe(zStringNumber(), "5000"),

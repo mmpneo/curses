@@ -1,10 +1,9 @@
 import NiceModal from "@ebay/nice-modal-react";
-import { FC, FormEvent, memo, useState } from "react";
+import { FC, FormEvent, memo, useEffect, useRef, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.min.css';
 import { TextEventSource, TextEventType } from "@/types";
 import Sidebar                            from "./sidebar";
-
 import { AnimatePresence, motion } from "framer-motion";
 import { useSnapshot }                    from "valtio";
 import ActionBar                          from "./actionbar";
@@ -32,7 +31,7 @@ const EditorView: FC = () => {
           <ActionBar />
           <EditorViewport />
           <AnimatePresence initial={false}>
-            {!showOverlay && <div className="absolute self-center bottom-4"><STTInput /></div>}
+            {!showOverlay && <div className="absolute flex justify-center self-center bottom-4 left-4 right-4"><STTInput /></div>}
           </AnimatePresence>
         </div>
         <AnimatePresence>
@@ -47,8 +46,8 @@ const EditorView: FC = () => {
             exit={{ opacity: 0 }}
             transition={{ ease: "anticipate", duration: 0.3 }}
             className="absolute top-16 right-4">
-          <RecordingAlerts/>
-        </motion.div>}
+            <RecordingAlerts/>
+          </motion.div>}
         </AnimatePresence>
         <ToastContainer className="toasts" draggable={false} closeOnClick limit={3} hideProgressBar theme="colored" />
       </NiceModal.Provider>
@@ -79,35 +78,58 @@ const Canvas: FC = memo(() => {
   const canvas = useGetState(state => state.canvas);
   const ids = useGetState(state => state.elementsIds);
   return <>
-    <div style={{ width: canvas?.w, height: canvas?.h }} className="relative">
+    <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    transition={{ ease: "anticipate", duration: 0.3 }}
+    style={{ width: canvas?.w, height: canvas?.h }} className="relative rounded-lg border border-dashed border-primary/50">
       {ids?.map((elementId) => <ElementEditorTransform id={elementId} key={elementId} />)}
-    </div>
+    </motion.div>
   </>
 })
 
-export const EditorViewport: FC = () => {
-  const [[x, y], setTranslate] = useState([0, 0]);
+const LogsView = () => {
+  const scrollContainer = useRef<HTMLDivElement>(null);
+  const { lastId, list } = useSnapshot(window.ApiShared.pubsub.textHistory);
 
-  const handleStartPan = (e: any) => {
-    const onUp = () => {
-      document.removeEventListener("mouseup", onUp);
-      document.removeEventListener("mousemove", onMove);
-    }
-    const onMove = (e: any) => setTranslate(([oldX, oldY]) => [oldX + e.movementX, oldY + e.movementY])
-    document.addEventListener("mouseup", onUp);
-    document.addEventListener("mousemove", onMove);
+  useEffect(() => {
+      setTimeout(() => scrollContainer.current?.scrollTo({ top: scrollContainer.current.scrollHeight, behavior: "smooth" }));
+  }, [lastId]);
+
+  const repeat = (value: string) => {
+
   }
 
-  return <div onMouseDown={event => event.button === 1 && handleStartPan(event)} className="w-full relative bg-base-300 rounded-tl-box flex flex-grow items-center justify-center overflow-hidden">
-    <div className="rounded-lg border border-dashed border-primary/50" style={{
-      transform: `translate3d(${x}px, ${y}px, 0px)`,
-    }}>
-      <Canvas />
+  return <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    transition={{ ease: "anticipate", duration: 0.3 }}
+    className="relative w-full h-full flex flex-col">
+    <div ref={scrollContainer} className="flex flex-grow overflow-y-scroll scrollbar-hide flex-col-reverse mb-8">
+      <div className="w-full flex flex-col px-6 pt-6 pb-12 space-y-2">
+        {/* <span className="opacity-50 px-2 text-xs font-medium">ℹ Doubleclick event to insert it into text field</span> */}
+        {list.map(event => <div key={event.id} onDoubleClick={() => repeat(event.value)} className="flex flex-col rounded-md bg-neutral/10 hover:bg-neutral/30 transition-colors p-2 cursor-pointer">
+          <div className="hidden sm:block text-xs opacity-50 font-semibold">from {event.event}</div>
+          <div className="text-sm sm:text-lg font-semibold !leading-none">{event.value}</div>
+        </div>)}
+      </div>
     </div>
+  </motion.div>
+}
+
+export const EditorViewport: FC = () => {
+  const { showLogs } = useSnapshot(window.ApiServer.state);
+  return <div className="w-full relative bg-base-300 rounded-tl-box flex flex-grow items-center justify-center overflow-hidden">
+    <AnimatePresence>
+      {showLogs ? <LogsView/> : <Canvas />}
+    </AnimatePresence>
   </div>
 }
 
 const STTInput: FC = () => {
+  const { showLogs } = useSnapshot(window.ApiServer.state);
   const {t} = useTranslation();
   const [inputValue, setInputValue] = useState('');
   const submit = (e: FormEvent<HTMLFormElement>) => {
@@ -122,18 +144,17 @@ const STTInput: FC = () => {
     window.ApiShared.pubsub.publishText(TextEventSource.textfield, { type: TextEventType.interim, value });
     setInputValue(value);
   }
-  // console.log($t('test'))
 
   return <motion.div
     key="overlay-input"
-    initial={{ opacity: 0, y: 10 }}
+    initial={{ opacity: 0, y: 10, width: showLogs ? '100%' : '400px' }}
     exit={{ opacity: 0, y: 10 }}
-    animate={{ opacity: 1, y: 0 }}
+    animate={{ opacity: 1, width: showLogs ? '100%' : '400px', y: 0 }}
     transition={{ ease: "anticipate", duration: 0.5 }}
     className="flex items-center space-x-2 w-96">
     {/* <button className="btn btn-circle btn-ghost"><RiChatDeleteFill/></button> */}
     <form onSubmit={submit} className="w-full">
-      <input type="text" autoComplete="off" name="sttinput" placeholder={t('main.keyboard_input')} className="w-full textarea" value={inputValue} onChange={e => handleChange(e.target.value)} />
+      <input type="text" autoComplete="off" name="sttinput" placeholder={t('main.keyboard_input')} className="w-full input text-sm" value={inputValue} onChange={e => handleChange(e.target.value)} />
     </form>
   </motion.div>
 }

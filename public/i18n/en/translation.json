@@ -34,6 +34,8 @@
     "btn_copy": "Copy"
   },
   "main": {
+    "btn_show_logs": "Show logs",
+    "btn_show_canvas": "Show canvas",
     "btn_fullscreen_input": "Fullscreen input",
     "btn_mute_stt": "Mute STT",
     "btn_unmute_stt": "Unmute STT",

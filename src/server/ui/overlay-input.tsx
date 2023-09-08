@@ -36,25 +36,11 @@ const logsVariants = {
 }
 
 const Logs: FC<{ onFillRequest: (value: string) => void }> = ({ onFillRequest }) => {
-  const [list, setList] = useState<{ id: string, value: string, event: string }[]>([]);
+  const { lastId, list } = useSnapshot(window.ApiShared.pubsub.textHistory);
   const scrollContainer = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    const subInput = window.ApiShared.pubsub.subscribeText(TextEventSource.any, (event, eventName) => {
-      if (event?.type === TextEventType.final) {
-        setList(v => {
-          const _v = [...v];
-          // limit to 20
-          if (v.length >= 20)
-            _v.shift()
-          _v.push({ id: nanoid(), event: eventName?.replace("text.", "") || "text", value: event.value });
-          return _v;
-        });
-        // push
-        setTimeout(() => scrollContainer.current?.scrollTo({ top: scrollContainer.current.scrollHeight, behavior: "smooth" }));
-      }
-    });
-    return () => window.ApiShared.pubsub.unsubscribe(subInput);
-  }, []);
+      setTimeout(() => scrollContainer.current?.scrollTo({ top: scrollContainer.current.scrollHeight, behavior: "smooth" }));
+  }, [lastId]);
 
   return <div ref={scrollContainer} style={{ width: '15rem' }} className="h-full bg-neutral/30 flex overflow-y-scroll scrollbar-hide flex-col-reverse">
     <div className="w-full flex flex-col px-2 py-2 space-y-1">

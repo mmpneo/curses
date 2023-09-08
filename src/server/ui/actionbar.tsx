@@ -2,7 +2,7 @@ import { appWindow } from "@tauri-apps/api/window";
 import { exit } from '@tauri-apps/api/process';
 import classNames from "classnames";
 import { FC, HtmlHTMLAttributes, PropsWithChildren, ReactNode, useState } from "react";
-import { RiChatVoiceFill, RiMicFill, RiMicOffFill, RiPushpin2Fill, RiPushpinFill, RiTranslate2, RiUserVoiceFill, RiVolumeMuteFill, RiVolumeUpFill } from "react-icons/ri";
+import { RiChatVoiceFill, RiFileListLine, RiMicFill, RiMicOffFill, RiPushpin2Fill, RiPushpinFill, RiStackFill, RiTranslate2, RiUserVoiceFill, RiVolumeMuteFill, RiVolumeUpFill } from "react-icons/ri";
 import { RxInput } from "react-icons/rx";
 import { VscChromeClose, VscChromeMaximize, VscChromeMinimize } from "react-icons/vsc";
 import { useSnapshot }         from "valtio";
@@ -45,6 +45,8 @@ const SttMuteButton: BtnProps<{ status: ServiceNetworkState, tooltip: string, bo
 
 
 const handleSwitchFullscreenInput = () => window.ApiServer.state.showOverlay = !window.ApiServer.state.showOverlay;
+const handleSwitchLogs = () => window.ApiServer.state.showLogs = !window.ApiServer.state.showLogs;
+
 const handleSwitchMuteSTT = () => window.ApiServer.stt.toggleMute();
 const handleSwitchSoundEffects = () => window.ApiServer.state.muteSoundEffects = !window.ApiServer.state.muteSoundEffects;
 const handleSwitchSTT = () => {
@@ -83,7 +85,7 @@ const ActionBar: FC = () => {
 const AppActions: FC = () => {
   const {t} = useTranslation();
   const { muted: sttMute, status: sttStatus } = useSnapshot(window.ApiServer.stt.serviceState);
-  const { muteSoundEffects: vfxMute } = useSnapshot(window.ApiServer.state);
+  const { muteSoundEffects: vfxMute, showLogs } = useSnapshot(window.ApiServer.state);
   const { status: ttsStatus } = useSnapshot(window.ApiServer.tts.serviceState);
   const { status: translationStatus } = useSnapshot(window.ApiServer.translation.serviceState);
 
@@ -92,7 +94,12 @@ const AppActions: FC = () => {
   const { showActionButton: translationButton } = useSnapshot(window.ApiServer.state.services.translation);
 
   return <div className="flex flex-none items-center space-x-0 sm:space-x-2">
+    {showLogs ? 
+      <Button tooltip={t('main.btn_show_canvas')} onClick={handleSwitchLogs} ><RiStackFill /></Button> :
+      <Button tooltip={t('main.btn_show_logs')} onClick={handleSwitchLogs} ><RiFileListLine /></Button>
+    }
     <Button tooltip={t('main.btn_fullscreen_input')} onClick={handleSwitchFullscreenInput} ><RxInput /></Button>
+    {/* <Button tooltip={t('main.btn_show_canvas')} onClick={handleSwitchLogs} ><RxInput /></Button> */}
     <Button className={vfxMute ? "btn-error" : "btn-ghost"} tooltip={t('main.btn_mute_effects')} body={t('main.btn_mute_effects_desc')} onClick={handleSwitchSoundEffects}>{vfxMute ? <RiVolumeMuteFill /> : <RiVolumeUpFill />}</Button>
 
     {window.ApiServer.stt.serviceState.muted === SttMuteState.muted && (

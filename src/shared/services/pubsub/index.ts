@@ -1,6 +1,7 @@
-import { BaseEvent, IServiceInterface, PartialWithRequired, ServiceNetworkState, TextEvent, TextEventSchema, TextEventSource } from "@/types";
+import { BaseEvent, IServiceInterface, PartialWithRequired, ServiceNetworkState, TextEvent, TextEventSchema, TextEventSource, TextEventType } from "@/types";
 import { listen } from '@tauri-apps/api/event';
 import { invoke } from "@tauri-apps/api/tauri";
+import { nanoid } from "nanoid";
 import PubSub from "pubsub-js";
 import { toast } from "react-toastify";
 import { proxy } from "valtio";
@@ -18,8 +19,19 @@ class Service_PubSub implements IServiceInterface {
   constructor() {}
   #socket?: WebSocket;
   serviceState = proxy({
-    state: ServiceNetworkState.disconnected
+    state: ServiceNetworkState.disconnected,
   });
+  textHistory = proxy<{
+    lastId: string
+    list: {
+      id: string,
+      event: string,
+      value: string
+    }[]
+  }>({
+    lastId: "",
+    list: []
+  })
 
   private consumePubSubMessage(stringEvent?: string) {
     if (!window.Config.isServer())
@@ -47,7 +59,6 @@ class Service_PubSub implements IServiceInterface {
     }
   }
 
-
   public registeredEvents = proxyMap<string, RegisteredEvent>([]);
 
   registerEvent = (event: RegisteredEvent) => this.registeredEvents.set(event.value, event);
@@ -56,12 +67,25 @@ class Service_PubSub implements IServiceInterface {
   async init() {
     window.Config.isServer() && listen('pubsub', (event) => {
       this.consumePubSubMessage(event.payload as string);
-    })
+    });
 
     this.registerEvent({label: "Speech to text", value: TextEventSource.stt});
     this.registerEvent({label: "Translation",value: TextEventSource.translation});
     this.registerEvent({label: "Text field",value: TextEventSource.textfield});
     this.registerEvent({label: "Any text source",value: TextEventSource.any});
+
+    //track text events
+    window.Config.isServer() && this.subscribeText(TextEventSource.any, (event, eventName) => {
+      if (event?.type === TextEventType.final) {
+        const _v: any[] = [];
+        // limit to 40
+        if (this.textHistory.list.length >= 40)
+          this.textHistory.list.shift();
+        const id = nanoid();
+        this.textHistory.list.push({ id, event: eventName?.replace("text.", "") || "text", value: event.value });
+        this.textHistory.lastId = id;
+      }
+    });
   }
 
   private applyEmotes(data: PartialWithRequired<TextEvent, "type" | "value">) {
