@@ -4,7 +4,7 @@ import "./style.css";
 import ApiServer          from "./server";
 import ApiClient          from "./client";
 import ClientView         from "./client/ui/view";
-import React, {ReactNode} from "react";
+import React, {ReactNode, Suspense} from "react";
 import AppConfiguration   from "@/config";
 import ApiShared          from "@/shared";
 import ClientLoadingView from "./client/ui/view_loading";
@@ -64,7 +64,6 @@ const LazyServerView = React.lazy(() => import("./server/ui/editor-view"));
       });
     }
   }
-
 
   if (window.Config.isClient())
     renderView(<ClientLoadingView/>);
