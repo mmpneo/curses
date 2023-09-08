@@ -51,7 +51,7 @@ class Service_PubSub implements IServiceInterface {
   public registeredEvents = proxyMap<string, RegisteredEvent>([]);
 
   registerEvent = (event: RegisteredEvent) => this.registeredEvents.set(event.value, event);
-  unregisterEvent = (event: RegisteredEvent) => this.registeredEvents.delete(event.value);
+  unregisterEvent = (eventValue: string) => this.registeredEvents.delete(eventValue);
 
   async init() {
     window.Config.isServer() && listen('pubsub', (event) => {

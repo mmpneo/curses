@@ -123,16 +123,6 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
     }
   }
 
-  const name = useGetState(s => s.elements[id].name);
-  useEffect(() => {
-    const event = {
-      label: `${name || 'Text element'} activity`,
-      value: `element.${id}`
-    }
-    window.ApiShared.pubsub.registerEvent(event)
-    return () => { window.ApiShared.pubsub.unregisterEvent(event); }
-  }, [name]);
-
   useEffect(() => {
     const sub = window.ApiShared.pubsub.subscribeText(state.sourceMain, event => {
       if (!stateRef.current.sourceInterim && event?.type === TextEventType.interim)

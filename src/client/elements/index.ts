@@ -5,12 +5,33 @@ import { ElementSceneStateFactory, ElementType, TransformRect, UnionElementState
 class Service_Elements implements IServiceInterface {
   constructor() {}
 
-  init(): void {}
+  init(): void {
+    const elements = window.ApiClient.document.fileBinder.get().elements;
+    for (const id in elements) {
+      this.#registerElementEvent(id, elements[id].name);
+    }
+  }
+
+  #registerElementEvent(id: string, elementName: string) {
+    const eventId = `element.${id}`;
+    window.ApiShared.pubsub.unregisterEvent(eventId);
+    const event = {
+      label: `${elementName} activity`,
+      value: eventId
+    }
+    window.ApiShared.pubsub.registerEvent(event);
+  }
 
   updateField<SchemaType, Key extends keyof SchemaType>(id: string, sceneId: string, key: Key, value: SchemaType[Key]) {
     window.ApiClient.document.patch(state => {
       if (!(id in state.elements) || !(sceneId in state.elements[id].scenes))
         return;
+
+      // update custom event label
+      if (key === "name" && state.elements[id].type === ElementType.text) {
+        this.#registerElementEvent(id, value as string);
+      }
+
       (state.elements[id].scenes[sceneId].data as SchemaType)[key] = value;
     });
   }
@@ -34,8 +55,8 @@ class Service_Elements implements IServiceInterface {
   }
 
   addElement(type: ElementType, sceneId: string = "main" , rect?: TransformRect) {
+    let id = nanoid();
     window.ApiClient.document.patch((state) => {
-      let id = nanoid();
       while (id in state.elements) {
         id = nanoid();
       }
@@ -43,6 +64,10 @@ class Service_Elements implements IServiceInterface {
       state.elements[id] = UnionElementStateSchema.parse({id, type});
       state.elements[id].scenes[sceneId] = ElementSceneStateFactory(state.elements[id].type).parse({rect});
     });
+    const elements = window.ApiClient.document.fileBinder.get().elements;
+
+    if (type === ElementType.text)
+      this.#registerElementEvent(id, elements[id].name);
   }
 
   removeElement(id: string) {
@@ -52,6 +77,7 @@ class Service_Elements implements IServiceInterface {
       state.elementsIds.splice(index, 1);
       delete state.elements[id];
     });
+    window.ApiShared.pubsub.unregisterEvent(`element.${id}`);
   }
 }
 
