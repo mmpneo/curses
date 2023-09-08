@@ -97,10 +97,6 @@ const LogsView = () => {
       setTimeout(() => scrollContainer.current?.scrollTo({ top: scrollContainer.current.scrollHeight, behavior: "smooth" }));
   }, [lastId]);
 
-  const repeat = (value: string) => {
-
-  }
-
   return <motion.div
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
@@ -108,9 +104,8 @@ const LogsView = () => {
     transition={{ ease: "anticipate", duration: 0.3 }}
     className="relative w-full h-full flex flex-col">
     <div ref={scrollContainer} className="flex flex-grow overflow-y-scroll scrollbar-hide flex-col-reverse mb-8">
-      <div className="w-full flex flex-col px-6 pt-6 pb-12 space-y-2">
-        {/* <span className="opacity-50 px-2 text-xs font-medium">ℹ Doubleclick event to insert it into text field</span> */}
-        {list.map(event => <div key={event.id} onDoubleClick={() => repeat(event.value)} className="flex flex-col rounded-md bg-neutral/10 hover:bg-neutral/30 transition-colors p-2 cursor-pointer">
+      <div className="w-full flex flex-col px-4 pt-6 pb-12 space-y-2">
+        {list.map(event => <div key={event.id} className="flex flex-col rounded-md bg-neutral/10 hover:bg-neutral/30 transition-colors px-4 py-2 cursor-pointer">
           <div className="hidden sm:block text-xs opacity-50 font-semibold">from {event.event}</div>
           <div className="text-sm sm:text-lg font-semibold !leading-none">{event.value}</div>
         </div>)}
