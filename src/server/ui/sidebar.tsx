@@ -13,9 +13,10 @@ import Tooltip from "./dropdown/Tooltip";
 import Inspector from "./inspector";
 import { MdExtension } from "react-icons/md";
 import { SiDiscord, SiObsstudio, SiTwitch } from "react-icons/si";
+import { useTranslation } from "react-i18next";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  tooltip: string;
+  tooltip: string; // locale key
   tab: InspectorTabPath;
   status?: ServiceNetworkState
 }
@@ -46,19 +47,21 @@ const Divider: FC = () => {
 }
 
 const AddElementsMenu: FC = () => {
+  const {t} = useTranslation();
   const handleAdd = (type: ElementType) => {
     window.ApiClient.elements.addElement(type);
   }
   return (
     <ul className="dropdown p-2">
-      <li className="menu-title"><span>Elements</span></li>
-      <li><button onClick={() => handleAdd(ElementType.text)}>Add text</button></li>
-      <li><button onClick={() => handleAdd(ElementType.image)}>Add image</button></li>
+      <li className="menu-title"><span>{t('main.add_elements')}</span></li>
+      <li><button onClick={() => handleAdd(ElementType.text)}>{t('main.btn_add_text')}</button></li>
+      <li><button onClick={() => handleAdd(ElementType.image)}>{t('main.btn_add_image')}</button></li>
     </ul>
   );
 };
 
 const ElementMenu: FC<{ id: string, title: string }> = ({ id, title }) => {
+  const {t} = useTranslation();
   const {activeScene} = useSnapshot(window.ApiClient.scenes.state);
   const elementScenes = useGetState(state => state.elements[id]?.scenes);
   const canRemoveFromScene = activeScene in elementScenes && Object.keys(elementScenes).length > 1;
@@ -69,8 +72,8 @@ const ElementMenu: FC<{ id: string, title: string }> = ({ id, title }) => {
   return (
     <ul className="dropdown p-2">
       <li className="menu-title"><span>{title}</span></li>
-      <li><button onClick={() => window.ApiClient.elements.removeElement(id)}>Remove element</button></li>
-      <li className={classNames({disabled: !canRemoveFromScene})}><button onClick={handleRemoveFromScene}>Remove from scene</button></li>
+      <li><button onClick={() => window.ApiClient.elements.removeElement(id)}>{t('common.btn_remove')}</button></li>
+      <li className={classNames({disabled: !canRemoveFromScene})}><button onClick={handleRemoveFromScene}>{t('main.btn_remove_from_scene')}</button></li>
     </ul>
   );
 };
@@ -102,6 +105,7 @@ const ElementList: FC = memo(() => {
 })
 
 const Sidebar: FC = memo(() => {
+  const {t} = useTranslation();
   const { sidebarState: { tab, show, expand } } = useSnapshot(window.ApiServer.ui);
   const {showOverlay} = useSnapshot(window.ApiServer.state);
   useEffect(() => {
@@ -125,29 +129,29 @@ const Sidebar: FC = memo(() => {
             <TbArrowBarToLeft className="swap-on" />
             <TbArrowBarToRight className="swap-off" />
           </span>
-          <div className="font-medium text-xs text-base-content/50 leading-none">Collapse menu</div>
+          <div className="font-medium text-xs text-base-content/50 leading-none">{t('main.btn_collapse_menu')}</div>
         </button>
-        <SideBarButton status={sttState.status} tab={{ tab: Services.stt }} tooltip="Speech to Text"><RiUserVoiceFill /></SideBarButton>
-        <SideBarButton status={ttsState.status} tab={{ tab: Services.tts }} tooltip="Text to Speech"><RiChatVoiceFill /></SideBarButton>
-        <SideBarButton status={translationState.status} tab={{ tab: Services.translation }} tooltip="Translation"><RiTranslate2 /></SideBarButton>
-        <SideBarButton tab={{ tab: "settings" }} tooltip="Settings & About"><RiSettings2Fill /></SideBarButton>
-        <SIdebarDivider expand={expand} icon={<MdExtension className="flex-none" size={14} />}>Integrations</SIdebarDivider>
+        <SideBarButton status={sttState.status} tab={{ tab: Services.stt }} tooltip={t("stt.title")}><RiUserVoiceFill /></SideBarButton>
+        <SideBarButton status={ttsState.status} tab={{ tab: Services.tts }} tooltip={t("tts.title")}><RiChatVoiceFill /></SideBarButton>
+        <SideBarButton status={translationState.status} tab={{ tab: Services.translation }} tooltip={t("transl.title")}><RiTranslate2 /></SideBarButton>
+        <SideBarButton tab={{ tab: "settings" }} tooltip={t("settings.title")}><RiSettings2Fill /></SideBarButton>
+        <SIdebarDivider expand={expand} icon={<MdExtension className="flex-none" size={14} />}>{t('main.section_integrations')}</SIdebarDivider>
         <div className={classNames("flex flex-col transition-spacing space-y-1", expand ? "pl-2" : "pl-0")}>
-          <SideBarButton tab={{ tab: "obs" }} tooltip="OBS Studio"><SiObsstudio /></SideBarButton>
-          <SideBarButton tab={{ tab: Services.twitch }} tooltip="Twitch"><SiTwitch /></SideBarButton>
-          <SideBarButton tab={{ tab: Services.discord }} tooltip="Discord"><SiDiscord /></SideBarButton>
-          <SideBarButton tab={{ tab: Services.vrc }} tooltip="VRChat"><RiMessage2Fill /></SideBarButton>
+          <SideBarButton tab={{ tab: "obs" }} tooltip={t("obs.title")}><SiObsstudio /></SideBarButton>
+          <SideBarButton tab={{ tab: Services.twitch }} tooltip={t("twitch.title")}><SiTwitch /></SideBarButton>
+          <SideBarButton tab={{ tab: Services.discord }} tooltip={t("discord.title")}><SiDiscord /></SideBarButton>
+          <SideBarButton tab={{ tab: Services.vrc }} tooltip={t("vrc.title")}><RiMessage2Fill /></SideBarButton>
         </div>
-        <SIdebarDivider expand={expand} icon={<RiBrushFill className="flex-none" size={14} />}>Elements</SIdebarDivider>
+        <SIdebarDivider expand={expand} icon={<RiBrushFill className="flex-none" size={14} />}>{t('main.section_elements')}</SIdebarDivider>
         <div className={classNames("flex flex-col space-y-1 transition-spacing", expand ? "pl-2" : "pl-0")}>
-          <SideBarButton tab={{ tab: "scenes" }} tooltip="Scenes"><RiStackFill /></SideBarButton>
+          <SideBarButton tab={{ tab: "scenes" }} tooltip={t("scenes.title")}><RiStackFill /></SideBarButton>
           <ElementList />
         </div>
         <Dropdown placement="right" content={<AddElementsMenu />}>
-          <SideBarButtonBase tooltip="Add element"><RiAddFill /></SideBarButtonBase>
+          <SideBarButtonBase tooltip={t("main.btn_add_element")}><RiAddFill /></SideBarButtonBase>
         </Dropdown>
         <Divider />
-        <SideBarButton tab={{ tab: "files" }} tooltip="Files"><RiFolderMusicFill /></SideBarButton>
+        <SideBarButton tab={{ tab: "files" }} tooltip={t("files.title")}><RiFolderMusicFill /></SideBarButton>
       </motion.div>
     </div>
     <AnimatePresence initial={false}>

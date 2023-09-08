@@ -3,7 +3,7 @@ import { ServiceNetworkState } from "@/types";
 import { getVersion } from '@tauri-apps/api/app';
 import { FC, memo, useEffect, useState } from "react";
 import { RiFileCopyLine, RiSettings2Fill } from "react-icons/ri";
-import { SiDiscord, SiPatreon, SiTwitch, SiTwitter } from "react-icons/si";
+import { SiDiscord, SiBuymeacoffee, SiPatreon, SiTwitch, SiTwitter } from "react-icons/si";
 import { useSnapshot } from "valtio";
 import Dropdown from "../dropdown/Dropdown";
 import Tooltip from "../dropdown/Tooltip";
@@ -11,6 +11,8 @@ import Logo from "../logo";
 import ServiceButton from "../service-button";
 import Inspector from "./components";
 import { InputChips, InputNetworkStatus, InputSelect, InputShortcut, InputText } from "./components/input";
+import { useTranslation } from "react-i18next";
+import { i18nLanguages } from "@/i18n";
 const themesLight = [
   'light',
   'lofi',
@@ -57,13 +59,15 @@ const options = [
 const UI_SCALE_MIN = 0.8;
 const UI_SCALE_MAX = 1.5;
 
+const languageOptions = i18nLanguages.map(({code, name}) => ({label: name, value: code}));
+
 const AddrInput = () => {
   const [v, setV] = useState(window.ApiServer.state.linkAddress);
   const upd = (v: string) => {
     setV(v);
     window.ApiServer.state.linkAddress = v;
   }
-  return <InputText value={v} onChange={e => upd(e.target.value)} label="Address" placeholder="192.168..smth" />
+  return <InputText value={v} onChange={e => upd(e.target.value)} label="settings.field_ip_address" placeholder="192.168..smth" />
 }
 
 const ExportMenu: FC = () => {
@@ -76,6 +80,7 @@ const ExportMenu: FC = () => {
 }
 
 const Inspector_Settings: FC = memo(() => {
+  const {t} = useTranslation();
   const { clientTheme, uiScale, backgroundInputTimer } = useSnapshot(window.ApiServer.state);
   const { state: linkStatus } = useSnapshot(window.ApiShared.pubsub.serviceState);
   const author = useGetState(state => state.author);
@@ -92,7 +97,7 @@ const Inspector_Settings: FC = memo(() => {
   }
 
   return <Inspector.Body>
-    <Inspector.Header><RiSettings2Fill /> Settings</Inspector.Header>
+    <Inspector.Header><RiSettings2Fill /> {t('settings.title')}</Inspector.Header>
     <Inspector.Content>
       <div className="flex flex-col items-center space-y-1">
         <span className="text-4xl leading-none font-header font-black"><Logo/></span>
@@ -106,33 +111,36 @@ const Inspector_Settings: FC = memo(() => {
           <Tooltip content="Code and Curses" body={<span>App updates and help</span>}>
             <a target="_blank" href="https://discord.gg/Sw6pw8fGYS" className="btn text-primary btn-ghost btn-circle text-2xl"><SiDiscord /></a>
           </Tooltip>
-          <Tooltip content="Support development" body={<span>😊 Donations will greatly help development</span>}>
+          <Tooltip content="Patreon" body={<span>Subscribe to get a Supporter role in discord <br/> (completely useless, just different color) <img className="h-8" src="/peepoSmile.webp"/></span>}>
             <a target="_blank" href="https://www.patreon.com/mmpcode" className="btn text-primary btn-ghost btn-circle text-2xl"><SiPatreon /></a>
           </Tooltip>
+          <Tooltip content="Buy me a coffee" body={<span>Tips are greatly appreciated 💖</span>}>
+            <a target="_blank" href="https://www.buymeacoffee.com/mmpcode" className="btn text-primary btn-ghost btn-circle text-2xl"><SiBuymeacoffee /></a>
+          </Tooltip>
         </div>
-        <div className="self-center text-sm opacity-50">Made with 💗 by Mmp</div>
-        <div className="self-center text-sm opacity-50">Join discord for updates and help!</div>
+        <div className="self-center text-sm opacity-50">{t('settings.desc_1')}</div>
+        <div className="self-center text-sm opacity-50">{t('settings.desc_2')}</div>
         <div className="self-center text-sm opacity-50">v.{version}</div>
       </div>
       <div className="divider"></div>
 
       {/* <Inspector.SubHeader>UI</Inspector.SubHeader> */}
-      <InputSelect label="Theme" options={options} value={clientTheme} onValueChange={handleChangeTheme} />
-      <InputChips label="UI scale" value={uiScale} onChange={e => handleChangeScale(e)} options={[
+      <InputSelect label="settings.field_app_theme" options={options} value={clientTheme} onValueChange={handleChangeTheme} />
+      <InputSelect label="settings.field_language" options={languageOptions} value={clientTheme} onValueChange={handleChangeTheme} />
+      <InputChips label="settings.field_ui_scale" value={uiScale} onChange={e => handleChangeScale(e)} options={[
         { label: "S", value: .8 },
         { label: "M", value: 1 },
         { label: "L", value: 1.2 },
         { label: "X", value: 1.4 },
       ]} />
 
-      
 
-      <Inspector.SubHeader>Template</Inspector.SubHeader>
+      <Inspector.SubHeader>{t('settings.section_template')}</Inspector.SubHeader>
       {author && <span className="text-sm text-secondary font-semibold">Created by {author}</span>}
       <div className="flex items-center space-x-2">
-        <button onClick={() => window.ApiClient.document.importDocument()} className="flex-grow btn btn-sm gap-2"><RiFileCopyLine /> Import</button>
+        <button onClick={() => window.ApiClient.document.importDocument()} className="flex-grow btn btn-sm gap-2"><RiFileCopyLine /> {t('settings.btn_import_template')}</button>
         <Dropdown className="flex-grow btn btn-sm gap-2" targetOffset={24} placement="right" content={<ExportMenu />}>
-          <RiFileCopyLine /> Export
+          <RiFileCopyLine /> {t('settings.btn_export_template')}
         </Dropdown>
       </div>
 
@@ -146,14 +154,14 @@ const Inspector_Settings: FC = memo(() => {
       </>}
 
 
-      <Inspector.SubHeader>Link apps</Inspector.SubHeader>
-      <Inspector.Description>Sync text events with remote app instance</Inspector.Description>
+      <Inspector.SubHeader>{t('settings.section_link_apps')}</Inspector.SubHeader>
+      <Inspector.Description>{t('settings.section_link_apps_desc')}</Inspector.Description>
       <Inspector.Deactivatable active={linkStatus === ServiceNetworkState.disconnected}>
         <AddrInput />
-        <InputNetworkStatus value={linkStatus} label="Status" />
+        <InputNetworkStatus value={linkStatus} label="common.field_connection_status" />
       </Inspector.Deactivatable>
-      <ServiceButton startLabel="Connect" stopLabel="Disconnect" status={linkStatus} onStart={() => window.ApiShared.pubsub.linkConnect()} onStop={() => window.ApiShared.pubsub.linkDisconnect()} />
-      <button className="btn btn-sm btn-ghost" onClick={() => window.ApiShared.pubsub.copyLinkAddress()}>Copy my address</button>
+      <ServiceButton startLabel="common.btn_connect" stopLabel="common.btn_disconnect" status={linkStatus} onStart={() => window.ApiShared.pubsub.linkConnect()} onStop={() => window.ApiShared.pubsub.linkDisconnect()} />
+      <button className="btn btn-sm btn-ghost" onClick={() => window.ApiShared.pubsub.copyLinkAddress()}>{t('settings.btn_copy_address')}</button>
 
     </Inspector.Content>
   </Inspector.Body>

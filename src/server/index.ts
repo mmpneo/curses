@@ -1,3 +1,5 @@
+import '../i18n';
+
 import Service_Sound from "@/server/services/sound";
 import { InspectorTabPath } from "@/types";
 import { proxy } from "valtio";

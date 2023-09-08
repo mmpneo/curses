@@ -7,6 +7,7 @@ import Inspector from "./components";
 import { InputCheckbox, InputMapObject, InputNetworkStatus, InputTextSource } from "./components/input";
 import NiceModal from "@ebay/nice-modal-react";
 import Modal from "../Modal";
+import { useTranslation } from "react-i18next";
 
 const EmotesInspector: FC = () => {
   return <>
@@ -42,14 +43,15 @@ const EmotesModal: FC = () => {
 }
 NiceModal.register('twitch-emotes', (props) => <Modal.Base {...props}><EmotesModal /></Modal.Base>);
 const EmotesMapModal: FC = () => {
+  const {t} = useTranslation();
   const pr = useSnapshot(window.ApiServer.state.services.twitch.data);
   const up = <K extends keyof Twitch_State>(key: K, v: Twitch_State[K]) => window.ApiServer.patchService("twitch", s => s.data[key] = v);
   return (
     <Modal.Body width={420}>
-      <Modal.Header>Remap Emotes</Modal.Header>
+      <Modal.Header>{t('twitch_emotes_remap.title')}</Modal.Header>
       <Modal.Content>
         <div className="p-4">
-          <InputMapObject keyPlaceholder="Word" valuePlaceholder="Emote" value={{...pr.emotesReplacements}} onChange={e => up("emotesReplacements", e)} label="" />
+          <InputMapObject keyPlaceholder={t('twitch_emotes_remap.label_dictionary_key')} valuePlaceholder={t('twitch_emotes_remap.label_dictionary_value')} value={{...pr.emotesReplacements}} onChange={e => up("emotesReplacements", e)} label="common.field_dictionary" />
         </div>
       </Modal.Content>
     </Modal.Body>
@@ -58,6 +60,7 @@ const EmotesMapModal: FC = () => {
 NiceModal.register('twitch-emotes-map', (props) => <Modal.Base {...props}><EmotesMapModal /></Modal.Base>);
 
 const Inspector_Twitch: FC = () => {
+  const {t} = useTranslation();
   const {user, liveStatus} = useSnapshot(window.ApiServer.twitch.state);
   const chatState = useSnapshot(window.ApiServer.twitch.chat.state);
   const handleLogin = () => window.ApiServer.twitch.login();
@@ -67,36 +70,36 @@ const Inspector_Twitch: FC = () => {
   const pr = useSnapshot(window.ApiServer.state.services.twitch.data);
   const up = <K extends keyof Twitch_State>(key: K, v: Twitch_State[K]) => window.ApiServer.patchService("twitch", s => s.data[key] = v);
   return <Inspector.Body>
-    <Inspector.Header><SiTwitch/> Twitch</Inspector.Header>
+    <Inspector.Header><SiTwitch/> {t('twitch.title')}</Inspector.Header>
     <Inspector.Content>
       {user && <div className="flex items-center space-x-4">
         <img className="rounded-full aspect-square w-10 ring-2 ring-success ring-offset-base-100 ring-offset-2" src={user.profilePictureUrl} />
         <div className="flex flex-col">
           <div className="font-semibold">{user.name}</div>
-          <div className="text-xs link link-warning link-hover font-medium" onClick={handleLogout}>Logout</div>
+          <div className="text-xs link link-warning link-hover font-medium" onClick={handleLogout}>{t('twitch.btn_logout')}</div>
         </div>
       </div>}
 
-      {!user && <button className="btn gap-2 border-none" style={{backgroundColor: "#9147ff", color: "#fff"}} onClick={handleLogin}><SiTwitch size={20}/> Login</button>}
+      {!user && <button className="btn gap-2 border-none" style={{backgroundColor: "#9147ff", color: "#fff"}} onClick={handleLogin}><SiTwitch size={20}/> {t('twitch.btn_login')}</button>}
       <Inspector.Switchable visible={!!user}>
-        <InputNetworkStatus label="Stream" connectedLabel="Live" disconnectedLabel="Offline" value={liveStatus} />
-        <InputNetworkStatus label="Chat" value={chatState.connection} />
-        <InputCheckbox label="Enable chat" value={pr.chatEnable} onChange={e => up("chatEnable", e)} />
+        <InputNetworkStatus label="twitch.status_stream" connectedLabel="Live" disconnectedLabel="Offline" value={liveStatus} />
+        <InputNetworkStatus label="twitch.status_chat" value={chatState.connection} />
+        <InputCheckbox label="twitch.field_enable_chat" value={pr.chatEnable} onChange={e => up("chatEnable", e)} />
         <Inspector.Switchable visible={pr.chatEnable}>
-          <InputCheckbox label="Post in chat" value={pr.chatPostEnable} onChange={e => up("chatPostEnable", e)} />
-          <Inspector.Description>Post speech to text or translation results in chat</Inspector.Description>
-          <InputCheckbox label="Post only when live streaming" value={pr.chatPostLive} onChange={e => up("chatPostLive", e)} />
-          <InputTextSource label="Post from" value={pr.chatPostSource} onChange={e => up("chatPostSource", e)} />
-          <InputCheckbox label="Post from text field" value={pr.chatPostInput} onChange={e => up("chatPostInput", e)} />
-          <InputCheckbox label="Post from chat" value={pr.chatReceiveEnable} onChange={e => up("chatReceiveEnable", e)} />
-          <Inspector.Description>Chat as a text field</Inspector.Description>
+          <InputCheckbox label="twitch.field_post_in_chat" value={pr.chatPostEnable} onChange={e => up("chatPostEnable", e)} />
+          <Inspector.Description>{t('twitch.field_post_in_chat_desc')}</Inspector.Description>
+          <InputCheckbox label="twitch.field_post_in_chat_live" value={pr.chatPostLive} onChange={e => up("chatPostLive", e)} />
+          <InputTextSource label="common.field_text_source" value={pr.chatPostSource} onChange={e => up("chatPostSource", e)} />
+          <InputCheckbox label="common.field_use_keyboard_input" value={pr.chatPostInput} onChange={e => up("chatPostInput", e)} />
+          <InputCheckbox label="twitch.field_chat_text" value={pr.chatReceiveEnable} onChange={e => up("chatReceiveEnable", e)} />
+          <Inspector.Description>{t('twitch.field_chat_text_desc')}</Inspector.Description>
         </Inspector.Switchable>
-        <Inspector.SubHeader>Emotes</Inspector.SubHeader>
+        <Inspector.SubHeader>{t('twitch.section_emotes')}</Inspector.SubHeader>
         <span>
-          <span className="link link-accent link-hover font-semibold text-xs" onClick={handleShowEmotes}>Show emotes</span> | <span className="link link-accent link-hover font-semibold text-xs" onClick={handleShowEmotesMapper}>Remap emotes</span>
+          <span className="link link-accent link-hover font-semibold text-xs" onClick={handleShowEmotes}>{t('twitch.btn_show_emotes')}</span> | <span className="link link-accent link-hover font-semibold text-xs" onClick={handleShowEmotesMapper}>{t('twitch.btn_remap_emotes')}</span>
         </span>
-        <InputCheckbox label="Enable emotes in captions" value={pr.emotesEnableReplacements} onChange={e => up("emotesEnableReplacements", e)} />
-        <InputCheckbox label="Case sensitive" value={pr.emotesCaseSensitive} onChange={e => up("emotesCaseSensitive", e)} />
+        <InputCheckbox label="twitch.field_enable_captions_emotes" value={pr.emotesEnableReplacements} onChange={e => up("emotesEnableReplacements", e)} />
+        <InputCheckbox label="twitch.field_case_sensitive" value={pr.emotesCaseSensitive} onChange={e => up("emotesCaseSensitive", e)} />
       </Inspector.Switchable>
     </Inspector.Content>
   </Inspector.Body>

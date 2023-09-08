@@ -1,24 +1,26 @@
 import groupBy from "lodash/groupBy";
 import { FC, memo, useEffect, useRef, useState } from "react";
-import { RiAddFill, RiTwitchFill } from "react-icons/ri";
+import { RiAddFill, RiImage2Fill } from "react-icons/ri";
 import { toast }                                  from "react-toastify";
 import { useGetState }                            from "@/client";
 import Dropdown                                   from "../dropdown/Dropdown";
 import Inspector                                  from "./components";
 import FileElement, { FontGroup, FontGroupProps } from "@/server/ui/file-element";
 import { FileState }                              from "@/client/services/files/schema";
+import { useTranslation } from "react-i18next";
 
 const AddFileMenu: FC = () => {
+  const {t} = useTranslation();
   return <ul className="dropdown p-2">
-    <li className="menu-title"><span>Add file</span></li>
-    <li><button onClick={() => window.ApiClient.files.addFile("image")}>Image</button></li>
-    <li><button onClick={() => window.ApiClient.files.addFile("audio")}>Sound</button></li>
-    <li><button onClick={() => window.ApiClient.files.addFile("font")}>Font</button></li>
-    {/*todo later <li><button onClick={() => window.APIFrontend.files.addFile("video")}>Image</button></li> */}
+    <li className="menu-title"><span>{t('files.add_file')}</span></li>
+    <li><button onClick={() => window.ApiClient.files.addFile("image")}>{t('files.type_image')}</button></li>
+    <li><button onClick={() => window.ApiClient.files.addFile("audio")}>{t('files.type_sound')}</button></li>
+    <li><button onClick={() => window.ApiClient.files.addFile("font")}>{t('files.type_font')}</button></li>
   </ul>;
 }
 
 const Inspector_Files: FC = memo(() => {
+  const {t} = useTranslation();
   const [fonts, setFonts] = useState<FontGroupProps[]>([]);
   const filesMeta = useGetState(store => store.filesMeta || []);
   const [data, setData] = useState<FileState[]>([])
@@ -40,14 +42,15 @@ const Inspector_Files: FC = memo(() => {
   const handleRemove = (id: string) => { window.ApiClient.files.removeFile(id) };
 
   const fileActions = useRef([
-    { label: 'Copy reference', fn: handleCopyStyle },
-    { label: 'Delete', fn: handleRemove },
+    { label: t('files.btn_copy_reference'), fn: handleCopyStyle },
+    { label: t('common.btn_remove'), fn: handleRemove },
   ]);
 
   return <Inspector.Body>
-    <Inspector.Header><RiTwitchFill />
+    <Inspector.Header>
+      <RiImage2Fill />
       <div className="w-full flex justify-between">
-        Files
+        {t('files.title')}
         <Dropdown targetOffset={24} placement="right" content={<AddFileMenu />}>
           <button className="flex-grow btn btn-circle btn-sm">
             <RiAddFill />

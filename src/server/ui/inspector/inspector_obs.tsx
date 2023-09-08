@@ -10,6 +10,7 @@ import { useDropdown } from "../dropdown/Dropdown";
 import ServiceButton from "../service-button";
 import Inspector from "./components";
 import { InputCheckbox, InputMapObject, InputNetworkStatus, InputText, InputTextSource } from "./components/input";
+import { useTranslation } from "react-i18next";
 
 const ObsSetupDropdown: FC = () => {
   const dropdown = useDropdown();
@@ -45,6 +46,7 @@ const ObsSetupDropdown: FC = () => {
 }
 
 const Inspector_OBS: FC = () => {
+  const {t} = useTranslation();
   const canvas = useGetState(state => state.canvas);
   const data = useSnapshot(window.ApiServer.state.services.obs.data);
   const wsState = useSnapshot(window.ApiServer.obs.wsState);
@@ -58,11 +60,11 @@ const Inspector_OBS: FC = () => {
   const handleCancelWs = () => window.ApiServer.obs.wsCancel();
 
   return <Inspector.Body>
-    <Inspector.Header><SiObsstudio/> OBS Studio</Inspector.Header>
+    <Inspector.Header><SiObsstudio/> {t("obs.title")}</Inspector.Header>
     <Inspector.Content>
-      <Inspector.SubHeader>Browser source captions</Inspector.SubHeader>
-      <Inspector.Description>Create new browser source, paste the link and set window size to {canvas.w}x{canvas.h} pixels</Inspector.Description>
-      <button onClick={window.ApiShared.peer.copyClientLink} className="flex-grow btn btn-sm border-2 gap-2"><RiFileCopyLine /> Copy browser source  url</button>
+      <Inspector.SubHeader>{t('obs.section_browser_source')}</Inspector.SubHeader>
+      <Inspector.Description>{t('obs.browser_source_desc', {width: canvas.w, height: canvas.h})}</Inspector.Description>
+      <button onClick={window.ApiShared.peer.copyClientLink} className="flex-grow btn btn-sm border-2 gap-2"><RiFileCopyLine /> {t('obs.btn_copy_browser_source_link')}</button>
       {/* <div className="flex items-center space-x-2">
         <span className="text-sm text-base-content/50 font-medium">or</span>
         <Tooltip placement="top" className="flex-grow flex flex-col" content="Setup browser source" body={<span><span className="font-medium">Active "obs-websocket"</span> plugin required. <br /> OBS 28.x should have it by default, just enable it!</span>}>
@@ -72,34 +74,34 @@ const Inspector_OBS: FC = () => {
         </Tooltip>
       </div> */}
 
-      <Inspector.SubHeader>Connection</Inspector.SubHeader>
-      <Inspector.Description><span><span className="font-medium">"obs-websocket"</span> plugin required. <br /> OBS 28.x should have it by default, just enable it!</span></Inspector.Description>
-      <InputCheckbox value={data.wsAutoStart} onChange={e => up("wsAutoStart", e)} label="Auto Connect" />
-      <InputNetworkStatus label="OBS connection" value={wsState.status} />
-      <InputText type="number" value={data.wsPort} onChange={e => up("wsPort", e.target.value)} label="Websocket Port" />
-      <InputText type="password" value={data.wsPassword} onChange={e => up("wsPassword", e.target.value)} label="Websocket Password" />
+      <Inspector.SubHeader>{t('obs.section_websocket')}</Inspector.SubHeader>
+      <Inspector.Description>{t('obs.websocket_desc')}</Inspector.Description>
+      <InputCheckbox label="obs.field_auto_connect" value={data.wsAutoStart} onChange={e => up("wsAutoStart", e)} />
+      <InputNetworkStatus label="common.field_connection_status" value={wsState.status} />
+      <InputText label="common.field_connection_port" type="number" value={data.wsPort} onChange={e => up("wsPort", e.target.value)} />
+      <InputText label="common.field_password" type="password" value={data.wsPassword} onChange={e => up("wsPassword", e.target.value)} />
       <ServiceButton 
         showError
         errorLabel="Error - Try Again"
-        stopLabel="Disconnect"
-        startLabel="Connect"
+        stopLabel="common.btn_disconnect"
+        startLabel="common.btn_connect"
         onError={handleStartWs}
         status={wsState.status}
         onStart={handleStartWs}
         onPending={handleCancelWs}
         onStop={handleStopWs}/>
-      <Inspector.SubHeader>Native stream captions</Inspector.SubHeader>
+      <Inspector.SubHeader>{t('obs.section_native_captions')}</Inspector.SubHeader>
       {/* <InputCheckbox value={data.enable} onChange={e => up("enable", e)} label="Enable captions" /> */}
-      <InputCheckbox value={data.captionsEnable} onChange={e => up("captionsEnable", e)} label="Enable" />
-      <InputTextSource value={data.source} onChange={e => up("source", e)} label="Source"/>
-      <InputCheckbox value={data.inputField} onChange={e => up("inputField", e)} label="Input field" />
-      <InputCheckbox value={data.interim} onChange={e => up("interim", e)} label="Show interim" />
+      <InputCheckbox value={data.captionsEnable} onChange={e => up("captionsEnable", e)} label="common.field_enable" />
+      <InputTextSource value={data.source} onChange={e => up("source", e)} label="common.field_text_source"/>
+      <InputCheckbox value={data.inputField} onChange={e => up("inputField", e)} label="common.field_use_keyboard_input" />
+      <InputCheckbox value={data.interim} onChange={e => up("interim", e)} label="common.field_interim_results" />
 
-      <Inspector.SubHeader>Scenes</Inspector.SubHeader>
-      <Inspector.Description>Automatically change curses scene to match active obs scene</Inspector.Description>
-      <InputCheckbox value={data.scenesEnable} onChange={e => up("scenesEnable", e)} label="Enable" />
-      <InputText value={data.scenesFallback} onChange={e => up("scenesFallback", e.target.value)} label="Fallback scene"/>
-      <InputMapObject keyPlaceholder="OBS name" valuePlaceholder="Scene" addLabel="Add word" value={{...data.scenesMap}} onChange={e => up("scenesMap", e)} label="Scenes map" />
+      <Inspector.SubHeader>{t('obs.section_scenes')}</Inspector.SubHeader>
+      <Inspector.Description>{t('obs.section_scenes_desc')}</Inspector.Description>
+      <InputCheckbox value={data.scenesEnable} onChange={e => up("scenesEnable", e)} label="common.field_enable" />
+      <InputText value={data.scenesFallback} onChange={e => up("scenesFallback", e.target.value)} label="obs.field_fallback_scene"/>
+      <InputMapObject keyPlaceholder="OBS name" valuePlaceholder="Scene" addLabel="Add word" value={{...data.scenesMap}} onChange={e => up("scenesMap", e)} label="obs.field_map_scenes" />
     </Inspector.Content>
   </Inspector.Body>
 }

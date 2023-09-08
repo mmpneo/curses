@@ -3,7 +3,7 @@ import { useId } from "@floating-ui/react-dom-interactions";
 import classNames from "classnames/bind";
 import { ChangeEvent, FC, forwardRef, InputHTMLAttributes, memo, PropsWithChildren, ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { RgbaColor, RgbaColorPicker } from "react-colorful";
-import { RiDeleteBack2Fill, RiUpload2Fill, RiKeyboardBoxFill, RiDeleteBin3Fill, RiCheckboxCircleFill, RiAddCircleFill, RiEdit2Fill, RiRecordCircleFill, RiCloseCircleFill } from "react-icons/ri";
+import { RiUpload2Fill, RiKeyboardBoxFill, RiDeleteBin3Fill, RiCheckboxCircleFill, RiAddCircleFill, RiEdit2Fill, RiRecordCircleFill, RiCloseCircleFill } from "react-icons/ri";
 import { HiChevronDown, HiChevronUp } from "react-icons/hi";
 import FileElement                                                     from "../../../file-element";
 import { FileState, FileType }                                         from "@/client/services/files/schema";
@@ -23,15 +23,18 @@ import { BackendState } from "../../../../schema";
 import Tooltip          from "../../../dropdown/Tooltip";
 import { invoke }       from "@tauri-apps/api/tauri";
 const cx = classNames.bind(styles);
+import { useTranslation } from 'react-i18next';
 
 interface InputBaseProps {
   label: string
+  labelOptions?: any
 }
 
 export const InputContainer: FC<PropsWithChildren<{ id?: string, vertical?: boolean, label: string }>> = memo(({ id, vertical, label, children }) => {
+  const {t} = useTranslation();
   const layout = vertical ? "flex-col space-y-2" : "justify-between items-center"
   return <div className={cx("flex min-h-8", layout)}>
-    <label className="flex-grow font-medium text-base-content/80 text-xs cursor-pointer" htmlFor={id}>{label}</label>
+    <label className="flex-grow font-medium text-base-content/80 text-xs cursor-pointer" htmlFor={id}>{t(label)}</label>
     {children}
   </div>
 });
@@ -118,7 +121,10 @@ export const InputColor: FC<InputColorProps> = memo(({ label, ...rest }) => {
 export const InputRange: FC<InputTextProps> = memo(({ label, ...rest }) => {
   const id = useId();
   return <InputContainer label={label} id={id}>
-    <input {...rest} id={id} type="range" className="field-width range range-sm range-primary" />
+    <div className="flex space-x-2">
+      <span>{rest.value}</span>
+      <input {...rest} id={id} type="range" className="field-width range range-sm range-primary" />
+    </div>
   </InputContainer>
 });
 

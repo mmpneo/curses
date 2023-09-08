@@ -6,43 +6,46 @@ import { useSnapshot } from "valtio";
 import ServiceButton from "../service-button";
 import Inspector from "./components";
 import { InputCheckbox, InputSelect, InputSelectOption, InputText } from "./components/input";
+import { useTranslation } from "react-i18next";
 
 const Azure: FC = memo(() => {
+  const {t} = useTranslation();
   const pr = useSnapshot(window.ApiServer.state.services.translation.data.azure);
   const {azure: azureLanguages} = useSnapshot(window.ApiServer.translation.lib);
   const up = <K extends keyof Translation_State["azure"]>(key: K, v: Translation_State["azure"][K]) => window.ApiServer.state.services.translation.data.azure[key] = v;
 
   return <>
     <Inspector.SubHeader>Azure options</Inspector.SubHeader>
-    <InputText label="Key" type="password" value={pr.key} onChange={e => up("key", e.target.value)} />
-    <InputText label="Location" value={pr.location} onChange={e => up("location", e.target.value)} />
+    <InputText label="transl.azure_key" type="password" value={pr.key} onChange={e => up("key", e.target.value)} />
+    <InputText label="transl.azure_location" value={pr.location} onChange={e => up("location", e.target.value)} />
     <InputSelect 
-      label="From language"
+      label="transl.azure_from_language"
       options={azureLanguages as InputSelectOption[]}
       value={pr.languageFrom}
       onValueChange={e => up("languageFrom", e as any)}
     />
     <InputSelect 
-      label="To language"
+      label="transl.azure_to_language"
       options={azureLanguages as InputSelectOption[]}
       value={pr.language}
       onValueChange={e => up("language", e as any)}
     />
     <InputSelect 
-      label="Profanity"
+      label="transl.azure_profanity"
       options={[
-        { label: 'Masked', value: 'Marked' },
-        { label: 'Removed', value: 'Deleted' },
-        { label: 'Raw', value: 'NoAction' },
+        { label: t('transl.azure_profanity_masked'), value: 'Marked' },
+        { label: t('transl.azure_profanity_removed'), value: 'Deleted' },
+        { label: t('transl.azure_profanity_raw'), value: 'NoAction' },
       ]}
       value={pr.profanity}
       onValueChange={e => up("profanity", e as any)}
     />
-    <InputCheckbox label="Interim result" onChange={e => up("interim", e)} value={pr.interim} />
+    <InputCheckbox label="common.field_interim_results" onChange={e => up("interim", e)} value={pr.interim} />
   </>
 })
 
 const Inspector_Translation: FC = () => {
+  const {t} = useTranslation();
   const data = useSnapshot(window.ApiServer.state.services.translation);
   const state = useSnapshot(window.ApiServer.translation.serviceState);
 
@@ -50,14 +53,14 @@ const Inspector_Translation: FC = () => {
   const up = <K extends keyof Translation_State>(key: K, v: Translation_State[K]) => window.ApiServer.patchService("translation", s => s.data[key] = v);
 
   return <Inspector.Body>
-    <Inspector.Header><RiTranslate2 /> Translation</Inspector.Header>
+    <Inspector.Header><RiTranslate2 /> {t('transl.title')}</Inspector.Header>
     <Inspector.Content>
-      <InputCheckbox label="Add to action bar" onChange={handleStart} value={data.showActionButton} />
-      <InputCheckbox label="Auto start" value={data.data.autoStart} onChange={e => up("autoStart", e)} />
+      <InputCheckbox label="common.field_action_bar" onChange={handleStart} value={data.showActionButton} />
+      <InputCheckbox label="common.field_auto_start" value={data.data.autoStart} onChange={e => up("autoStart", e)} />
       <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
         <InputSelect options={[
           { label: "Azure", value: Translation_Backends.azure },
-        ]} label="Service" value={data.data.backend} onValueChange={e => up("backend", e as Translation_Backends)} />
+        ]} label="common.field_service" value={data.data.backend} onValueChange={e => up("backend", e as Translation_Backends)} />
 
         {data.data.backend === Translation_Backends.azure && <Azure />}
       </Inspector.Deactivatable>

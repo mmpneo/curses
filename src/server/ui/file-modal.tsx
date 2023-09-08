@@ -1,13 +1,14 @@
 import NiceModal, { useModal } from "@ebay/nice-modal-react";
 import { FC, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import SimpleBar       from "simplebar-react";
 import { useGetState } from "@/client";
 import Modal           from "./Modal";
 import { FileState } from "@/client/services/files/schema";
 import FileElement   from "./file-element";
+import { useTranslation } from "react-i18next";
 
 const FilesModal: FC = () => {
+  const {t} = useTranslation();
   const modal = useModal();
   const args = modal.args as { select: string };
   const filesMeta       = useGetState(store => store.filesMeta || []);
@@ -25,11 +26,11 @@ const FilesModal: FC = () => {
   const handleRemove = (id: string) => { window.ApiClient.files.removeFile(id) };
 
   const selectActions = useRef([
-    { label: 'Select', fn: handleSelect }
+    { label: t('common.btn_select'), fn: handleSelect }
   ]);
   const fileActions = useRef([
-    { label: 'Copy reference', fn: handleCopyStyle },
-    { label: 'Delete', fn: handleRemove },
+    { label: t('files.btn_copy_reference'), fn: handleCopyStyle },
+    { label: t('common.btn_remove'), fn: handleRemove },
   ]);
 
   useEffect(() => {
@@ -39,15 +40,14 @@ const FilesModal: FC = () => {
   return <Modal.Body>
 
     <Modal.Header>
-      {args?.select ? "Select file" : "Files"}
-      {!args?.select && <button className=" absolute right-4 top-4 btn btn-accent btn-sm" onClick={() => window.ApiClient.files.addFile()}>Add file</button>}
+      {t('select_file.title')}
+      {!args?.select && <button className=" absolute right-4 top-4 btn btn-accent btn-sm" onClick={() => window.ApiClient.files.addFile()}>{t('files.add_file')}</button>}
     </Modal.Header>
     <Modal.Content>
       <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
         {data.map(file => <FileElement key={file.id} data={file} actions={args?.select ? selectActions.current : fileActions.current} />)}
       </div>
     </Modal.Content>
-
   </Modal.Body>
 }
 

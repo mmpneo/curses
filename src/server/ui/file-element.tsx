@@ -2,6 +2,7 @@ import { createContext, FC, memo, PropsWithChildren, ReactNode, useContext, useR
 import { useSnapshot } from "valtio";
 import { RiFontSize, RiMusic2Fill, RiPauseMiniFill, RiPlayFill } from "react-icons/ri";
 import { FileState }                                             from "@/client/services/files/schema";
+import { useTranslation } from "react-i18next";
 
 type FileProps = {
   data: FileState,
@@ -127,13 +128,14 @@ export type FontGroupProps = {
   size: number;
 }
 export const FontGroup: FC<{data: FontGroupProps}> = memo(({data}) => {
+  const {t} = useTranslation();
   const handleUninstall = () => {
     window.ApiClient.files.uninstallFont(data.name);
   }
   return <FileTemplate
   name={data.name}
   desc={formatBytes(data.size)}
-  actions={<span className="link link-hover link-primary" onClick={handleUninstall}>Uninstall font</span>}
+  actions={<span className="link link-hover link-primary" onClick={handleUninstall}>{t('files.btn_uninstall_font')}</span>}
   ><FileFont /></FileTemplate>
 })
 

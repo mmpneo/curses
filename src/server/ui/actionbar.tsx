@@ -11,6 +11,7 @@ import Tooltip                 from "./dropdown/Tooltip";
 import Logo                    from "./logo";
 import { invoke } from "@tauri-apps/api/tauri";
 import { SttMuteState } from "../services/stt/types";
+import { useTranslation } from "react-i18next";
 
 const Divider: FC = () => {
   return <div className="flex-none h-4 w-1 bg-neutral rounded-full"></div>
@@ -80,6 +81,7 @@ const ActionBar: FC = () => {
 }
 
 const AppActions: FC = () => {
+  const {t} = useTranslation();
   const { muted: sttMute, status: sttStatus } = useSnapshot(window.ApiServer.stt.serviceState);
   const { muteSoundEffects: vfxMute } = useSnapshot(window.ApiServer.state);
   const { status: ttsStatus } = useSnapshot(window.ApiServer.tts.serviceState);
@@ -90,11 +92,11 @@ const AppActions: FC = () => {
   const { showActionButton: translationButton } = useSnapshot(window.ApiServer.state.services.translation);
 
   return <div className="flex flex-none items-center space-x-0 sm:space-x-2">
-    <Button tooltip="Fullscreen input" onClick={handleSwitchFullscreenInput} ><RxInput /></Button>
-    <Button className={vfxMute ? "btn-error" : "btn-ghost"} tooltip="Mute sound effects" body={<>Mute effects like text typing sound <b>in this window</b>. <br /> Does not affect text-to-speech</>} onClick={handleSwitchSoundEffects}>{vfxMute ? <RiVolumeMuteFill /> : <RiVolumeUpFill />}</Button>
+    <Button tooltip={t('main.btn_fullscreen_input')} onClick={handleSwitchFullscreenInput} ><RxInput /></Button>
+    <Button className={vfxMute ? "btn-error" : "btn-ghost"} tooltip={t('main.btn_mute_effects')} body={t('main.btn_mute_effects_desc')} onClick={handleSwitchSoundEffects}>{vfxMute ? <RiVolumeMuteFill /> : <RiVolumeUpFill />}</Button>
 
     {window.ApiServer.stt.serviceState.muted === SttMuteState.muted && (
-      <Button className="btn-error" tooltip="Muted" body={<>Click to unmute STT</>} onClick={handleSwitchMuteSTT}>
+      <Button className="btn-error" tooltip={t('main.btn_unmute_stt')} onClick={handleSwitchMuteSTT}>
         <RiMicOffFill />
       </Button>  
     )}
@@ -106,18 +108,19 @@ const AppActions: FC = () => {
     )}
 
     {window.ApiServer.stt.serviceState.muted === SttMuteState.unmuted && (
-      <Button className="btn-ghost" tooltip="Unmuted" body={<>Click to mute STT</>} onClick={handleSwitchMuteSTT}>
+      <Button className="btn-ghost" tooltip={t('main.btn_mute_stt')} onClick={handleSwitchMuteSTT}>
         <RiMicFill />
       </Button>  
     )}
     {(sttButton || ttsButton) && <Divider />}
-    {sttButton && <ButtonService status={sttStatus} tooltip="Speech to text" onClick={handleSwitchSTT} ><RiUserVoiceFill /></ButtonService>}
-    {ttsButton && <ButtonService status={ttsStatus} tooltip="Text to speech" onClick={handleSwitchTTS} ><RiChatVoiceFill /></ButtonService>}
-    {translationButton && <ButtonService status={translationStatus} tooltip="Translation" onClick={handleSwitchTranslation} ><RiTranslate2 /></ButtonService>}
+    {sttButton && <ButtonService status={sttStatus} tooltip={t('stt.title')} onClick={handleSwitchSTT} ><RiUserVoiceFill /></ButtonService>}
+    {ttsButton && <ButtonService status={ttsStatus} tooltip={t('tts.title')} onClick={handleSwitchTTS} ><RiChatVoiceFill /></ButtonService>}
+    {translationButton && <ButtonService status={translationStatus} tooltip={t('transl.title')} onClick={handleSwitchTranslation} ><RiTranslate2 /></ButtonService>}
   </div>
 }
 
 const WindowActions: FC = () => {
+  const {t} = useTranslation();
   const handleMinimize = () => window.Config.isApp() && appWindow.minimize();
   const handleMaximize = async () => {
     const state = await appWindow.isMaximized();
@@ -138,7 +141,7 @@ const WindowActions: FC = () => {
   }
 
   return <div className="flex z-0 pointer-events-auto items-center space-x-2">
-    <Button tooltip={alwaysOnTop ? "Unpin window" : "Pin window on top"} onClick={handlePin}>{alwaysOnTop ? <RiPushpin2Fill /> : <RiPushpinFill />}</Button>
+    <Button tooltip={alwaysOnTop ? t('main.btn_unpin_window') : t('main.btn_pin_window')} onClick={handlePin}>{alwaysOnTop ? <RiPushpin2Fill /> : <RiPushpinFill />}</Button>
     <button className="btn btn-ghost btn-sm btn-square" onClick={handleMinimize}><VscChromeMinimize /></button>
     <button className="btn btn-ghost btn-sm btn-square" onClick={handleMaximize}><VscChromeMaximize /></button>
     <button className="btn btn-ghost btn-sm btn-square" onClick={handleClose}><VscChromeClose /></button>

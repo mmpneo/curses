@@ -16,6 +16,7 @@ import classNames                 from "classnames";
 import { RiCheckFill }                    from "react-icons/ri";
 import BackgroundInput                    from "./background-input";
 import RecordingAlerts from "./recording-alerts";
+import { useTranslation } from "react-i18next";
 
 const EditorView: FC = () => {
   const { showOverlay } = useSnapshot(window.ApiServer.state);
@@ -65,7 +66,6 @@ const ShortcutRecorder: FC = () => {
       exit={{ opacity: 0 }}
       transition={{ ease: "anticipate", duration: 0.3 }}
       className="fixed inset-0 z-50 bg-base-300/90 flex flex-col space-y-5 items-center justify-center">
-      {/* <span className="text-2xl">Recording hotkey</span> */}
       <span className={classNames("font-bold text-5xl", { "opacity-50": !currentValue })}>{currentValue || "Listening for input.."}</span>
       <div className="flex space-x-2">
         <button className="btn btn-sm btn-ghost gap-2 leading-none items-center" onClick={() => window.ApiServer.keyboard.cancelComboRecord()}>Cancel</button>
@@ -108,6 +108,7 @@ export const EditorViewport: FC = () => {
 }
 
 const STTInput: FC = () => {
+  const {t} = useTranslation();
   const [inputValue, setInputValue] = useState('');
   const submit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -121,6 +122,7 @@ const STTInput: FC = () => {
     window.ApiShared.pubsub.publishText(TextEventSource.textfield, { type: TextEventType.interim, value });
     setInputValue(value);
   }
+  // console.log($t('test'))
 
   return <motion.div
     key="overlay-input"
@@ -131,7 +133,7 @@ const STTInput: FC = () => {
     className="flex items-center space-x-2 w-96">
     {/* <button className="btn btn-circle btn-ghost"><RiChatDeleteFill/></button> */}
     <form onSubmit={submit} className="w-full">
-      <input type="text" autoComplete="off" name="sttinput" placeholder="Type something and press [Enter]" className="w-full textarea" value={inputValue} onChange={e => handleChange(e.target.value)} />
+      <input type="text" autoComplete="off" name="sttinput" placeholder={t('main.keyboard_input')} className="w-full textarea" value={inputValue} onChange={e => handleChange(e.target.value)} />
     </form>
   </motion.div>
 }

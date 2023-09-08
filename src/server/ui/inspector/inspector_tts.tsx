@@ -11,6 +11,7 @@ import ServiceButton from "../service-button";
 import Inspector from "./components";
 import { InputCheckbox, InputMapObject, InputMappedGroupSelect, InputNativeAudioOutput, InputRange, InputSelect, InputSelectOption, InputText, InputTextSource } from "./components/input";
 import classNames from "classnames";
+import { useTranslation } from "react-i18next";
 
 type WindowsToken = {
   id: string;
@@ -18,6 +19,7 @@ type WindowsToken = {
 }
 type WindowsConfig = { devices: WindowsToken[], voices: WindowsToken[] };
 const Windows: FC = () => {
+  const {t} = useTranslation();
   const data = useSnapshot(window.ApiServer.state.services.tts.data.windows);
   const handleUpdate = <K extends keyof TTS_State["windows"]>(key: K, v: TTS_State["windows"][K]) => window.ApiServer.patchService("tts", s => s.data.windows[key] = v);
 
@@ -28,40 +30,42 @@ const Windows: FC = () => {
   }, []);
 
   return <>
-    <Inspector.SubHeader>WindowsTTS options</Inspector.SubHeader>
+    <Inspector.SubHeader>{t('tts.windows_title')}</Inspector.SubHeader>
     <InputSelect
       value={data.device}
       onValueChange={e => handleUpdate("device", e)}
       options={config?.devices.map(d => ({label: d.label, value: d.id })) || []}
-      label="Audio output" />
+      label="common.field_output_device" />
     {/* <InputNativeAudioOutput label="Audio Output" value={pr.device} onChange={e => handleUpdate("device", e)} /> */}
     <InputSelect
       value={data.voice}
       onValueChange={e => handleUpdate("voice", e)}
       options={config?.voices.map(d => ({ ...d, value: d.id })) || []}
-      label="Voice" />
-    <InputRange value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} label={`Volume (${data.volume})`} step="0.05" min="0" max="1" />
-    <InputRange value={data.rate} onChange={e => handleUpdate("rate", e.target.value)} label={`Rate (${data.rate})`} step="0.05" min="0.1" max="5" />
+      label="tts.field_voice" />
+    <InputRange value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} label="common.field_volume" step="0.05" min="0" max="1" />
+    <InputRange value={data.rate} onChange={e => handleUpdate("rate", e.target.value)} label="common.field_rate" step="0.05" min="0.1" max="5" />
   </>
 }
 
 const TikTok: FC = () => {
+  const {t} = useTranslation();
   const data = useSnapshot(window.ApiServer.state.services.tts.data.tiktok);
   const handleUpdate = <K extends keyof TTS_State["tiktok"]>(key: K, v: TTS_State["tiktok"][K]) => window.ApiServer.patchService("tts", s => s.data.tiktok[key] = v);
   return <>
-    <Inspector.SubHeader>TikTok options</Inspector.SubHeader>
-    <InputNativeAudioOutput label="Audio Output" value={data.device} onChange={e => handleUpdate("device", e)} />
+    <Inspector.SubHeader>{t("tts.tiktok_title")}</Inspector.SubHeader>
+    <InputNativeAudioOutput label="common.field_output_device" value={data.device} onChange={e => handleUpdate("device", e)} />
     <InputSelect
       value={data.voice}
       onValueChange={e => handleUpdate("voice", e)}
       options={tiktokVoices}
-      label="Voice" />
-    <InputRange value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} label={`Volume (${data.volume})`} step="0.05" min="0" max="1" />
+      label="tts.field_voice" />
+    <InputRange value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} label="common.field_volume" step="0.05" min="0" max="1" />
     {/* <InputRange value={data.rate} onChange={e => handleUpdate("rate", e.target.value)} label={`Rate (${data.rate})`} step="0.05" min="0.1" max="5" /> */}
   </>
 }
 
 const Native: FC = () => {
+  const {t} = useTranslation();
   const data = useSnapshot(window.ApiServer.state.services.tts.data.native);
   const handleUpdate = <K extends keyof TTS_State["native"]>(key: K, v: TTS_State["native"][K]) => window.ApiServer.patchService("tts", s => s.data.native[key] = v);
   const state = useSnapshot(window.ApiServer.tts.serviceState);
@@ -83,22 +87,23 @@ const Native: FC = () => {
   }, []);
 
   return <>
-    <Inspector.SubHeader>Native options</Inspector.SubHeader>
+    <Inspector.SubHeader>{t('tts.native_title')}</Inspector.SubHeader>
     <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
       <InputSelect
         value={data.voice}
         onValueChange={e => handleUpdate("voice", e)}
         options={voices}
-        label="Voice" />
+        label="tts.field_voice" />
     </Inspector.Deactivatable>
 
-    <InputRange value={data.pitch} onChange={e => handleUpdate("pitch", e.target.value)} label={`Pitch (${data.pitch})`} step="0.1" min="0" max="2" />
-    <InputRange value={data.rate} onChange={e => handleUpdate("rate", e.target.value)} label={`Rate (${data.rate})`} step="0.1" min="0.1" max="10" />
-    <InputRange value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} label={`Volume (${data.volume})`} step="0.05" min="0" max="1" />
+    <InputRange value={data.pitch} onChange={e => handleUpdate("pitch", e.target.value)} label="common.field_pitch" step="0.1" min="0" max="2" />
+    <InputRange value={data.rate} onChange={e => handleUpdate("rate", e.target.value)} label="common.field_rate" step="0.1" min="0.1" max="10" />
+    <InputRange value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} label="common.field_volume" step="0.05" min="0" max="1" />
   </>
 }
 
 const Azure: FC = () => {
+  const {t} = useTranslation();
   const data = useSnapshot(window.ApiServer.state.services.tts.data.azure);
   const handleUpdate = <K extends keyof TTS_State["azure"]>(key: K, v: TTS_State["azure"][K]) => window.ApiServer.state.services.tts.data.azure[key] = v;
   const state = useSnapshot(window.ApiServer.tts.serviceState);
@@ -127,22 +132,22 @@ const Azure: FC = () => {
   }, [data.language, data.voice]);
 
   return <>
-    <Inspector.SubHeader>Azure options</Inspector.SubHeader>
+    <Inspector.SubHeader>{t('tts.azure_title')}</Inspector.SubHeader>
     <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
-      <InputNativeAudioOutput label="Audio Output" value={data.device} onChange={e => handleUpdate("device", e)} />
-      <InputText type="password" label="Key" value={data.key} onChange={e => handleUpdate("key", e.target.value)} />
-      <InputText type="password" label="Location" value={data.location} onChange={e => handleUpdate("location", e.target.value)} />
+      <InputNativeAudioOutput label="common.field_output_device" value={data.device} onChange={e => handleUpdate("device", e)} />
+      <InputText type="password" label="tts.azure_key" value={data.key} onChange={e => handleUpdate("key", e.target.value)} />
+      <InputText type="password" label="tts.azure_location" value={data.location} onChange={e => handleUpdate("location", e.target.value)} />
     </Inspector.Deactivatable>
 
     <InputMappedGroupSelect
-      labelGroup="Language"
-      labelOption="Voice"
+      labelGroup="common.field_language"
+      labelOption="common.field_dialect"
       value={{ group: data.language, option: data.voice }}
       onChange={updateVoice}
       library={azureVoices} />
 
-    {voiceStyles.length > 0 && <InputSelect value={data.voiceStyle} options={voiceStyles} label="Voice Style" onValueChange={e => handleUpdate("voiceStyle", e)} />}
-    {voiceRoles.length > 0 && <InputSelect value={data.voiceRole} options={voiceRoles} label="Voice Role" onValueChange={e => handleUpdate("voiceRole", e)} />}
+    {voiceStyles.length > 0 && <InputSelect value={data.voiceStyle} options={voiceStyles} label="tts.azure_voice_style" onValueChange={e => handleUpdate("voiceStyle", e)} />}
+    {voiceRoles.length > 0 && <InputSelect value={data.voiceRole} options={voiceRoles} label="tts.azure_voice_role" onValueChange={e => handleUpdate("voiceRole", e)} />}
     <InputSelect options={[
       { label: "silent", value: "silent" },
       { label: "x-soft", value: "x-soft" },
@@ -151,7 +156,7 @@ const Azure: FC = () => {
       { label: "loud", value: "loud" },
       { label: "x-loud", value: "x-loud" },
       { label: "default", value: "default" }
-    ]} label="Voice volume" value={data.voiceVolume} onValueChange={e => handleUpdate("voiceVolume", e)} />
+    ]} label="tts.azure_voice_volume" value={data.voiceVolume} onValueChange={e => handleUpdate("voiceVolume", e)} />
     <InputSelect options={[
       { label: "x-slow", value: "x-slow" },
       { label: "slow", value: "slow" },
@@ -159,7 +164,7 @@ const Azure: FC = () => {
       { label: "fast", value: "fast" },
       { label: "x-fast", value: "x-fast" },
       { label: "default", value: "default" },
-    ]} label="Voice rate" value={data.voiceRate} onValueChange={e => handleUpdate("voiceRate", e)} />
+    ]} label="tts.azure_voice_rate" value={data.voiceRate} onValueChange={e => handleUpdate("voiceRate", e)} />
     <InputSelect options={[
       { label: "x-low", value: "x-low" },
       { label: "low", value: "low" },
@@ -167,7 +172,7 @@ const Azure: FC = () => {
       { label: "high", value: "high" },
       { label: "x-high", value: "x-high" },
       { label: "default", value: "default" },
-    ]} label="Voice pitch" value={data.voicePitch} onValueChange={e => handleUpdate("voicePitch", e)} />
+    ]} label="tts.azure_voice_pitch" value={data.voicePitch} onValueChange={e => handleUpdate("voicePitch", e)} />
     <InputSelect options={[
       { label: "x-low", value: "x-low" },
       { label: "low", value: "low" },
@@ -175,8 +180,8 @@ const Azure: FC = () => {
       { label: "high", value: "high" },
       { label: "x-high", value: "x-high" },
       { label: "default", value: "default" },
-    ]} label="Voice range" value={data.voiceRange} onValueChange={e => handleUpdate("voiceRange", e)} />
-    <InputRange value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} label={`Volume (${data.volume})`} step="0.05" min="0" max="1" />
+    ]} label="tts.azure_voice_range" value={data.voiceRange} onValueChange={e => handleUpdate("voiceRange", e)} />
+    <InputRange value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} label="common.field_volume" step="0.05" min="0" max="1" />
     {/* <InputRange value={data.rate} onChange={e => handleUpdate("rate", e.target.value)} label={`Rate (${data.rate})`} step="0.05" min="0.1" max="5" /> */}
   </>
 }
@@ -248,6 +253,7 @@ const uberduckVoices = proxy<{value: InputSelectOption[]}>({
 });
 
 const UberDuck: FC = () => {
+  const {t} = useTranslation();
   const data = useSnapshot(window.ApiServer.state.services.tts.data.uberduck);
   const state = useSnapshot(window.ApiServer.tts.serviceState);
   const handleUpdate = <K extends keyof TTS_State["uberduck"]>(key: K, v: TTS_State["uberduck"][K]) => window.ApiServer.patchService("tts", s => s.data.uberduck[key] = v);
@@ -272,47 +278,39 @@ const UberDuck: FC = () => {
       loadVoices();
   }, []);
   return <>
-    <Inspector.SubHeader>Uberduck options</Inspector.SubHeader>
+    <Inspector.SubHeader>{t('tts.uberduck_title')}</Inspector.SubHeader>
     <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
-      <InputNativeAudioOutput label="Audio Output" value={data.device} onChange={e => handleUpdate("device", e)} />
-      <InputText label="API Key" value={data.api_key} onChange={e => handleUpdate("api_key", e.target.value)} />
-      <InputText label="Secret" type="password" value={data.secret_key} onChange={e => handleUpdate("secret_key", e.target.value)} />
+      <InputNativeAudioOutput label="common.field_output_device" value={data.device} onChange={e => handleUpdate("device", e)} />
+      <InputText label="tts.uberduck_api_key" value={data.api_key} onChange={e => handleUpdate("api_key", e.target.value)} />
+      <InputText label="tts.uberduck_secret" type="password" value={data.secret_key} onChange={e => handleUpdate("secret_key", e.target.value)} />
       <Inspector.Description>
         <span className="text-base-content/60 text-xs mt-2">
-          Voices can be loaded only with valid API key and secret.<br/>
-          Preview available voices at <a className="link link-primary link-hover" target="_blank" href="https://app.uberduck.ai/speak#mode=tts-reference&voice=zwf">app.uberduck.ai</a>
+          {t('tts.uberduck_voice_desc')}<br/>
+          <a className="link link-primary link-hover" target="_blank" href="https://app.uberduck.ai/speak#mode=tts-reference&voice=zwf">{t('tts.uberduck_voice_desc_link')}</a>
         </span>
       </Inspector.Description>
       <InputSelect
         value={data.voice}
         onValueChange={e => handleUpdate("voice", e)}
         options={voices as InputSelectOption[]}
-        label="Voice" />
-      <button onClick={loadVoices} className={classNames("btn btn-xs disabled", {loading: loadingVoices, "btn-disabled": !data.api_key || !data.secret_key})}>{loadingVoices ? "Updating voices" : "Reload voices"}</button>
-      <InputRange value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} label={`Volume (${data.volume})`} step="0.05" min="0" max="1" />
+        label="tts.field_voice" />
+      <button onClick={loadVoices} className={classNames("btn btn-xs disabled", {loading: loadingVoices, "btn-disabled": !data.api_key || !data.secret_key})}>{loadingVoices ? t('tts.uberduck_voice_status_updating') : t('tts.uberduck_voice_status_reload')}</button>
+      <InputRange label="common.field_volume" value={data.volume} onChange={e => handleUpdate("volume", e.target.value)} step="0.05" min="0" max="1" />
     </Inspector.Deactivatable>
   </>
 }
 
-const serviceOptions = [
-  { label: "Native", value: TTS_Backends.native },
-  { label: "Windows", value: TTS_Backends.windows },
-  { label: "Azure", value: TTS_Backends.azure },
-  { label: "TikTok", value: TTS_Backends.tiktok },
-  { label: "Uberduck", value: TTS_Backends.uberduck },
-  // { label: "VoiceVox", value: TTS_Backends.voicevox },
-]
-
 const WordsReplacementModal: FC = () => {
+  const {t} = useTranslation();
   const data = useSnapshot(window.ApiServer.state.services.tts);
   const up = <K extends keyof TTS_State>(key: K, v: TTS_State[K]) => window.ApiServer.patchService("tts", s => s.data[key] = v);
 
   return <Modal.Body width={420}>
-    <Modal.Header>TTS Word replacements</Modal.Header>
+    <Modal.Header>{t('word_replacements.title')}</Modal.Header>
     <Modal.Content>
       <div className="p-4">
-        <InputCheckbox label="Ignore letter case" value={data.data.replaceWordsIgnoreCase} onChange={v => up("replaceWordsIgnoreCase", v)}/>
-        <InputMapObject keyPlaceholder="Word" valuePlaceholder="Replacement" addLabel="Add word" value={{...data.data.replaceWords}} onChange={e => up("replaceWords", e)} label="" />
+        <InputCheckbox label="word_replacements.field_ignore_case" value={data.data.replaceWordsIgnoreCase} onChange={v => up("replaceWordsIgnoreCase", v)}/>
+        <InputMapObject keyPlaceholder={t('word_replacements.label_dictionary_key')} valuePlaceholder={t('word_replacements.label_dictionary_value')} addLabel="Add word" value={{...data.data.replaceWords}} onChange={e => up("replaceWords", e)} label="" />
       </div>
     </Modal.Content>
   </Modal.Body>
@@ -320,6 +318,7 @@ const WordsReplacementModal: FC = () => {
 NiceModal.register('tts-replacements', (props) => <Modal.Base {...props}><WordsReplacementModal /></Modal.Base>);
 
 const Inspector_TTS: FC = () => {
+  const {t} = useTranslation();
   const data = useSnapshot(window.ApiServer.state.services.tts);
   const up = <K extends keyof TTS_State>(key: K, v: TTS_State[K]) => window.ApiServer.patchService("tts", s => s.data[key] = v);
   const handleStart = (v: boolean) => window.ApiServer.state.services.tts.showActionButton = v;
@@ -329,15 +328,22 @@ const Inspector_TTS: FC = () => {
   }
 
   return <Inspector.Body>
-    <Inspector.Header><RiChatVoiceFill /> Text to Speech</Inspector.Header>
+    <Inspector.Header><RiChatVoiceFill /> {t('tts.title')}</Inspector.Header>
     <Inspector.Content>
-      <InputCheckbox label="Add to action bar" value={data.showActionButton} onChange={handleStart} />
-      <InputCheckbox label="Auto start" value={data.data.autoStart} onChange={e => up("autoStart", e)} />
-      <span className="link link-accent link-hover font-semibold flex items-center gap-2 text-sm" onClick={handleShowReplacements}><RiCharacterRecognitionFill/> Edit word replacements</span>
+      <InputCheckbox label="common.field_action_bar" value={data.showActionButton} onChange={handleStart} />
+      <InputCheckbox label="common.field_auto_start" value={data.data.autoStart} onChange={e => up("autoStart", e)} />
+      <span className="link link-accent link-hover font-semibold flex items-center gap-2 text-sm" onClick={handleShowReplacements}><RiCharacterRecognitionFill/> {t('common.btn_edit_replacements')}</span>
       <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
-        <InputTextSource label="Source" value={data.data.source} onChange={e => up("source", e)} />
-        <InputCheckbox label="Text field" value={data.data.inputField} onChange={e => up("inputField", e)} />
-        <InputSelect value={data.data.backend} options={serviceOptions} label="Service" onValueChange={e => up("backend", e as TTS_Backends)} />
+        <InputTextSource label="common.field_text_source" value={data.data.source} onChange={e => up("source", e)} />
+        <InputCheckbox label="common.field_use_keyboard_input" value={data.data.inputField} onChange={e => up("inputField", e)} />
+        <InputSelect label="common.field_service" value={data.data.backend} options={[
+          { label: "Native", value: TTS_Backends.native },
+          { label: "Windows", value: TTS_Backends.windows },
+          { label: "Azure", value: TTS_Backends.azure },
+          { label: "TikTok", value: TTS_Backends.tiktok },
+          { label: "Uberduck", value: TTS_Backends.uberduck },
+          // { label: "VoiceVox", value: TTS_Backends.voicevox },
+        ]} onValueChange={e => up("backend", e as TTS_Backends)} />
       </Inspector.Deactivatable>
       {data.data.backend === TTS_Backends.windows && <Windows />}
       {data.data.backend === TTS_Backends.azure && <Azure />}
