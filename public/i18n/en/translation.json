@@ -133,6 +133,7 @@
     "section_template": "Template",
     "section_link_apps": "Link apps",
     "section_link_apps_desc": "Sync text events with remote app instance",
+    "btn_import_translation": "Import translation",
     "btn_import_template": "Import",
     "btn_export_template": "Export",
     "btn_copy_address": "Copy my address",

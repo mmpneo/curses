@@ -12,7 +12,7 @@ import ServiceButton from "../service-button";
 import Inspector from "./components";
 import { InputChips, InputNetworkStatus, InputSelect, InputShortcut, InputText } from "./components/input";
 import { useTranslation } from "react-i18next";
-import { i18nLanguages } from "@/i18n";
+import { i18nLanguages, loadLanguageFile } from "@/i18n";
 const themesLight = [
   'light',
   'lofi',
@@ -92,6 +92,7 @@ const Inspector_Settings: FC = memo(() => {
 
   const handleChangeTheme = (v: string) => window.ApiServer.changeTheme(v);
   const handleChangeLanguage = (v: string) => window.ApiServer.changeLanguage(v);
+
   const handleChangeScale = (v: string | number) => {
     const _v = typeof v === "string" ? parseFloat(v) : v;
     window.ApiServer.changeScale(Math.max(UI_SCALE_MIN, Math.min(UI_SCALE_MAX, _v)));
@@ -126,13 +127,14 @@ const Inspector_Settings: FC = memo(() => {
       <div className="divider"></div>
 
       <InputSelect label="settings.field_app_theme" options={options} value={clientTheme} onValueChange={handleChangeTheme} />
-      <InputSelect label="settings.field_language" options={languageOptions} value={uiLanguage} onValueChange={handleChangeLanguage} />
       <InputChips label="settings.field_ui_scale" value={uiScale} onChange={e => handleChangeScale(e)} options={[
         { label: "S", value: .8 },
         { label: "M", value: 1 },
         { label: "L", value: 1.2 },
         { label: "X", value: 1.4 },
       ]} />
+      <InputSelect label="settings.field_language" options={languageOptions} value={uiLanguage} onValueChange={handleChangeLanguage} />
+      <Inspector.Description><span className="text-primary font-semibold mt-2" onClick={loadLanguageFile}>{t('settings.btn_import_translation')}</span></Inspector.Description>
 
 
       <Inspector.SubHeader>{t('settings.section_template')}</Inspector.SubHeader>
