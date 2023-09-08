@@ -35,10 +35,38 @@ module.exports = {
       "coffee",
       {
         forest: {
-          ...require("daisyui/src/colors/themes")["[data-theme=forest]"],
+          ...require("daisyui/src/theming/themes")["[data-theme=forest]"],
           "base-content": "#f3f3f3",
           "base-100": "#111"
         },
+      },
+      {
+        synthwave: {
+          ...require("daisyui/src/theming/themes")["[data-theme=synthwave]"],
+        "base-100": "#2d1b69",
+        "primary": "#ff2975",
+        "secondary": "#ff901f",
+        "base-content": "#31f9fd"
+        // "base-300": "#0a0718"
+        }
+      },
+      {
+        coffee: {
+          ...require("daisyui/src/theming/themes")["[data-theme=coffee]"],
+          "base-200": "#1b131a",
+        "base-300": "#150f14"
+        }
+      },
+      {
+        night: {
+          ...require("daisyui/src/theming/themes")["[data-theme=night]"],
+        "base-200": "#0b1321",
+        "base-300": "#080f1a",
+        "base-content": "#b3c5ef"
+        // "primary": "#ff2975",
+        // "secondary": "#ff901f",
+        // "base-content": "#31f9fd"
+        }
       },
       {
         curses: {
@@ -73,7 +101,7 @@ module.exports = {
           accent: "#00eb5e",
           "base-content": "#f4e32a",
           "base-100": "#333333",
-          // "base-200": "#070707",
+          "base-200": "#232323",
           "base-300": "#212121",
           neutral: "#272626",
           "neutral-focus": "#343232",

@@ -148,7 +148,7 @@ fieldset > input[type="color"]::-webkit-color-swatch {
 .dropdown {
   min-width: 13rem;
   z-index: 1000;
-  @apply menu menu-compact bg-base-100 w-56 rounded-box font-semibold shadow-lg;
+  @apply menu bg-base-100 w-56 rounded-box font-semibold shadow-lg;
 }
 .dropdown li {
   z-index: 1001;
