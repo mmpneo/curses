@@ -14,6 +14,7 @@ export const zodSTT_Backends = z.nativeEnum(STT_Backends);
 export const Service_STT_Schema = z.object({
   backend: zSafe(zodSTT_Backends, STT_Backends.native),
   autoStart: zSafe(z.coerce.boolean(), false),
+  uwu: zSafe(z.coerce.boolean(), false),
   replaceWords: zSafe(z.record(z.coerce.string(), z.coerce.string()), {}),
   replaceWordsIgnoreCase: zSafe(z.coerce.boolean(), false),
   replaceWordsPreserveCase: zSafe(z.coerce.boolean(), false),

@@ -18,6 +18,8 @@ tauri = { version = "1.4", features = ["dialog-all", "fs-all", "global-shortcut-
 tauri-plugin-window-state = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
 window-shadows = "0.2.0"
 
+uwuify = "^0.2"
+
 itertools = "0.10.5"
 rosc = "0.9.1"
 warp = "0.3.3"

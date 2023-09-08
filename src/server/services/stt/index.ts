@@ -8,6 +8,7 @@ import { STT_AzureService } from "./services/azure";
 import { STT_DeepgramService } from "./services/deepgram";
 import { STT_NativeService } from "./services/native";
 import { STT_SpeechlyService } from "./services/speechly";
+import {invoke} from "@tauri-apps/api/tauri";
 import {
   ISTTReceiver,
   ISTTServiceConstructor,
@@ -138,7 +139,12 @@ class Service_STT implements IServiceInterface, ISTTReceiver {
   }
 
   async #sendFinal(sentence: string) {
-    const value = this.runReplacements(sentence);
+    let value = sentence;
+    if (this.data.uwu) {
+      value = await invoke<string>("plugin:uwu|translate", {value: sentence});
+    }
+
+    value = this.runReplacements(value);
     !this.isMuted() &&
     window.ApiShared.pubsub.publishText(TextEventSource.stt, {
       value,
@@ -151,8 +157,12 @@ class Service_STT implements IServiceInterface, ISTTReceiver {
     this.triggerPendingUnmute();
   }
 
-  #sendInterim(sentence: string) {
-    const value = this.runReplacements(sentence);
+  async #sendInterim(sentence: string) {
+    let value = sentence;
+    if (this.data.uwu) {
+      value = await invoke<string>("plugin:uwu|translate", {value: sentence});
+    }
+    value = this.runReplacements(value);
     !this.isMuted() &&
     window.ApiShared.pubsub.publishText(TextEventSource.stt, {
       value,
