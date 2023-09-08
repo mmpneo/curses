@@ -1,5 +1,3 @@
-import '../i18n';
-
 import Service_Sound from "@/server/services/sound";
 import { InspectorTabPath } from "@/types";
 import { proxy } from "valtio";
@@ -13,6 +11,7 @@ import Service_Translation from "./services/translation";
 import Service_TTS from "./services/tts";
 import Service_Twitch from "./services/twitch";
 import Service_VRC from "./services/vrc";
+import { changeLanguage, initI18n } from '@/i18n';
 
 export enum Services {
   vrc = "vrc",
@@ -87,6 +86,10 @@ class ApiServer {
     this.state.uiScale = value;
     document.documentElement.style.setProperty("--uiscale", value.toString());
   }
+  public changeLanguage(value: string) {
+    this.state.uiLanguage = value;
+    changeLanguage(value);
+  }
 
   public async init() {
     if (window.Config.isClient())
@@ -101,6 +104,7 @@ class ApiServer {
     await this.vrc.init();
     await this.obs.init();
     await this.keyboard.init();
+    await initI18n(this.state.uiLanguage);
     this.changeTheme(this.state.clientTheme);
     this.changeScale(this.state.uiScale);
   }

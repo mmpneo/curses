@@ -81,7 +81,7 @@ const ExportMenu: FC = () => {
 
 const Inspector_Settings: FC = memo(() => {
   const {t} = useTranslation();
-  const { clientTheme, uiScale, backgroundInputTimer } = useSnapshot(window.ApiServer.state);
+  const { clientTheme, uiScale, uiLanguage, backgroundInputTimer } = useSnapshot(window.ApiServer.state);
   const { state: linkStatus } = useSnapshot(window.ApiShared.pubsub.serviceState);
   const author = useGetState(state => state.author);
 
@@ -91,6 +91,7 @@ const Inspector_Settings: FC = memo(() => {
   }, [])
 
   const handleChangeTheme = (v: string) => window.ApiServer.changeTheme(v);
+  const handleChangeLanguage = (v: string) => window.ApiServer.changeLanguage(v);
   const handleChangeScale = (v: string | number) => {
     const _v = typeof v === "string" ? parseFloat(v) : v;
     window.ApiServer.changeScale(Math.max(UI_SCALE_MIN, Math.min(UI_SCALE_MAX, _v)));
@@ -124,9 +125,8 @@ const Inspector_Settings: FC = memo(() => {
       </div>
       <div className="divider"></div>
 
-      {/* <Inspector.SubHeader>UI</Inspector.SubHeader> */}
       <InputSelect label="settings.field_app_theme" options={options} value={clientTheme} onValueChange={handleChangeTheme} />
-      <InputSelect label="settings.field_language" options={languageOptions} value={clientTheme} onValueChange={handleChangeTheme} />
+      <InputSelect label="settings.field_language" options={languageOptions} value={uiLanguage} onValueChange={handleChangeLanguage} />
       <InputChips label="settings.field_ui_scale" value={uiScale} onChange={e => handleChangeScale(e)} options={[
         { label: "S", value: .8 },
         { label: "M", value: 1 },
