@@ -6,6 +6,14 @@ export const i18nLanguages = [
   {
     name: 'English',
     code: 'en'
+  },
+  {
+    name: '简体中文',
+    code: 'zh_cn'
+  },
+  {
+    name: '繁体中文',
+    code: 'zh_tw'
   }
 ]
 
