@@ -8,11 +8,11 @@ export const i18nLanguages = [
     code: 'en'
   },
   {
-    name: '简体中文',
+    name: '中文（简体）',
     code: 'zh_cn'
   },
   {
-    name: '繁体中文',
+    name: '中文（繁体）',
     code: 'zh_tw'
   }
 ]
