@@ -59,13 +59,15 @@ export type WordReplacementsCache = {
 }
 
 export function buildWordReplacementsCache(map: Record<string, string>, caseInsensitive: boolean): WordReplacementsCache {
+  let trimKeys = Object.fromEntries(Object.entries(map).map(([k,v]) => [k.trim(), v]));
+  console.log(trimKeys);
   let _map = {}
   if (caseInsensitive) {
     _map = Object.fromEntries(Object.entries(map).map(([k,v]) => [k.toLowerCase(), v]));
   }
   else
     _map = {...map};
-  let regexp = new RegExp(Object.keys(_map).join("|"), caseInsensitive ? "ig" : "g");
+  let regexp = new RegExp(`\\b(${Object.keys(_map).join("|")})\\b`, caseInsensitive ? "ig" : "g");
   return {
     regexp,
     map: _map,

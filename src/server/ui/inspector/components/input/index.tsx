@@ -452,11 +452,12 @@ export const InputMapObject: FC<ObjectProps> = memo(({ label, onChange, value, .
   const [newValue, setNewValue] = useState<string>("");
 
   const handleAdd = () => {
-    if (!newKey || !newValue || !!value[newKey])
+    const trimmedKey = newKey.trim();
+    if (!trimmedKey || !newValue || !!value[trimmedKey])
       return;
     setNewKey("");
     setNewValue("");
-    onChange({...value, [newKey]: newValue});
+    onChange({...value, [trimmedKey]: newValue});
   };
   const handleRemove = (key: string) => {
     const newVal = produce(value, v => { delete v[key]; });
@@ -510,7 +511,7 @@ const MapRow:FC<MapRowProps> = memo(({keyValue, keyPlaceholder, valuePlaceholder
   const [edit, setEdit] = useState(false);
 
   const handleSave = () => {
-    onChange([newKey, newValue])
+    onChange([newKey.trim(), newValue])
     && setEdit(false);
   }
 
