@@ -236,6 +236,7 @@ interface FileProps extends InputBaseProps {
   onChange: (value: string) => void
 }
 export const InputFile: FC<FileProps> = ({ label, type, onChange, value }) => {
+  const {t} = useTranslation();
   const [file, setFile] = useState<FileState>();
 
   useEffect(() => {
@@ -259,16 +260,16 @@ export const InputFile: FC<FileProps> = ({ label, type, onChange, value }) => {
 
   return <InputContainer label={label} vertical>
     {file && <FileElement actions={[
-      { label: "Clear", fn: () => onChange("") },
-      { label: "Change", fn: handleSelect },
+      { label: t('files.btn_clear_file'), fn: () => onChange("") },
+      { label: t('files.btn_change_file'), fn: handleSelect },
     ]} data={file} />}
     {!file && <div className="flex items-center space-x-2">
       <div onClick={handleAdd} className="cursor-pointer text-base-content p-2 flex-none relative border-2 border-primary/10 border-dashed bg-base-100 rounded-lg w-14 h-14 flex items-center justify-center overflow-hidden">
         <RiUpload2Fill className="text-xl" />
       </div>
       <div className="flex flex-col items-start text-sm">
-        <span className="font-medium link link-accent link-hover" onClick={handleAdd}>Add new file</span>
-        <span className="font-medium">or select from <span onClick={handleSelect} className="link link-accent link-hover">library</span></span>
+        <span className="font-semibold link link-primary link-hover" onClick={handleAdd}>{t('files.add_file')}</span>
+        <span className="font-semibold link link-accent link-hover" onClick={handleSelect}>{t('files.btn_select_library')}</span>
         {/* <button onClick={handleSelect} className="flex-grow btn btn-sm btn-primary">Select existing file</button> */}
       </div>
     </div>}
@@ -284,16 +285,16 @@ export const InputEvent: FC<EventProps> = memo(({ label, value, onChange }) => {
   return <InputSelect options={events} label={label} defaultValue={value} onValueChange={e => onChange(e || "")} />
 });
 
-const sourceOptions = [
-  { label: 'Speech to Text', value: TextEventSource.stt },
-  { label: 'Translation', value: TextEventSource.translation },
-]
 interface TextSourceProps extends InputBaseProps {
   onChange: (value: TextEventSource) => void,
   value: string
 }
 export const InputTextSource: FC<TextSourceProps> = memo(({ label, value, onChange }) => {
-  return <InputSelect label={label} value={value} options={sourceOptions} onValueChange={onChange} />
+  const {t} = useTranslation();
+  return <InputSelect label={label} value={value} options={[
+    { label: t('stt.title'), value: TextEventSource.stt },
+    { label: t('transl.title'), value: TextEventSource.translation },
+  ]} onValueChange={onChange} />
 });
 
 interface CodeProps extends InputBaseProps {
@@ -308,19 +309,20 @@ interface NetworkStatusProps extends InputBaseProps {
   disconnectedLabel?: string
   connectingLabel?: string
 }
-export const InputNetworkStatus: FC<NetworkStatusProps> = ({ label, value, connectedLabel = "Connected", disconnectedLabel = "Disconnected", connectingLabel = "Connecting.." }) => {
+export const InputNetworkStatus: FC<NetworkStatusProps> = ({ label, value, connectedLabel, disconnectedLabel, connectingLabel }) => {
+  const {t} = useTranslation()
   return <InputContainer label={label}>
     <div className="self-end flex space-x-2 items-center pl-2 pr-3 h-8 py-1 rounded-full bg-neutral/50 border-dashed border-neutral">
       {value === ServiceNetworkState.disconnected && <>
-        <span className="text-xs font-semibold text-error leading-none">{disconnectedLabel}</span>
+        <span className="text-xs font-semibold text-error leading-none">{disconnectedLabel || t(`common.status_disconnected`)}</span>
         <div className="rounded-full ring-2 bg-error ring-error ring-offset-base-100 ring-offset-2 w-2 h-2 " />
       </>}
       {value === ServiceNetworkState.connecting && <>
-        <span className="text-xs font-semibold text-neutral leading-none">{connectingLabel}</span>
+        <span className="text-xs font-semibold text-neutral leading-none">{connectingLabel || t(`common.status_connecting`)}</span>
         <div className="rounded-full ring-2 bg-neutral ring-neutral ring-offset-base-100 ring-offset-2 w-2 h-2 " />
       </>}
       {value === ServiceNetworkState.connected && <>
-        <span className="text-xs font-semibold text-success leading-none">{connectedLabel}</span>
+        <span className="text-xs font-semibold text-success leading-none">{connectedLabel || t(`common.status_connected`)}</span>
         <div className="rounded-full ring-2 bg-success ring-success ring-offset-base-100 ring-offset-2 w-2 h-2 " />
       </>}
       {/* {value === ServiceNetworkState.error && <>
@@ -399,6 +401,7 @@ interface FontProps extends InputBaseProps {
   onChange: (value: string) => void
 }
 const FontSelectDropdown: FC<any> = memo(({ onChange, value }) => {
+  const {t} = useTranslation();
   const [name, setName] = useState("");
   const fonts = useSnapshot(window.ApiClient.files.ui.fontFamilies)
 
@@ -411,7 +414,7 @@ const FontSelectDropdown: FC<any> = memo(({ onChange, value }) => {
   }
 
   return <div className="flex flex-col space-y-2 bg-base-100 rounded-box p-4 w-64">
-    <span className="text-xs text-primary font-bold font-header">Available fonts</span>
+    <span className="text-xs text-primary font-bold font-header">{t('font_select.available_fonts')}</span>
     <label className="flex justify-between items-center cursor-pointer">
       <span className="label-text font-semibold" style={{ fontFamily: "Outfit" }}>Outfit</span>
       <input type="radio" name="font" value={value} checked={value === "Outfit"} onChange={e => onChange("Outfit")} className="radio radio-primary" />
@@ -420,13 +423,13 @@ const FontSelectDropdown: FC<any> = memo(({ onChange, value }) => {
       <span className="label-text font-semibold" style={{ fontFamily: font }}>{font}</span>
       <input type="radio" name="font" value={value} checked={value === font} onChange={e => onChange(font)} className="radio radio-primary" />
     </label>)}
-    <span className="text-xs text-primary font-bold font-header pt-4">Install from google fonts</span>
+    <span className="text-xs text-primary font-bold font-header pt-4">{t('font_select.install_google')}</span>
     <div className="input-group w-full">
       <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Font name" className="w-full input input-sm input-bordered" />
       <button className="btn btn-sm btn-square" onClick={handleInstallGFonts}>+</button>
     </div>
-    <span className="text-xs text-base-content/50">Find font at <a className="link link-primary link-hover font-medium" target="_blank" href="https://fonts.google.com/">Google Fonts</a> and copypaste its name here</span>
-    <button className="btn btn-sm btn-primary" onClick={handleInstallDrive}>Install from file system</button>
+    <span className="text-xs text-base-content/50">{t('font_select.install_google_desc')} <a className="link link-primary link-hover font-medium" target="_blank" href="https://fonts.google.com/">Font list</a></span>
+    <button className="btn btn-sm btn-primary" onClick={handleInstallDrive}>{t('font_select.btn_install')}</button>
   </div>
 })
 export const InputFont: FC<FontProps> = memo(({ label, ...rest }) => {
@@ -448,6 +451,7 @@ interface ObjectProps extends InputBaseProps {
   addLabel?: string
 }
 export const InputMapObject: FC<ObjectProps> = memo(({ label, onChange, value, ...rest }) => {
+  const {t} = useTranslation();
   const [newKey, setNewKey] = useState<string>("");
   const [newValue, setNewValue] = useState<string>("");
 
@@ -491,7 +495,7 @@ export const InputMapObject: FC<ObjectProps> = memo(({ label, onChange, value, .
       <div className="flex space-x-2">
         <InputBaseText fieldWidth={false} className="w-full" placeholder={rest.keyPlaceholder || "Key"} value={newKey} onChange={e => setNewKey(e.target.value)} />
         <InputBaseText fieldWidth={false} className="w-full" placeholder={rest.valuePlaceholder || "Value"} value={newValue} onChange={e => setNewValue(e.target.value)} />
-        <Tooltip placement="top" content="Add record"><button className="btn btn-sm btn-primary btn-outline flex-nowrap whitespace-nowrap gap-1" onClick={handleAdd}><RiAddCircleFill size={18} /> add</button></Tooltip>
+        <button className="btn btn-sm btn-primary btn-outline flex-nowrap whitespace-nowrap gap-1" onClick={handleAdd}><RiAddCircleFill size={18} /> {t('common.btn_add')}</button>
       </div>
     </div>
   </InputContainer>

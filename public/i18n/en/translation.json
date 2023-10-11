@@ -31,7 +31,13 @@
     "btn_disconnect": "Disconnect",
     "btn_start": "Start",
     "btn_stop": "Stop",
-    "btn_copy": "Copy"
+    "btn_copy": "Copy",
+    "status_connected": "Connected",
+    "status_disconnected": "Disconnected",
+    "status_connecting": "Connecting",
+    "status_error": "Error",
+    "status_online": "Online",
+    "status_offline": "Offline"
   },
   "main": {
     "btn_show_logs": "Show logs",
@@ -56,6 +62,8 @@
   "stt": {
     "title": "Speech to text",
     "field_enable_interim_results": "Enable interim results",
+    "field_uwu_filter": "UwU filter",
+    "field_uwu_filter_desc": "Only works with English (* ^ ω ^)!!1",
     "state_muted": "Muted",
     "state_": "Muted",
 
@@ -346,9 +354,18 @@
     "type_sound": "Sound",
     "type_font": "Font",
     "btn_copy_reference": "Copy reference",
-    "btn_uninstall_font": "Uninstall font"
+    "btn_uninstall_font": "Uninstall font",
+    "btn_select_library": "Select from library",
+    "btn_change_file": "Change file",
+    "btn_clear_file": "Clear"
   },
   "select_file": {
     "title": "Select file"
+  },
+  "font_select": {
+    "available_fonts": "Available fonts",
+    "install_google": "Install from google fonts",
+    "install_google_desc": "Find font at Google Fonts and copypaste it's name here.",
+    "btn_install": "Install from file system"
   }
 }

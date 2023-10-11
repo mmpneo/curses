@@ -82,7 +82,7 @@ const Inspector_Twitch: FC = () => {
 
       {!user && <button className="btn gap-2 border-none" style={{backgroundColor: "#9147ff", color: "#fff"}} onClick={handleLogin}><SiTwitch size={20}/> {t('twitch.btn_login')}</button>}
       <Inspector.Switchable visible={!!user}>
-        <InputNetworkStatus label="twitch.status_stream" connectedLabel="Live" disconnectedLabel="Offline" value={liveStatus} />
+        <InputNetworkStatus label="twitch.status_stream" connectedLabel={t('common.status_online')} disconnectedLabel={t('common.status_offline')} value={liveStatus} />
         <InputNetworkStatus label="twitch.status_chat" value={chatState.connection} />
         <InputCheckbox label="twitch.field_enable_chat" value={pr.chatEnable} onChange={e => up("chatEnable", e)} />
         <Inspector.Switchable visible={pr.chatEnable}>

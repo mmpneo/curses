@@ -15,7 +15,7 @@ const Azure: FC = memo(() => {
   const up = <K extends keyof Translation_State["azure"]>(key: K, v: Translation_State["azure"][K]) => window.ApiServer.state.services.translation.data.azure[key] = v;
 
   return <>
-    <Inspector.SubHeader>Azure options</Inspector.SubHeader>
+    <Inspector.SubHeader>{t('transl.azure_title')}</Inspector.SubHeader>
     <InputText label="transl.azure_key" type="password" value={pr.key} onChange={e => up("key", e.target.value)} />
     <InputText label="transl.azure_location" value={pr.location} onChange={e => up("location", e.target.value)} />
     <InputSelect 

@@ -26,8 +26,9 @@ const Button: BtnProps<{ tooltip: string, body?: ReactNode }> = ({ tooltip, body
 }
 
 const ButtonService: BtnProps<{ status: ServiceNetworkState, tooltip: string, body?: ReactNode }> = ({ status, tooltip, body, children, ...rest }) => {
+  const {t} = useTranslation();
   const classes = status === ServiceNetworkState.connected ? "btn-success" : status === ServiceNetworkState.connecting ? "btn-neutral" : "btn-ghost"
-  return <Tooltip className="flex-none" content={tooltip} body={status}>
+  return <Tooltip className="flex-none" content={tooltip} body={t(`common.status_${status}`)}>
     <button {...rest} className={classNames("btn border-2 h-10 min-h-fit text-xl w-10 btn-square flex items-center justify-center", classes, { "loading": status === ServiceNetworkState.connecting })}>
       {status !== ServiceNetworkState.connecting && children}
     </button>

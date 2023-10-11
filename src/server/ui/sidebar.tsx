@@ -23,9 +23,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 
 const SideBarButtonBase: FC<PropsWithChildren<Omit<ButtonProps, "tab"> & { active?: boolean }>> = memo(({ status, active, tooltip, children, ...props }) => {
+  const {t} = useTranslation();
   const { expand } = useSnapshot(window.ApiServer.ui.sidebarState);
   const activeStyles = active ? "btn-secondary" : "btn-ghost";
-  return <Tooltip body={status === ServiceNetworkState.connected ? "Connected" : ""} enable={!expand} placement="right" className="relative" content={tooltip}>
+  return <Tooltip body={status === ServiceNetworkState.connected ? t('common.status_connected') : ""} enable={!expand} placement="right" className="relative" content={tooltip}>
     <button {...props} className={classNames("w-full btn border-none justify-start min-h-fit h-auto flex-nowrap whitespace-nowrap px-0 gap-1", activeStyles)}>
       <div className="flex flex-none w-10 h-10 items-center justify-center text-xl">
         {children}
