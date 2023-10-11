@@ -39,7 +39,7 @@
     "nanoid": "^4.0.0",
     "obs-websocket-js": "^5.0.3",
     "peerjs": "^1.5.0",
-    "postcss": "^8.4.19",
+    "postcss": "^8.4.31",
     "pubsub-js": "^1.9.4",
     "react": "^18.2.0",
     "react-ace": "^10.1.0",
