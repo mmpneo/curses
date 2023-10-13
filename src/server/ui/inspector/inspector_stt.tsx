@@ -215,8 +215,8 @@ const Inspector_STT: FC = () => {
 
       {data.data.backend !== STT_Backends.browser && <ServiceButton status={state.status} onStart={() => window.ApiServer.stt.start()} onStop={() => window.ApiServer.stt.stop()} />}
       <div className="pt-8">
-        <InputCheckbox label="♡UωU♡ phiwtwe" onChange={e => up("uwu", e)} value={data.data.uwu} />
-        <Inspector.Description>Engwish o-onwy〜☆  p-pwease (* ^ ω ^)!!1</Inspector.Description>
+        <InputCheckbox label='stt.field_uwu_filter' onChange={e => up("uwu", e)} value={data.data.uwu} />
+        <Inspector.Description>{t('stt.field_uwu_filter_desc')}</Inspector.Description>
       </div>
     </Inspector.Content>
   </Inspector.Body>
