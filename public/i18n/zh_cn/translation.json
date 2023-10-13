@@ -31,7 +31,13 @@
     "btn_disconnect": "断开连接",
     "btn_start": "开始",
     "btn_stop": "停止",
-    "btn_copy": "复制"
+    "btn_copy": "复制",
+    "status_connected": "连接",
+    "status_disconnected": "断开连接",
+    "status_connecting": "正在连接...",
+    "status_error": "错误",
+    "status_online": "在线",
+    "status_offline": "离线"
   },
   "main": {
     "btn_show_logs": "显示日志",
@@ -56,6 +62,8 @@
   "stt": {
     "title": "语音转文本",
     "field_enable_interim_results": "启用临时结果",
+    "field_uwu_filter": "生成颜文字",
+    "field_uwu_filter_desc": "只能在英语下使用 (* ^ ω ^)!!1",
     "state_muted": "静音",
     "state_": "静音",
 
@@ -346,9 +354,18 @@
     "type_sound": "声音",
     "type_font": "字体",
     "btn_copy_reference": "复制索引",
-    "btn_uninstall_font": "卸载字体"
+    "btn_uninstall_font": "卸载字体",
+    "btn_select_library": "从字体库中选择",
+    "btn_change_file": "更改文件",
+    "btn_clear_file": "清除"
   },
   "select_file": {
     "title": "选择文件"
+  },
+  "font_select": {
+    "available_fonts": "可用字体",
+    "install_google": "从 Google 字体安装",
+    "install_google_desc": "在这儿粘贴文字，在 Google 字体中搜索.",
+    "btn_install": "从系统文件安装"
   }
 }
