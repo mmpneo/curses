@@ -145,6 +145,7 @@ const Element_Text: FC<{ id: string }> = memo(({ id }) => {
 
   const onComplete = useCallback(() => {
     isRunning.current = false;
+    sentencesRef.current[sentencesRef.current.length - 1].state.animateEnable = false
     if (sentenceQueue.current.length) // try to dequeue with delay
       setTimeout(() => tryDequeue(), stateRef.current.animateDelaySentence)
     else
