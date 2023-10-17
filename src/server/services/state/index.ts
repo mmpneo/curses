@@ -49,7 +49,7 @@ class Service_State implements IServiceInterface {
     if (!bExists)
       await createDir("user", { dir: BaseDirectory.AppData, recursive: true });
     const value = JSON.stringify(this.state);
-    await writeBinaryFile("user/settings", encoder.encode(value), {dir: BaseDirectory.AppData});
+    await writeBinaryFile("user/settings", encoder.encode(value), {append: false, dir: BaseDirectory.AppData});
   }, 1000);
 }
 export default Service_State;

@@ -150,7 +150,7 @@ class Service_Document implements IServiceInterface {
       ],
     });
     if (path) try {
-      await writeBinaryFile(path, tempEncodedUpdate);
+      await writeBinaryFile(path, tempEncodedUpdate, {append: false});
       // write author to original doc on success
       this.fileBinder.update(a => {a.author = authorName});
     } catch (error) {
@@ -181,7 +181,7 @@ class Service_Document implements IServiceInterface {
     if (!bExists)
       await createDir("user", { dir: BaseDirectory.AppData, recursive: true });
     const data = Y.encodeStateAsUpdate(doc);
-    await writeBinaryFile("user/template", data, {dir: BaseDirectory.AppData});
+    await writeBinaryFile("user/template", data, {append: false, dir: BaseDirectory.AppData});
   }
 
   saveDocument = debounce(() => {
