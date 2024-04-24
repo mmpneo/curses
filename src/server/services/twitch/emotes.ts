@@ -38,37 +38,42 @@ class TwitchEmotesApi {
     );
   }
 
-  scanForEmotes(sentence: string) {
-    const enabled =
-      window.ApiServer.state.services.twitch.data.emotesEnableReplacements;
+  scanForEmotes(sentence: string): Record<number, string> {
+    const enabled = window.ApiServer.state.services.twitch.data.emotesEnableReplacements;
     if (!sentence || !enabled) return {};
 
-    const isSensitive =
-      window.ApiServer.state.services.twitch.data.emotesCaseSensitive;
+    const isSensitive = window.ApiServer.state.services.twitch.data.emotesCaseSensitive;
     let emotes: TextEvent["emotes"] = {};
 
     const wordList = (isSensitive ? sentence : sentence.toLowerCase())
-      .replace(/[^\w ]/g, "")
+      // .replace(/[^\w ]/g, "")
       .split(" ");
 
+    let cursor: number = 0;
     for (let i = 0; i < wordList.length; i++) {
       const word = wordList[i];
+      const clearedWord = word.replace(/[^\w ]/g, "");
 
       // look for replacements
       let replacementKey = isSensitive
-        ? this.#emoteReplacements[word]
-        : this.dictionaryReplacementsLowerCase[word]?.toLowerCase();
+        ? this.#emoteReplacements[clearedWord]
+        : this.dictionaryReplacementsLowerCase[clearedWord]?.toLowerCase();
 
       const targetDictionary = isSensitive
         ? this.dictionary
         : this.dictionaryLowerCase;
 
       if (!!replacementKey && replacementKey in targetDictionary) {
-        // replacement -> emote
-        emotes[i] = targetDictionary[replacementKey];
-      } else if (word in targetDictionary) {
-        emotes[i] = targetDictionary[word];
+        // for animation cursors
+        emotes[cursor] = targetDictionary[replacementKey];
+        // for replaceAll
+        emotes[replacementKey] = targetDictionary[replacementKey]
+      } else if (clearedWord in targetDictionary) {
+        emotes[cursor] = targetDictionary[clearedWord];
+        emotes[clearedWord] = targetDictionary[clearedWord];
       }
+
+      cursor += word.length + 1;
     }
     return emotes;
   }
