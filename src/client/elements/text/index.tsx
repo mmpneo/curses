@@ -1,335 +1,419 @@
-import classNames from "classnames";
-import produce from "immer";
-import { nanoid } from "nanoid";
-import { FC, memo, PropsWithChildren, useCallback, useEffect, useRef, useState } from "react";
-import { useMeasure, useTimeoutFn } from "react-use";
-import { useSnapshot } from "valtio";
+import fastEqual from "fast-deep-equal";
+import { FC, memo, useEffect, useRef } from "react";
+import { subscribe, useSnapshot } from "valtio";
 import { useGetState } from "../..";
 import { TextEvent, TextEventSource, TextEventType } from "../../../types";
 import { Element_TextState } from "./schema";
-import TextSentence, { TextSentenceTest } from "./sentence";
-import { sentenceCtx, TextSentenceData } from "./shared";
-import { elementStyle } from "./style";
+import { buildStateStyle, elementStyle } from "./style";
 
+type SentenceState = {
+  type: TextEventType
+  element: HTMLElement
+  text: string
+  cursor: number
+  cursorProfanity: number
+  profanityCursorList: Record<number, any>
+  isAnimated: boolean,
+  emotes: Record<number, string>
+}
+
+class TextController {
+  constructor(private id: string) {}
+
+  private boxElement!: HTMLElement
+  private containerElement!: HTMLElement
+  private scrollContainerElement!: HTMLElement
+  private textElement!: HTMLElement
+  private textEndElement!: HTMLSpanElement
+  private baseStyleElement!: HTMLStyleElement;
+  private stateStyleElement!: HTMLStyleElement;
+
+  private textObserver!: ResizeObserver;
+
+  private eventTextRef: any;
+  private eventTextInputRef: any;
+  private storeEventCancelToken?: () => void;
+  private sceneChangeEventCancelToken?: () => void;
+
+  private currentState!: Element_TextState;
+  private sentenceQueue: SentenceState[] = [];
+
+  private isPlayingAnimation = false;
+
+  private activityTimerHandle: number = -1;
+  private activityTimerDelayClearHandle: number = -1;
+
+  onShow() {
+    if (this.currentState.soundEnable && this.currentState.soundFileOnShow) {
+      window.ApiClient.sound.playFile(this.currentState.soundFileOnShow, {volume: this.currentState.soundVolume ?? 1});
+    }
+  }
+  onHide() {
+    if (this.currentState.soundEnable && this.currentState.soundFileOnHide) {
+      window.ApiClient.sound.playFile(this.currentState.soundFileOnHide, {volume: this.currentState.soundVolume ?? 1});
+    }
+  }
+  onNewSentence() {}
+
+  onActivity() {
+    try {
+      const rect = this.textEndElement.getBoundingClientRect();
+  
+      if (this.currentState.animateEvent) {
+        window.ApiShared.pubsub.publishLocally({ topic: `element.${this.id}` });
+      }
+  
+      if (rect && this.currentState.particlesEnable) {
+        //TODO cache particle config
+        window.ApiClient.particles.emit(rect, {
+          imageIds: [
+            this.currentState.particlesSpriteFileIdFirst,
+            this.currentState.particlesSpriteFileIdSecond,
+            this.currentState.particlesSpriteFileIdThird,
+          ].filter(s => !!s),
+          particlesCountMin: parseFloat(this.currentState.particlesCountMin) || 0,
+          particlesCountMax: parseFloat(this.currentState.particlesCountMax) || 0,
+          particlesDurationMin: parseFloat(this.currentState.particlesDurationMin) || 0,
+          particlesDurationMax: parseFloat(this.currentState.particlesDurationMax) || 0,
+          particlesDirectionXMin: parseFloat(this.currentState.particlesDirectionXMin) || 0,
+          particlesDirectionXMax: parseFloat(this.currentState.particlesDirectionXMax) || 0,
+          particlesDirectionYMin: parseFloat(this.currentState.particlesDirectionYMin) || 0,
+          particlesDirectionYMax: parseFloat(this.currentState.particlesDirectionYMax) || 0,
+          particlesScaleMin: parseFloat(this.currentState.particlesScaleMin) || 1,
+          particlesScaleMax: parseFloat(this.currentState.particlesScaleMax) || 1,
+          particlesRotationMin: parseFloat(this.currentState.particlesRotationMin) || 0,
+          particlesRotationMax: parseFloat(this.currentState.particlesRotationMax) || 0,
+        });
+      }
+  
+      if (this.currentState.soundEnable && this.currentState.soundFile) {
+        window.ApiClient.sound.playFile(this.currentState.soundFile, {
+          volume: this.currentState.soundVolume ?? 1,
+          detuneMin: this.currentState.soundDetuneMin ?? 0,
+          detuneMax: this.currentState.soundDetuneMax ?? 0,
+          playbackMin: this.currentState.soundPlaybackMin ?? 1,
+          playbackMax: this.currentState.soundPlaybackMax ?? 1,
+        });
+      }
+    } catch (error) {
+      
+    }
+  }
+
+  // start/restart activity timer
+  triggerActivity() {
+    // reset timer
+    clearTimeout(this.activityTimerHandle);
+    clearTimeout(this.activityTimerDelayClearHandle);
+
+    // const previewEnabled = this.currentState.previewMode;
+    
+
+    if (!this.boxElement.classList.contains("active")) {
+      this.onShow();
+      this.boxElement.classList.add("active");
+    }
+
+    this.activityTimerHandle = setTimeout(() => {
+      this.boxElement.classList.remove("active");
+
+      this.onHide();
+
+      this.activityTimerDelayClearHandle = setTimeout(() => {
+        this.clearSentences();
+      }, this.currentState.behaviorClearDelay) as unknown as number;
+    }, this.currentState.behaviorClearTimer) as unknown as number;
+  }
+
+  clearSentences() {
+    for (let v of this.sentenceQueue) {
+      v.element.remove();
+    }
+    // this.textElement.replaceChildren();
+    this.sentenceQueue.length = 0;
+  }
+
+  moveCursorToSpaceOrEnd(sentence: SentenceState) {
+    let emoteEndIndex = sentence.text.indexOf(" ", sentence.cursor);
+    if (emoteEndIndex === -1) { // if last
+      emoteEndIndex = sentence.text.length;
+    }
+    sentence.cursor = emoteEndIndex;
+  }
+
+  stepSentenceAnimation(sentence: SentenceState) {
+    // end sentence animation
+    if (sentence.cursor >= sentence.text.length) {
+      sentence.isAnimated = true;
+      this.isPlayingAnimation = false;
+      this.tryAnimateNextSentence();
+      // add space in the end
+      sentence.element.innerHTML += " ";
+      return;
+    }
+
+    this.isPlayingAnimation = true;
+
+    this.triggerActivity();
+    sentence.text[sentence.cursor] !== " " && this.onActivity();
+
+    //profanity mask
+    if (sentence.cursor in sentence.profanityCursorList) {
+      const maskStr: string = this.currentState.textProfanityMask;
+
+      if (this.currentState.animateDelayChar === 0) {
+        sentence.element.innerHTML += `<span class="profanity">${maskStr}</span>`; 
+        this.moveCursorToSpaceOrEnd(sentence);
+      }
+      else {
+        sentence.element.innerHTML += `<span class="profanity">${maskStr[sentence.cursorProfanity]}</span>`; 
+  
+        // finish mask stepping
+        if (sentence.cursorProfanity +1 >= maskStr.length) {
+          this.moveCursorToSpaceOrEnd(sentence);
+          sentence.cursorProfanity = 0;
+        }
+        else {
+          sentence.cursorProfanity++;
+        }
+      }
+    }
+    // insert emote
+    else if (sentence.cursor in sentence.emotes) {
+      sentence.element.innerHTML += `<img src=${sentence.emotes[sentence.cursor]} />`;
+      this.moveCursorToSpaceOrEnd(sentence);
+    }
+    // insert text
+    else {
+      // animate whole word
+      if (this.currentState.animateDelayChar === 0 && sentence.text[sentence.cursor] !== " ") {
+        // skip to next word
+        const wordStart = sentence.cursor;
+        this.moveCursorToSpaceOrEnd(sentence);
+        sentence.element.innerHTML += sentence.text.substring(wordStart, sentence.cursor);
+      }
+      // animate single char
+      else {
+        sentence.element.innerHTML += sentence.text[sentence.cursor];
+        sentence.cursor ++;
+      }
+    }
+
+    setTimeout(() => this.stepSentenceAnimation(sentence), sentence.text[sentence.cursor] === " " ? 
+      this.currentState.animateDelayWord - this.currentState.animateDelayChar :
+      this.currentState.animateDelayChar);
+  }
+
+  tryAnimateNextSentence() {
+    if (this.isPlayingAnimation) {
+      return;
+    }
+
+    const interimIndex = this.sentenceQueue.findIndex(s => !s.isAnimated); // todo cache index
+    if (interimIndex !== -1) {
+      // run animation
+      this.stepSentenceAnimation(this.sentenceQueue[interimIndex]);
+    }
+  }
+
+  enqueueSentence(event: TextEvent) {
+    if (!this.currentState.sourceInterim && event?.type === TextEventType.interim) {
+      return;
+    }
+
+    // insert animated text
+    if (this.currentState.animateEnable) {
+      // ignore interim
+      if (event.type === TextEventType.interim) {
+        return;
+      }
+
+      const sentenceState: SentenceState = {
+        type: event.type,
+        element: document.createElement("span"),
+        text: event.value,
+        cursor: 0,
+        cursorProfanity: 0,
+        profanityCursorList: {},
+        isAnimated: false,
+        emotes: event.emotes
+      }
+
+      // find profanity
+      const maskedValue = event.value.matchAll(/[^\s\.,?!]*\*+[^\s\.,?!]*/gi);
+      for(let v of maskedValue) {
+        sentenceState.profanityCursorList[v.index as number] = true;
+      }
+
+      this.sentenceQueue.push(sentenceState);
+      this.textElement.insertBefore(sentenceState.element, this.textEndElement);
+      this.tryAnimateNextSentence();
+
+    }
+    // insert static text
+    else {
+      const interimIndex = this.sentenceQueue.findIndex(s => s.type === TextEventType.interim); // todo cache index
+      
+      let filteredText = event.value.replaceAll(/[^\s\.,?!]*\*+[^\s\.,?!]*/gi, `<span class="${event.type === TextEventType.interim ? 'interim' : ''} profanity">${this.currentState.textProfanityMask}</span>`);
+      for (let emoteKey in event.emotes) {
+        // ignore cursors
+        if (typeof emoteKey === "string") {          
+          filteredText = filteredText.replaceAll(emoteKey, `<img src="${event.emotes[emoteKey]}" />`)
+        }
+      }
+
+      // add space
+      filteredText += " ";
+
+      // update interim
+      if (interimIndex !== -1) {
+
+        // remove interim / drop active state
+        if (event.value === "") {
+          this.sentenceQueue[interimIndex].element?.remove?.();
+          this.sentenceQueue.splice(interimIndex, 1);
+
+          if (!this.sentenceQueue.length) {
+            this.boxElement.classList.remove("active");
+          }
+          return;
+        }
+
+        const sentenceElement = this.sentenceQueue[interimIndex].element;
+        this.sentenceQueue[interimIndex].type = event.type;
+        if (sentenceElement) {
+          sentenceElement.innerHTML = filteredText;
+          // final
+          if (event.type === TextEventType.final) {
+            sentenceElement.classList.remove("interim");
+          }
+        }
+      }
+      else {
+        // create new sentence
+        const sentenceState: SentenceState = {
+          type: event.type,
+          element: document.createElement("span"),
+          text: event.value,
+          cursor: 0,
+          cursorProfanity: 0,
+          profanityCursorList: {},
+          isAnimated: true,
+          emotes: event.emotes
+        }
+
+        this.sentenceQueue.push(sentenceState);
+        sentenceState.element.innerHTML = filteredText;
+        if (event.type === TextEventType.interim) {
+          sentenceState.element.classList.add("interim");
+        }
+        this.textElement.insertBefore(sentenceState.element, this.textEndElement);
+      }
+      this.onActivity();
+    }
+    this.triggerActivity();
+  }
+
+  onResize() {
+    this.scrollContainerElement.scrollTo({ top: this.scrollContainerElement.scrollHeight, behavior: "smooth" });
+  }
+
+  // copy state for faster access
+  onStateChange(){
+    // detect changes
+    const scene = window.ApiClient.scenes.state.activeScene;
+    const storedState = window.ApiClient.document.fileBinder.get().elements[this.id].scenes[scene].data as Element_TextState;
+    if (fastEqual(storedState, this.currentState)) {
+      return;
+    }
+    this.currentState = storedState;
+
+    // update styles
+    this.stateStyleElement.innerHTML = buildStateStyle(this.currentState);
+
+    // rebind events
+    this.bindTextEvents();
+
+    if (this.currentState.previewMode) {
+      this.boxElement.classList.add("active");
+    }
+    else {
+      this.boxElement.classList.remove("active");
+    }
+  }
+
+
+  bindTextEvents() {
+    // primary event sub
+    window.ApiShared.pubsub.unsubscribe(this.eventTextRef);
+    this.eventTextRef = window.ApiShared.pubsub.subscribeText(this.currentState.sourceMain, e => e?.value && this.enqueueSentence(e));
+
+    // kb input event sub
+    window.ApiShared.pubsub.unsubscribe(this.eventTextInputRef);
+    this.eventTextInputRef = window.ApiShared.pubsub.subscribeText(TextEventSource.textfield, e => e && this.enqueueSentence(e), true);
+  }
+
+  bindContainer(containerElement: HTMLDivElement | null) {
+    if (!containerElement) {
+      return;
+    }
+
+    this.containerElement = containerElement;
+    this.boxElement = this.containerElement.querySelector(".box") as HTMLElement;
+    this.textElement = this.containerElement.querySelector(".text") as HTMLElement;
+    this.textEndElement = this.containerElement.querySelector(".text-end") as HTMLSpanElement;
+    this.scrollContainerElement = this.containerElement.querySelector(".scroll-container") as HTMLElement;
+
+    // create base style ele
+    this.baseStyleElement = document.createElement("style");
+    this.baseStyleElement.innerHTML = elementStyle;
+    this.containerElement.append(this.baseStyleElement);
+
+    // create state style ele
+    this.stateStyleElement = document.createElement("style");
+    this.containerElement.append(this.stateStyleElement);
+
+    // listen for text or container sizes
+    this.textObserver = new ResizeObserver(e => this.onResize());
+    this.textObserver.observe(this.textElement);
+    this.textObserver.observe(this.scrollContainerElement);
+    
+    // subscribe to store updates
+    this.sceneChangeEventCancelToken = subscribe(window.ApiClient.scenes.state, () => this.onStateChange());
+    this.storeEventCancelToken = window.ApiClient.document.fileBinder.subscribe(data => this.onStateChange());
+
+    this.onStateChange();
+  }
+
+  dispose() {
+    this.textObserver.disconnect();
+    this.sceneChangeEventCancelToken?.();
+    this.storeEventCancelToken?.();
+    window.ApiShared.pubsub.unsubscribe(this.eventTextRef);
+    window.ApiShared.pubsub.unsubscribe(this.eventTextInputRef);
+  }
+}
+// state.previewMode
 const Element_Text: FC<{ id: string }> = memo(({ id }) => {
-  const isRunning = useRef(false);
+  const controller = useRef(new TextController(id));
   const {activeScene} = useSnapshot(window.ApiClient.scenes.state);
   const state = useGetState(state => (state.elements[id].scenes[activeScene].data as Element_TextState));
-  const stateRef = useRef<Element_TextState>({} as Element_TextState);
-  stateRef.current = state;
-
-  const [sentences, setSentences] = useState<TextSentenceData[]>([]);
-  const sentencesRef = useRef<TextSentenceData[]>([]);
-
-  sentencesRef.current = sentences;
-
-  const sentenceQueue = useRef<TextSentenceData[]>([]);
-
-  const behaviorClearDelayCancelToken = useRef(-1);
-  const [active, setActive] = useState(false);
-
-  const [_clearTimeoutReady, cancelClearTimer, startClearTimer] = useTimeoutFn(() => {
-    if (!active)
-      return;
-    setActive(false);
-
-    // play hide sound
-    if (stateRef.current.soundEnable && stateRef.current.soundFileOnHide) {
-      window.ApiClient.sound.playFile(stateRef.current.soundFileOnHide, {volume: stateRef.current.soundVolume ?? 1,});
-    }
-
-    if (sentenceQueue.current.length === 0)
-      behaviorClearDelayCancelToken.current = setTimeout(() => {
-        setSentences([]);
-      }, stateRef.current.behaviorClearDelay) as unknown as number;
-  }, state.behaviorClearTimer);
-
-  const tryDequeue = () => {
-    if (isRunning.current)
-      return;
-    const nextSentence = sentenceQueue.current.shift();
-    if (!nextSentence)
-      return;
-
-    if (stateRef.current.behaviorLastSentence)
-      setSentences([nextSentence]);
-    else {
-      setSentences(v => [...v, nextSentence]);
-    }
-
-    if (stateRef.current.soundEnable && stateRef.current.soundFileNewSentence && sentencesRef.current.length) {
-      window.ApiClient.sound.playFile(stateRef.current.soundFileNewSentence, {volume: stateRef.current.soundVolume ?? 1,});
-    }
-
-    setActive(true);
-
-    // play show sound
-    if (stateRef.current.soundEnable && stateRef.current.soundFileOnShow)
-      window.ApiClient.sound.playFile(stateRef.current.soundFileOnShow, {volume: stateRef.current.soundVolume ?? 1});
-
-    isRunning.current = true;
-  }
-
-  const enqueueSentence = (event: TextEvent) => {
-    clearTimeout(behaviorClearDelayCancelToken.current); // cancel clear
-    cancelClearTimer();
-    if (document.visibilityState === "hidden")
-      return;
-
-    const isInterim = event.type === TextEventType.interim;
-    const data: TextSentenceData = {
-      id: nanoid(),
-      value: event.value.trim(),
-      emotes: event.emotes,
-      interim: stateRef.current.animateEnable ? false : isInterim,
-      state: { ...stateRef.current }
-    };
-
-    if (stateRef.current.animateEnable) {
-      if (isInterim) { // animation enabled -> ignore interim result completely
-        // show indicator
-      } else { // queue add
-        sentenceQueue.current.push(data);
-        tryDequeue();
-      }
-    }
-    else {
-
-      const lookForInterim = sentencesRef.current.findIndex(s => s.interim); // todo cache index
-      // ignore interim results if has sentence animating and no active interim
-      if (lookForInterim < 0 && isRunning.current && isInterim) {
-        return;
-      }
-      if (!event.value && lookForInterim >= 0) {
-        sentenceQueue.current.splice(lookForInterim);
-        isRunning.current = false;
-        setSentences(l => l.filter(l => !l.interim));
-        onComplete();
-        return;
-        // cancel last interim
-      }
-
-      if (lookForInterim >= 0) { // update last interim sentence
-        setSentences(produce(t => {
-          t[lookForInterim].value = event.value;
-          t[lookForInterim].emotes = event.emotes;
-          t[lookForInterim].interim = isInterim;
-        }));
-      }
-      else { // push new sentence
-        sentenceQueue.current.push(data);
-        tryDequeue();
-      }
-    }
-  }
 
   useEffect(() => {
-    const sub = window.ApiShared.pubsub.subscribeText(state.sourceMain, event => {
-      if (!stateRef.current.sourceInterim && event?.type === TextEventType.interim)
-        return;
-      event?.value && enqueueSentence(event);
-    });
-    return () => window.ApiShared.pubsub.unsubscribe(sub);
-  }, [state.sourceMain, state.behaviorClearTimer]);
+    return () => controller.current.dispose();
+  }, []);
 
-  useEffect(() => {
-    if (!state.sourceInputField)
-      return;
-    const sub = window.ApiShared.pubsub.subscribeText(TextEventSource.textfield, event => {
-      if (!stateRef.current.sourceInterim && event?.type === TextEventType.interim)
-        return;
-      event && enqueueSentence(event);
-    }, true);
-    return () => window.ApiShared.pubsub.unsubscribe(sub);
-  }, [state.sourceInputField, state.behaviorClearTimer]);
-
-  const onComplete = useCallback(() => {
-    isRunning.current = false;
-    setSentences(produce(t => {
-      t[sentencesRef.current.length - 1].state.animateEnable = false
-    }));
-    if (sentenceQueue.current.length) // try to dequeue with delay
-      setTimeout(() => tryDequeue(), stateRef.current.animateDelaySentence)
-    else
-      startClearTimer();
-  }, [state.behaviorClearTimer]);
-
-  useEffect(() => {
-    if (state.animateEnable && sentencesRef.current.at(-1)?.interim) {
-      setSentences(state => {
-        const l = [...state];
-        l.pop()
-        return l;
-      });
-      onComplete();
-    }
-  }, [state.animateEnable]);
-
-  const onActivity = (rect?: DOMRect) => {
-    // play sound
-    if (stateRef.current.soundEnable && stateRef.current.soundFile) {
-      window.ApiClient.sound.playFile(stateRef.current.soundFile, {
-        volume: stateRef.current.soundVolume ?? 1,
-        detuneMin: stateRef.current.soundDetuneMin ?? 0,
-        detuneMax: stateRef.current.soundDetuneMax ?? 0,
-        playbackMin: stateRef.current.soundPlaybackMin ?? 1,
-        playbackMax: stateRef.current.soundPlaybackMax ?? 1,
-      });
-    }
-    if (rect && stateRef.current.particlesEnable) {
-      //TODO cache particle config
-      window.ApiClient.particles.emit(rect, {
-        imageIds: [
-          stateRef.current.particlesSpriteFileIdFirst,
-          stateRef.current.particlesSpriteFileIdSecond,
-          stateRef.current.particlesSpriteFileIdThird,
-        ].filter(s => !!s),
-        particlesCountMin: parseFloat(stateRef.current.particlesCountMin) || 0,
-        particlesCountMax: parseFloat(stateRef.current.particlesCountMax) || 0,
-        particlesDurationMin: parseFloat(stateRef.current.particlesDurationMin) || 0,
-        particlesDurationMax: parseFloat(stateRef.current.particlesDurationMax) || 0,
-        particlesDirectionXMin: parseFloat(stateRef.current.particlesDirectionXMin) || 0,
-        particlesDirectionXMax: parseFloat(stateRef.current.particlesDirectionXMax) || 0,
-        particlesDirectionYMin: parseFloat(stateRef.current.particlesDirectionYMin) || 0,
-        particlesDirectionYMax: parseFloat(stateRef.current.particlesDirectionYMax) || 0,
-        particlesScaleMin: parseFloat(stateRef.current.particlesScaleMin) || 1,
-        particlesScaleMax: parseFloat(stateRef.current.particlesScaleMax) || 1,
-        particlesRotationMin: parseFloat(stateRef.current.particlesRotationMin) || 0,
-        particlesRotationMax: parseFloat(stateRef.current.particlesRotationMax) || 0,
-      });
-    }
-
-    // emit activity event
-    if (stateRef.current.animateEvent) {
-      window.ApiShared.pubsub.publishLocally({ topic: `element.${id}` });
-    }
-  }
-
-  return <>
-    <style>{elementStyle}</style>
-    <style>{`
-    .container{
-      align-items: ${state.boxAlignH};
-      justify-content: ${state.boxAlignV};
-    }
-    .box{
-      transform: translate3d(0,0,0);
-      overflow-y: scroll;
-      justify-content: start;
-      width: ${state.boxAutoWidth ? 'auto' : '100%'};
-      height: ${state.boxAutoHeight ? 'auto' : '100%'};
-      box-shadow: ${state.boxShadowX}px ${state.boxShadowY}px ${state.boxShadowZ}px ${state.boxShadowSpread}px ${state.boxShadowColor};
-      
-      padding: ${state.boxScrollPaddingTop}px ${state.boxScrollPaddingRight}px ${state.boxScrollPaddingBottom}px ${state.boxScrollPaddingLeft}px;
-      
-      ${state.boxBackgroundType == "solid" ?
-        `
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-color: ${state.boxColor};
-      background-image: url("${window.ApiClient.files.getFileUrl(state.boxImageFileId)}");
-      border-style: solid;
-      border-radius: ${state.boxBorderRadius}px;
-      border-width: ${state.boxBorderWidth}px;
-      border-color: ${state.boxBorderColor};
-      ` :
-        `
-      border-image: url(${window.ApiClient.files.getFileUrl(state.boxImageFileId)}) ${state.boxSliceTileSize} round;
-      border-image-slice: ${state.boxSliceTop} ${state.boxSliceRight} ${state.boxSliceBottom} ${state.boxSliceBottom} fill;
-      border-image-width: ${state.boxSliceTop}px ${state.boxSliceRight}px ${state.boxSliceBottom}px ${state.boxSliceBottom}px;
-      `}
-    }
-    .box::-webkit-scrollbar {
-      display: none;
-    }
-
-    .text-container{
-      align-items: ${state.textAlignH};
-      justify-content: ${state.textAlignV};
-      display: flex;
-      flex: 0 0 auto;
-      flex-direction: column;
-      min-height: 100%;
-      min-width: 100%;
-    }
-
-    .text{
-      padding: ${state.boxPadding}px;
-      font-family: ${state.textFontFamily};
-      text-transform: ${state.textCase};
-      text-align: ${state.textAlignH};
-      font-size: ${state.textFontSize}px;
-      font-weight: ${state.textFontWeight};
-      line-height: ${state.textLineHeight};
-      color: ${state.textColor};
-      text-shadow: ${state.textShadowX}px ${state.textShadowY}px ${state.textShadowZ}px ${state.textShadowColor};
-      
-      -webkit-text-stroke: ${state.textStroke}px ${state.textStrokeColor};
-      text-stroke: ${state.textStroke}px ${state.textStrokeColor};
-    }
-    .text img {
-      height: ${state.textFontSize}px;
-    }
-    .profanity {
-      color: ${state.textProfanityColor}
-    }
-    .interim {
-      color: ${state.textColorInterim}
-    }
-    .interim.profanity {
-      color: ${state.textProfanityInterimColor}
-    }
-    
-    .char.animate {
-      animation: charAppear ${state.animateDelayChar || 20}ms ease-in-out;
-    }
-    .scroll-container {
-      transform: translate3d(0,0,0);
-      min-height: 100%;
-      min-width: 100%;
-      max-height: 100%;
-      overflow-y: scroll;
-    }
-    .scroll-container::-webkit-scrollbar {
-      display: none;
-    }
-    `}</style>
-    <style>{state.css}</style>
-    <div className="container">
-      <BoxElement className={classNames("box", { active: active || state.previewMode })}>
-        <span className="text">
-          {state.previewMode && <TextSentenceTest state={state} />}
-          {sentences.map(data => <sentenceCtx.Provider key={data.id} value={{ data, onActivity, onComplete }}>
-            <TextSentence key={data.id} />
-          </sentenceCtx.Provider>)}
-        </span>
-      </BoxElement>
-    </div>
-  </>
-
-});
-// todo path box ref to sentences
-const BoxElement: FC<PropsWithChildren<any>> = memo(({ children, ...boxProps }) => {
-  const boxRef = useRef<HTMLDivElement>(null)
-  const [scrollRef, scrollRect] = useMeasure<HTMLDivElement>();
-  const [textRef, textRect] = useMeasure<HTMLDivElement>();
-
-  useEffect(() => {
-    if (textRect.height === scrollRect.height)
-      return;
-    boxRef.current?.scrollTo({ top: boxRef.current.scrollHeight, behavior: "smooth" });
-  }, [textRect.height, scrollRect.height]);
-
-  return <div {...boxProps}>
-    <div className="scroll-container" ref={element => {
-      element && scrollRef(element);
-      (boxRef.current as any) = element;
-    }}>
-      <span ref={textRef} className="text-container">
-        {children}
-      </span>
+  return <div className="container" ref={ele => controller.current.bindContainer(ele)}>
+    <div className="box">
+      <div className="scroll-container">
+        <div className="text-container">
+          <span className="text">
+            {state.previewMode && <span>This is <span className="profanity">{state.textProfanityMask || '***'}</span> test! <span className="interim">This is interim test</span> </span>}
+            <span className="text-end"></span>
+          </span>
+        </div>
+      </div>
     </div>
   </div>
-})
+});
 export default Element_Text;
