@@ -7,6 +7,7 @@ import {
   AudioConfig,
   AutoDetectSourceLanguageConfig,
   CancellationErrorCode,
+  LanguageIdMode,
   PropertyId,
   SpeechConfig,
   SpeechRecognizer,
@@ -50,9 +51,9 @@ export class STT_AzureService implements ISTTService {
     );
     speechConfig.enableDictation();
 
-    const langConfig = AutoDetectSourceLanguageConfig.fromLanguages([
-      state.azure.language,
-    ]);
+    const langConfig = AutoDetectSourceLanguageConfig.fromLanguages(state.azure.secondary_language && state.azure.use_secondary_language ? 
+      [state.azure.language, state.azure.secondary_language] : [state.azure.language]);
+    langConfig.mode = LanguageIdMode.Continuous;
     const audioConfig = AudioConfig.fromMicrophoneInput(state.azure.device);
     this.#instance = SpeechRecognizer.FromConfig(
       speechConfig,
@@ -67,10 +68,12 @@ export class STT_AzureService implements ISTTService {
       else this.bindings.onStop(`${CancellationErrorCode[e.errorCode]}`);
     };
 
-    this.#instance.recognizing = (s, e) =>
+    this.#instance.recognizing = (s, e) => {
+      console.log(e);
       state.azure.interim &&
       !!e.result.text &&
       this.bindings.onInterim(e.result.text);
+    }
     this.#instance.recognized = (s, e) => this.bindings.onFinal(e.result.text);
     this.#instance?.startContinuousRecognitionAsync();
   }

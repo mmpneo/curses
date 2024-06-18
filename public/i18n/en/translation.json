@@ -91,6 +91,8 @@
     "azure_profanity_masked": "Masked",
     "azure_profanity_removed": "Removed",
     "azure_profanity_raw": "Raw",
+    "azure_secondary_language": "Secondary language",
+    "azure_use_secondary_language": "Enable secondary language",
     "azure_silence_timeout": "Silence timeout"
   },
   "tts": {
