@@ -17,6 +17,7 @@ declare global {
     ApiClient: ApiClient;
   }
 }
+window.global ||= window;
 
 declare module 'react' {
   interface CSSProperties {
