@@ -53,19 +53,26 @@ export async function Load_FFZ_CHANNEL(id: string) {
 
 //region 7tv
 export async function Load_7TV_CHANNEL(id: string) {
+  
   try {
-    const resp                          = await fetch(`https://api.7tv.app/v2/users/${id}/emotes`);
+
+    const resp                          = await fetch(`https://7tv.io/v3/users/twitch/${id}`);
     const r = await resp.json();
-    return Object.fromEntries(r.map((e: any) => [e.name, e.urls[0][1]]))
+    const emoteSet = r.emote_set;
+    return Object.fromEntries(emoteSet.emotes.map((emote: any) =>
+      [emote.name, `${emote.data.host.url}/${emote.data.host.files[1].name}`]
+    ))
   } catch (error) {
     return {}
   }
 }
 export async function Load_7TV_GLOBAL() {
   try {
-    const resp                          = await fetch(`https://api.7tv.app/v2/emotes/global`);
+    const resp                          = await fetch(`https://7tv.io/v3/emote-sets/global`);
     const r = await resp.json();
-    return Object.fromEntries(r.map((e: any) => [e.name, e.urls[0][1]]))
+    return Object.fromEntries(r.emotes.map((emote: any) =>
+      [emote.name, `${emote.data.host.url}/${emote.data.host.files[1].name}`]
+    ));
   } catch (error) {
     return {}
   }
