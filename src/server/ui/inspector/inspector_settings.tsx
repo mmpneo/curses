@@ -3,7 +3,7 @@ import { ServiceNetworkState } from "@/types";
 import { getVersion } from '@tauri-apps/api/app';
 import { FC, memo, useEffect, useState } from "react";
 import { RiFileCopyLine, RiSettings2Fill } from "react-icons/ri";
-import { SiDiscord, SiBuymeacoffee, SiPatreon, SiTwitch, SiTwitter } from "react-icons/si";
+import { SiDiscord, SiPatreon, SiTwitch, SiTwitter } from "react-icons/si";
 import { useSnapshot } from "valtio";
 import Dropdown from "../dropdown/Dropdown";
 import Tooltip from "../dropdown/Tooltip";
@@ -115,9 +115,6 @@ const Inspector_Settings: FC = memo(() => {
           </Tooltip>
           <Tooltip content="Patreon" body={<span>Subscribe to get a Supporter role in discord <br/> (completely useless, just different color) <img className="h-8" src="/peepoSmile.webp"/></span>}>
             <a target="_blank" href="https://www.patreon.com/mmpcode" className="btn text-primary btn-ghost btn-circle text-2xl"><SiPatreon /></a>
-          </Tooltip>
-          <Tooltip content="Buy me a coffee" body={<span>Tips are greatly appreciated 💖</span>}>
-            <a target="_blank" href="https://www.buymeacoffee.com/mmpcode" className="btn text-primary btn-ghost btn-circle text-2xl"><SiBuymeacoffee /></a>
           </Tooltip>
         </div>
         <div className="self-center text-sm opacity-50">{t('settings.desc_1')}</div>

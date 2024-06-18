@@ -35,7 +35,7 @@ class TwitchChatApi {
       if (this.#state.data.chatReceiveEnable) {
         window.ApiShared.pubsub.publishText(TextEventSource.textfield, {
           type: TextEventType.final,
-          value: msg.content.value,
+          value: msg.text,
           textFieldType: "twitchChat",
         });
       }
