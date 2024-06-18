@@ -18,6 +18,7 @@ export const Service_TTS_Schema = z.object({
   inputField: zSafe(z.coerce.boolean(), true),
   backend: zSafe(zodTTS_Backends, TTS_Backends.native),
   autoStart: zSafe(z.coerce.boolean(), false),
+  stopWithStream: zSafe(z.coerce.boolean(), false),
   replaceWords: zSafe(z.record(z.coerce.string(), z.coerce.string()), {}),
   replaceWordsIgnoreCase: zSafe(z.coerce.boolean(), true),
   native: z.object({

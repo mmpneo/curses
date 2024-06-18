@@ -332,6 +332,7 @@ const Inspector_TTS: FC = () => {
     <Inspector.Content>
       <InputCheckbox label="common.field_action_bar" value={data.showActionButton} onChange={handleStart} />
       <InputCheckbox label="common.field_auto_start" value={data.data.autoStart} onChange={e => up("autoStart", e)} />
+      <InputCheckbox label="tts.field_stop_with_stream" value={data.data.stopWithStream} onChange={e => up("stopWithStream", e)} />
       <span className="link link-accent link-hover font-semibold flex items-center gap-2 text-sm" onClick={handleShowReplacements}><RiCharacterRecognitionFill/> {t('common.btn_edit_replacements')}</span>
       <Inspector.Deactivatable active={state.status === ServiceNetworkState.disconnected}>
         <InputTextSource label="common.field_text_source" value={data.data.source} onChange={e => up("source", e)} />

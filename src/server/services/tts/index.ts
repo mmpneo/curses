@@ -68,6 +68,11 @@ class Service_TTS implements IServiceInterface, ITTSReceiver {
 
     if (this.data.autoStart)
       this.start();
+    window.ApiShared.pubsub.subscribe("stream.on_ended", () => {
+      if (this.data.stopWithStream && this.serviceState.status === ServiceNetworkState.connected) {
+        this.stop();
+      }
+    });
   }  
 
   stop(): void {

@@ -99,6 +99,7 @@
   "tts": {
     "title": "Text to speech",
     "field_voice": "Voice",
+    "field_stop_with_stream": "Stop with twitch stream",
 
     "uberduck_title": "Uberduck",
     "uberduck_api_key": "Api key",
