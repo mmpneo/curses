@@ -54,8 +54,10 @@ class TwitchChatApi {
 
   post(message: string) {
     this.state.username &&
-      this.state.connection === ServiceNetworkState.connected &&
+    this.state.connection === ServiceNetworkState.connected &&
+    setTimeout(() => {
       this.chatClient?.say(this.state.username, message);
+    }, parseFloat(this.#state.data.chatSendDelay) || 0);
   }
 }
 

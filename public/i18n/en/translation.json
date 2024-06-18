@@ -185,6 +185,7 @@
     "field_post_in_chat": "Post in chat",
     "field_post_in_chat_desc": "Post speech to text or translation results in chat",
     "field_post_in_chat_live": "Post only when live streaming",
+    "field_post_in_chat_delay": "Send delay(ms)",
     "field_chat_text": "Use chat messages",
     "field_chat_text_desc": "Use your twitch chat messages as source for speech to text",
 

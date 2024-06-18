@@ -4,7 +4,7 @@ import { SiTwitch } from "react-icons/si";
 import { useSnapshot } from "valtio";
 import Tooltip from "../dropdown/Tooltip";
 import Inspector from "./components";
-import { InputCheckbox, InputMapObject, InputNetworkStatus, InputTextSource } from "./components/input";
+import { InputCheckbox, InputMapObject, InputNetworkStatus, InputText, InputTextSource } from "./components/input";
 import NiceModal from "@ebay/nice-modal-react";
 import Modal from "../Modal";
 import { useTranslation } from "react-i18next";
@@ -89,6 +89,7 @@ const Inspector_Twitch: FC = () => {
           <InputCheckbox label="twitch.field_post_in_chat" value={pr.chatPostEnable} onChange={e => up("chatPostEnable", e)} />
           <Inspector.Description>{t('twitch.field_post_in_chat_desc')}</Inspector.Description>
           <InputCheckbox label="twitch.field_post_in_chat_live" value={pr.chatPostLive} onChange={e => up("chatPostLive", e)} />
+          <InputText label="twitch.field_post_in_chat_delay" type="number" value={pr.chatSendDelay} onChange={e => up("chatSendDelay", e.target.value)} />
           <InputTextSource label="common.field_text_source" value={pr.chatPostSource} onChange={e => up("chatPostSource", e)} />
           <InputCheckbox label="common.field_use_keyboard_input" value={pr.chatPostInput} onChange={e => up("chatPostInput", e)} />
           <InputCheckbox label="twitch.field_chat_text" value={pr.chatReceiveEnable} onChange={e => up("chatReceiveEnable", e)} />
