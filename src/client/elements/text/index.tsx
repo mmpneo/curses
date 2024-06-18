@@ -19,6 +19,7 @@ type SentenceState = {
 
 class TextController {
   constructor(private id: string) {}
+  private disposed: boolean = false;
 
   private boxElement!: HTMLElement
   private containerElement!: HTMLElement
@@ -142,6 +143,9 @@ class TextController {
   }
 
   stepSentenceAnimation(sentence: SentenceState) {
+    if (this.disposed) {
+      return
+    }
     // end sentence animation
     if (sentence.cursor >= sentence.text.length) {
       sentence.isAnimated = true;
@@ -386,6 +390,7 @@ class TextController {
   }
 
   dispose() {
+    this.disposed = true;
     this.textObserver.disconnect();
     this.sceneChangeEventCancelToken?.();
     this.storeEventCancelToken?.();
