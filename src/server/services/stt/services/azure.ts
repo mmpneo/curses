@@ -69,7 +69,6 @@ export class STT_AzureService implements ISTTService {
     };
 
     this.#instance.recognizing = (s, e) => {
-      console.log(e);
       state.azure.interim &&
       !!e.result.text &&
       this.bindings.onInterim(e.result.text);
