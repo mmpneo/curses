@@ -116,6 +116,12 @@ class Service_STT implements IServiceInterface, ISTTReceiver {
     this.updateReplacementsCache();
     subscribeKey(this.data, "replaceWords", () => this.updateReplacementsCache());
     subscribeKey(this.data, "replaceWordsIgnoreCase", () => this.updateReplacementsCache());
+
+    window.ApiShared.pubsub.subscribe("stream.on_ended", () => {
+      if (this.data.stopWithStream && this.serviceState.status === ServiceNetworkState.connected) {
+        this.stop();
+      }
+    });
     
     // native is bugged
     if (this.data.autoStart && this.data.backend !== STT_Backends.native)

@@ -38,7 +38,7 @@ class Service_Twitch implements IServiceInterface {
     this.emotes = new TwitchEmotesApi();
     this.chat = new TwitchChatApi();
     // check live status
-    setInterval(() => this.#checkLive(), 8000);
+    setInterval(() => this.#checkLive(), 4000);
 
     // login with token
     this.connect();
@@ -137,9 +137,15 @@ class Service_Twitch implements IServiceInterface {
       const resp = await this.apiClient?.streams.getStreamByUserName(
         this.state.user.name
       );
+      // window.ApiShared.pubsub.publishLocally({topic: "stream.on_started"});
+      const prevStatus = this.state.liveStatus;
       this.state.liveStatus = !!resp
         ? ServiceNetworkState.connected
         : ServiceNetworkState.disconnected;
+      // stream ended
+      if (prevStatus === ServiceNetworkState.connected && this.state.liveStatus == ServiceNetworkState.disconnected) {
+        window.ApiShared.pubsub.publishLocally({topic: "stream.on_ended"});
+      }
     } catch (error) {
       this.state.liveStatus = ServiceNetworkState.disconnected;
     }

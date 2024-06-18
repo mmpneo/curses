@@ -64,6 +64,7 @@
     "field_enable_interim_results": "Enable interim results",
     "field_uwu_filter": "UwU filter",
     "field_uwu_filter_desc": "Only works with English (* ^ ω ^)!!1",
+    "field_stop_with_stream": "Stop with twitch stream",
     "state_muted": "Muted",
     "state_": "Muted",
 
