@@ -16,7 +16,7 @@ type RegisteredEvent = {
 };
 
 class Service_PubSub implements IServiceInterface {
-  constructor() {}
+  constructor() { }
   #socket?: WebSocket;
   serviceState = proxy({
     state: ServiceNetworkState.disconnected,
@@ -37,13 +37,13 @@ class Service_PubSub implements IServiceInterface {
     if (!window.Config.isServer())
       return;
     if (typeof stringEvent === "string") try {
-      const {topic, data}: BaseEvent = JSON.parse(stringEvent);
+      const { topic, data }: BaseEvent = JSON.parse(stringEvent);
       if (typeof data !== "object")
         return;
       const validated = TextEventSchema.safeParse(data);
       if (!validated.success)
         return;
-      
+
       const textEvent = this.applyEmotes(validated.data);
       // redirect stt
       if (topic === "text.stt") {
@@ -51,7 +51,7 @@ class Service_PubSub implements IServiceInterface {
         return;
       }
 
-      const msg = {topic, data: textEvent};
+      const msg = { topic, data: textEvent };
       this.publishLocally(msg);
       this.#publishPeers(msg);
     } catch (error) {
@@ -69,18 +69,18 @@ class Service_PubSub implements IServiceInterface {
       this.consumePubSubMessage(event.payload as string);
     });
 
-    this.registerEvent({label: "Speech to text", value: TextEventSource.stt});
-    this.registerEvent({label: "Translation",value: TextEventSource.translation});
-    this.registerEvent({label: "Text field",value: TextEventSource.textfield});
-    this.registerEvent({label: "Any text source",value: TextEventSource.any});
+    this.registerEvent({ label: "Speech to text", value: TextEventSource.stt });
+    this.registerEvent({ label: "Translation", value: TextEventSource.translation });
+    this.registerEvent({ label: "Text field", value: TextEventSource.textfield });
+    this.registerEvent({ label: "Any text source", value: TextEventSource.any });
 
     //track text events
     window.Config.isServer() && this.subscribeText(TextEventSource.any, (event, eventName) => {
       if (event?.type === TextEventType.final) {
-        const _v: any[] = [];
         // limit to 40
         if (this.textHistory.list.length >= 40)
           this.textHistory.list.shift();
+
         const id = nanoid();
         this.textHistory.list.push({ id, event: eventName?.replace("text.", "") || "text", value: event.value });
         this.textHistory.lastId = id;
@@ -91,18 +91,18 @@ class Service_PubSub implements IServiceInterface {
   private applyEmotes(data: PartialWithRequired<TextEvent, "type" | "value">) {
     if (!data.emotes) {
       let emotes = window.ApiServer.twitch.emotes.scanForEmotes(data.value);
-      return  {...data, emotes};
+      return { ...data, emotes };
     }
     else
       return data;
   }
 
-  publishLocally({topic, data}: BaseEvent) {
+  publishLocally({ topic, data }: BaseEvent) {
     PubSub.publishSync(topic, data);
   }
   #publishPubSub(msg: BaseEvent) {
     window.Config.isApp() &&
-    invoke("plugin:web|pubsub_broadcast", {value: JSON.stringify(msg)});
+      invoke("plugin:web|pubsub_broadcast", { value: JSON.stringify(msg) });
   }
   #publishLink(msg: BaseEvent) {
     if (this.#socket && this.#socket.readyState === this.#socket.OPEN)
@@ -115,12 +115,14 @@ class Service_PubSub implements IServiceInterface {
   publish(topic: string, data: any) {
     if (window.Config.isClient())
       return;
-      let msg = {topic, data};
-      this.publishLocally(msg);
-      this.#publishPeers(msg);
-      this.#publishPubSub(msg);
-      this.#publishLink(msg);
+
+    let msg = { topic, data };
+    this.publishLocally(msg);
+    this.#publishPeers(msg);
+    this.#publishPubSub(msg);
+    this.#publishLink(msg);
   }
+
   publishText(topic: TextEventSource, textData: PartialWithRequired<TextEvent, "type" | "value">) {
     let data = this.applyEmotes(textData);
     this.publish(topic, data);
@@ -136,9 +138,7 @@ class Service_PubSub implements IServiceInterface {
 
   public subscribeText(source: TextEventSource, fn: (value?: TextEvent, eventName?: string) => void, allowEmpty = false) {
     return PubSub.subscribe(source, (eventName, data: TextEvent) => {
-      if (allowEmpty)
-        fn(data, eventName);
-      else if (data.value)
+      if (data.value || allowEmpty)
         fn(data, eventName);
     })
   }

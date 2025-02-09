@@ -1,9 +1,9 @@
 import NiceModal from "@ebay/nice-modal-react";
-import { useId } from "@floating-ui/react-dom-interactions";
+import { useId } from "@floating-ui/react";
 import classNames from "classnames/bind";
 import { ChangeEvent, FC, forwardRef, InputHTMLAttributes, memo, PropsWithChildren, ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { RgbaColor, RgbaColorPicker } from "react-colorful";
-import { RiUpload2Fill, RiKeyboardBoxFill, RiDeleteBin3Fill, RiCheckboxCircleFill, RiAddCircleFill, RiEdit2Fill, RiRecordCircleFill, RiCloseCircleFill } from "react-icons/ri";
+import { RiUpload2Fill, RiKeyboardBoxFill, RiDeleteBin3Fill, RiCheckboxCircleFill, RiAddCircleFill, RiEdit2Fill, RiCloseCircleFill, RiFolder2Line, RiFile3Line } from "react-icons/ri";
 import { HiChevronDown, HiChevronUp } from "react-icons/hi";
 import FileElement                                                     from "../../../file-element";
 import { FileState, FileType }                                         from "@/client/services/files/schema";
@@ -22,6 +22,7 @@ import produce          from "immer";
 import { BackendState } from "../../../../schema";
 import Tooltip          from "../../../dropdown/Tooltip";
 import { invoke }       from "@tauri-apps/api/tauri";
+import { open, OpenDialogOptions } from '@tauri-apps/api/dialog';
 const cx = classNames.bind(styles);
 import { useTranslation } from 'react-i18next';
 
@@ -39,7 +40,7 @@ export const InputContainer: FC<PropsWithChildren<{ id?: string, vertical?: bool
   </div>
 });
 
-export const InputBaseText: FC<InputHTMLAttributes<HTMLInputElement> & {fieldWidth?: boolean}> = ({value, onChange, fieldWidth = true, ...props}) => {
+export const InputBaseText = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement> & {fieldWidth?: boolean}>(({ value, onChange, fieldWidth = true, ...props }, ref) => {
   const [internalValue, setInternalValue] = useState(value);
   useEffect(() => {
     if (value !== internalValue)
@@ -49,8 +50,8 @@ export const InputBaseText: FC<InputHTMLAttributes<HTMLInputElement> & {fieldWid
     setInternalValue(val.target.value);
     onChange?.(val);
   };
-  return <input {...props} value={internalValue} onChange={updateVal} className={cx(styles.clearAppearance, props.className, { "field-width": fieldWidth }, "input input-bordered overflow-hidden input-sm font-semibold leading-none")} />;
-};
+  return <input {...props} ref={ref} value={internalValue} onChange={updateVal} className={cx(styles.clearAppearance, props.className, { "field-width": fieldWidth }, "input input-bordered overflow-hidden input-sm font-semibold leading-none")} />;
+});
 
 interface InputTextProps extends InputBaseProps, InputHTMLAttributes<HTMLInputElement> { }
 
@@ -79,6 +80,41 @@ export const InputText: FC<InputTextProps> = memo(({ label, ...rest }) => {
   const id = useId();
   return <InputContainer label={label} id={id}><InputBaseText id={id} className="flex-none" type="text" {...rest} /></InputContainer>
 });
+
+interface InputFilePathProps extends InputBaseProps, InputHTMLAttributes<HTMLInputElement> {
+  value: string,
+  dialogOptions?: OpenDialogOptions,
+  onPathSelected?: (path: string) => void,
+}
+
+export const InputFilePath: FC<InputFilePathProps> = ({ label, value, onChange, onPathSelected, dialogOptions }) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const options: OpenDialogOptions = { ...dialogOptions };
+
+  const handleButtonClick = async () => {
+    try {
+      const input = inputRef.current;
+      const path = await open({ defaultPath: input?.value, ...options });
+      if (input && path && typeof path === 'string') {
+        const property = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value');
+        property?.set?.call(input, path);
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        onPathSelected?.(path);
+      }
+    } catch (error) {
+      toast.error('Error selecting path: ' + error);
+    }
+  };
+
+  return <InputContainer label={label} vertical>
+    <div className="flex">
+      <InputBaseText ref={inputRef} value={value} onChange={onChange} fieldWidth={false} className="rounded-r-none w-full" />
+      <button onClick={handleButtonClick} className="btn btn-square btn-sm rounded-l-none">
+        {options.directory ? <RiFolder2Line /> : <RiFile3Line />}
+      </button>
+    </div>
+  </InputContainer>
+};
 
 const ColorSelectDropdown: FC<any> = ({ onChange, value }) => {
   const [rgba, setRgba] = useState(stringToRgba(value));
@@ -146,6 +182,7 @@ export const InputChips: FC<ChipsProps> = memo(({ label, value, options, onChang
 });
 
 import * as RadixSelect from '@radix-ui/react-select';
+import { toast } from "react-toastify";
 
 const SelectItem = forwardRef<HTMLDivElement, PropsWithChildren<any>>(({ children, className, ...props }: any, ref) => {
   return (

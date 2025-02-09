@@ -4,17 +4,11 @@ use clap::Parser;
 use serde::{Deserialize, Serialize};
 use tauri::{command, Manager, State};
 use tauri_plugin_window_state::{AppHandleExt, StateFlags};
-use window_shadows::set_shadow;
-
-use windows::{
-    core::PCSTR,
-    s,
-    Win32::UI::WindowsAndMessaging::{MessageBoxA, MB_ICONWARNING, MB_OK},
-};
 
 use crate::services::AppConfiguration;
 
 mod services;
+mod utils;
 
 #[derive(Parser, Debug)]
 struct InitArguments {
@@ -30,7 +24,7 @@ struct NativeFeatures {
 #[command]
 fn get_native_features() -> NativeFeatures {
     NativeFeatures {
-        background_input: cfg!(feature="background_input")
+        background_input: cfg!(feature = "background_input"),
     }
 }
 
@@ -50,6 +44,11 @@ fn app_close(app_handle: tauri::AppHandle) {
         return app_handle.exit(0);
     }
 }
+fn app_setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
+    let window = app.get_window("main").unwrap();
+    window_shadows::set_shadow(&window, true).ok(); // ignore failure
+    Ok(())
+}
 
 fn main() {
     let args = InitArguments::parse();
@@ -59,24 +58,26 @@ fn main() {
     match port_availability {
         Ok(l) => l.set_nonblocking(true).unwrap(),
         Err(_err) => {
-            unsafe {
-                MessageBoxA(
-                    None,
-                    PCSTR(format!("Port {} is not available!", args.port).as_ptr()),
-                    s!("Curses error"),
-                    MB_OK | MB_ICONWARNING,
-                );
+            #[cfg(windows)]
+            {
+                use windows::core::*;
+                use windows::Win32::UI::WindowsAndMessaging::{MessageBoxA, MB_ICONWARNING, MB_OK};
+                let message = format!("Port {} is not available!", args.port);
+                unsafe {
+                    MessageBoxA(
+                        None,
+                        windows::core::PCSTR(message.as_ptr()),
+                        s!("Curses error"),
+                        MB_OK | MB_ICONWARNING,
+                    );
+                }
             }
             return;
         }
     };
 
     tauri::Builder::default()
-        .setup(|app| {
-            let window = app.get_window("main").unwrap();
-            set_shadow(&window, true).expect("Unsupported platform!");
-            Ok(())
-        })
+        .setup(app_setup)
         .invoke_handler(tauri::generate_handler![get_port, get_native_features, app_close])
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .manage(AppConfiguration { port: args.port })
@@ -85,6 +86,8 @@ fn main() {
         .plugin(services::audio::init())
         .plugin(services::windows_tts::init())
         .plugin(services::uberduck_tts::init())
+        .plugin(services::piper_tts::init())
+        .plugin(services::custom_tts::init())
         .plugin(services::keyboard::init())
         .plugin(services::uwu::init())
         .run(tauri::generate_context!())

@@ -3,17 +3,17 @@ import { FC, FormEvent, memo, useEffect, useRef, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.min.css';
 import { TextEventSource, TextEventType } from "@/types";
-import Sidebar                            from "./sidebar";
+import Sidebar from "./sidebar";
 import { AnimatePresence, motion } from "framer-motion";
-import { useSnapshot }                    from "valtio";
-import ActionBar                          from "./actionbar";
+import { useSnapshot } from "valtio";
+import ActionBar from "./actionbar";
 import "./file-modal";
-import OverlayInput                       from "./overlay-input";
+import OverlayInput from "./overlay-input";
 import { ElementEditorTransform } from "./element-transform";
-import { useGetState }            from "@/client";
-import classNames                 from "classnames";
-import { RiCheckFill }                    from "react-icons/ri";
-import BackgroundInput                    from "./background-input";
+import { useGetState } from "@/client";
+import classNames from "classnames";
+import { RiCheckFill } from "react-icons/ri";
+import BackgroundInput from "./background-input";
 import RecordingAlerts from "./recording-alerts";
 import { useTranslation } from "react-i18next";
 
@@ -46,7 +46,7 @@ const EditorView: FC = () => {
             exit={{ opacity: 0 }}
             transition={{ ease: "anticipate", duration: 0.3 }}
             className="absolute top-16 right-4">
-            <RecordingAlerts/>
+            <RecordingAlerts />
           </motion.div>}
         </AnimatePresence>
         <ToastContainer className="toasts" draggable={false} closeOnClick limit={3} hideProgressBar theme="colored" />
@@ -79,12 +79,12 @@ const Canvas: FC = memo(() => {
   const ids = useGetState(state => state.elementsIds);
   return <>
     <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-    transition={{ ease: "anticipate", duration: 0.3 }}
-    style={{ width: canvas?.w, height: canvas?.h }} className="relative rounded-lg border border-dashed border-primary/50">
-      {ids?.map((elementId) => <ElementEditorTransform id={elementId} key={elementId} />)}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ ease: "anticipate", duration: 0.3 }}
+      style={{ width: canvas?.w, height: canvas?.h }} className="relative rounded-lg border border-dashed border-primary/50">
+        {ids?.map((elementId) => <ElementEditorTransform id={elementId} key={elementId} />)}
     </motion.div>
   </>
 })
@@ -94,7 +94,7 @@ const LogsView = () => {
   const { lastId, list } = useSnapshot(window.ApiShared.pubsub.textHistory);
 
   useEffect(() => {
-      setTimeout(() => scrollContainer.current?.scrollTo({ top: scrollContainer.current.scrollHeight, behavior: "smooth" }));
+    setTimeout(() => scrollContainer.current?.scrollTo({ top: scrollContainer.current.scrollHeight, behavior: "smooth" }));
   }, [lastId]);
 
   return <motion.div
@@ -118,21 +118,21 @@ export const EditorViewport: FC = () => {
   const { showLogs } = useSnapshot(window.ApiServer.state);
   return <div className="w-full relative bg-base-300 rounded-tl-box flex flex-grow items-center justify-center overflow-hidden">
     <AnimatePresence>
-      {showLogs ? <LogsView/> : <Canvas />}
+      {showLogs ? <LogsView /> : <Canvas />}
     </AnimatePresence>
   </div>
 }
 
 const STTInput: FC = () => {
   const { showLogs } = useSnapshot(window.ApiServer.state);
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [inputValue, setInputValue] = useState('');
   const submit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!inputValue)
-      return;
-    setInputValue('');
-    window.ApiShared.pubsub.publishText(TextEventSource.textfield, { type: TextEventType.final, value: inputValue });
+    if (inputValue) {
+      setInputValue('');
+      window.ApiShared.pubsub.publishText(TextEventSource.textfield, { type: TextEventType.final, value: inputValue });
+    }
   }
 
   const handleChange = (value: string) => {

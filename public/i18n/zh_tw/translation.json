@@ -116,6 +116,12 @@
     "azure_voice_pitch": "音調",
     "azure_voice_range": "音域",
 
+    "piper_title": "Piper",
+    "piper_exe_location": "Executable",
+    "piper_voice_location": "Voice directory",
+    "piper_reload_voices": "Rescan voice directory",
+    "piper_speaker_id": "Speaker ID",
+
     "native_title": "本地",
 
     "tiktok_title": "抖音",

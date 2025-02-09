@@ -1,6 +1,5 @@
-import { invoke } from "@tauri-apps/api/tauri";
-import { proxy }             from "valtio";
 import { IServiceInterface } from "@/types";
+import { toArrayBuffer } from "@/utils";
 
 type SoundEffects = {
   volume?: number;
@@ -31,9 +30,9 @@ class Service_Sound implements IServiceInterface {
       try {
         const buffer = window.ApiClient.files.getFileBuffer(fileId);
         if (!buffer) return;
-        this.#audioFiles[fileId] = await this.audioContext.decodeAudioData(
-          buffer.buffer.slice(0)
-        );
+        
+        const audioData = toArrayBuffer(buffer.buffer);
+        this.#audioFiles[fileId] = await this.audioContext.decodeAudioData(audioData);
       } catch (error) {
         return;
       }

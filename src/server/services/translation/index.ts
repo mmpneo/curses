@@ -61,7 +61,7 @@ class Service_Translation implements IServiceInterface, ITranslationReceiver {
         label: json.translation[k].nativeName,
         value: k,
       }));
-    } catch (error) {}
+    } catch (error) { }
   }
 
   init(): void {
@@ -69,7 +69,7 @@ class Service_Translation implements IServiceInterface, ITranslationReceiver {
 
     if (this.data.autoStart)
       this.start();
-      
+
     window.ApiShared.pubsub.subscribeText(
       TextEventSource.stt,
       (e) => e && this.translate(e)
@@ -90,6 +90,7 @@ class Service_Translation implements IServiceInterface, ITranslationReceiver {
   onStart(): void {
     this.#setStatus(ServiceNetworkState.connected);
   }
+
   onStop(error: string): void {
     if (error) {
       toast(error, { type: "error", autoClose: false });
@@ -97,6 +98,7 @@ class Service_Translation implements IServiceInterface, ITranslationReceiver {
     }
     this.#setStatus(ServiceNetworkState.disconnected);
   }
+
   onTranslation(id: number, e: TextEvent, value: string): void {
     // ignore late results
     if (this.#id - 1 !== id) return;
@@ -108,9 +110,10 @@ class Service_Translation implements IServiceInterface, ITranslationReceiver {
   // #endregion
 
   stop() {
-    if (!this.#serviceInstance) return;
-    this.#serviceInstance.stop();
+    if (this.#serviceInstance)
+      this.#serviceInstance.stop();
   }
+
   start() {
     this.stop();
     this.serviceState.error = "";
@@ -127,13 +130,10 @@ class Service_Translation implements IServiceInterface, ITranslationReceiver {
   }
 
   translate(text: TextEvent) {
-    if (
-      !this.#serviceInstance ||
-      this.serviceState.status !== ServiceNetworkState.connected
-    )
-      return;
-    this.#serviceInstance.translate(this.#id, text);
-    this.#id++;
+    if (this.#serviceInstance && this.serviceState.status === ServiceNetworkState.connected) {
+      this.#serviceInstance.translate(this.#id, text);
+      this.#id++;
+    }
   }
 }
 

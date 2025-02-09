@@ -86,7 +86,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                     warp::serve(routes.clone()).run(([0, 0, 0, 0], app_port)).await
                 }
             });
-            let handle = app.app_handle();
+            let handle = app.clone();
             tauri::async_runtime::spawn(async move {
                 loop {
                     if let Some(output) = pubsub_output_rx.recv().await {

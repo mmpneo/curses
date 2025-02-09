@@ -120,6 +120,15 @@
     "azure_voice_pitch": "Voice pitch",
     "azure_voice_range": "Voice range",
 
+    "piper_title": "Piper",
+    "piper_exe_location": "Executable",
+    "piper_voice_location": "Voice directory",
+    "piper_reload_voices": "Rescan voice directory",
+    "piper_speaker_id": "Speaker ID",
+
+    "custom_title": "Custom",
+    "custom_exe_location": "Executable",
+    
     "native_title": "Native",
 
     "tiktok_title": "TikTok",

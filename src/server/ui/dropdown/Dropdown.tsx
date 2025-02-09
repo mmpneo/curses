@@ -1,5 +1,5 @@
 import { createContext, FC, HtmlHTMLAttributes, memo, PropsWithChildren, ReactNode, useContext, useRef, useState } from "react";
-import { arrow, offset, autoUpdate, flip, safePolygon, shift, useClick, useDismiss, useFloating, useHover, useInteractions, FloatingPortal } from "@floating-ui/react-dom-interactions";
+import { arrow, offset, autoUpdate, flip, safePolygon, shift, useClick, useDismiss, useFloating, useHover, useInteractions, FloatingPortal } from "@floating-ui/react";
 import { Placement } from "@floating-ui/react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 interface Props {
@@ -21,14 +21,14 @@ export const dropdownContext = createContext({
 const Dropdown: FC<PropsWithChildren<Omit<HtmlHTMLAttributes<HTMLSpanElement>, "content"> & Props>> = memo(({ children, content, interact = "click", placement = "bottom", targetOffset = 8, ...props }) => {
   const arrowRef = useRef(null);
   const [open, setOpen] = useState(false);
-  const { x, y, reference, floating, strategy, context, middlewareData: { arrow: { x: arrowX, y: arrowY } = {} } } = useFloating({
+  const { x, y, refs, strategy, context, middlewareData: { arrow: { x: arrowX, y: arrowY } = {} } } = useFloating({
     whileElementsMounted: autoUpdate,
     strategy: "fixed",
     placement,
     open,
     onOpenChange: setOpen,
     middleware: [
-      shift({padding: 8}),
+      shift({ padding: 8 }),
       offset(targetOffset),
       flip(),
       arrow({ element: arrowRef, padding: 20 })
@@ -36,7 +36,7 @@ const Dropdown: FC<PropsWithChildren<Omit<HtmlHTMLAttributes<HTMLSpanElement>, "
   });
   const { getReferenceProps, getFloatingProps } = useInteractions([
     useClick(context, { enabled: interact === "click" }),
-    useHover(context, { enabled: interact === "hover", handleClose: safePolygon({ restMs: 25 }) }),
+    useHover(context, { enabled: interact === "hover", handleClose: safePolygon(), restMs: 25 }),
     useDismiss(context),
   ]);
 
@@ -48,7 +48,7 @@ const Dropdown: FC<PropsWithChildren<Omit<HtmlHTMLAttributes<HTMLSpanElement>, "
   }
 
   return <dropdownContext.Provider value={{ close: () => setOpen(false) }}>
-    <span {...props} onContextMenu={handleContext} {...getReferenceProps()} ref={reference}>{children}</span>
+    <span {...props} onContextMenu={handleContext} {...getReferenceProps()} ref={refs.setReference}>{children}</span>
 
     <FloatingPortal id="floating-elements">
       <AnimatePresence initial={false}>
@@ -58,7 +58,7 @@ const Dropdown: FC<PropsWithChildren<Omit<HtmlHTMLAttributes<HTMLSpanElement>, "
           transition={{ ease: "anticipate", duration: 0.15 }}
           exit={{ scale: 0.97, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="z-50 shadow-lg rounded-box" {...getFloatingProps()} ref={floating} style={{margin: 0,position: strategy,top: y ?? 0,left: x ?? 0,}}>
+          className="z-50 shadow-lg rounded-box" {...getFloatingProps()} ref={refs.setFloating} style={{ margin: 0, position: strategy, top: y ?? 0, left: x ?? 0, }}>
           <div style={{ top: arrowY ?? 0, left: arrowX ?? -5 }} className="dropdown-arrow" ref={arrowRef} />
           {content}
         </motion.span>

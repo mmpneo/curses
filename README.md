@@ -38,7 +38,7 @@
 - **Native OBS stream captions**
 - **Google Fonts**: more than 1000 free fonts for OBS captions
 - **Speech to Text**: [Microsoft Azure](https://azure.microsoft.com/en-au/products/cognitive-services/speech-to-text/), [Speechly](https://www.speechly.com/), [Deepgram](https://deepgram.com/), WebSpeechApi(Chrome and Edge)
-- **Text to Speech**: [Microsoft Azure](https://azure.microsoft.com/en-us/products/cognitive-services/text-to-speech/), [Uberduck](https://uberduck.ai/), TikTok, Windows Api (SAPI), WebSpeechApi
+- **Text to Speech**: [Microsoft Azure](https://azure.microsoft.com/en-us/products/cognitive-services/text-to-speech/), [Uberduck](https://uberduck.ai/), [Piper](https://github.com/rhasspy/piper), TikTok, Windows Api (SAPI), WebSpeechApi
 - **VRChat**: [KillFrenzy Avatar text](https://github.com/killfrenzy96/KillFrenzyAvatarText), vrchat's chatbox
 - **Twitch**: 
   - Use 7TV/FFZ/BTTV emotes in OBS captions
