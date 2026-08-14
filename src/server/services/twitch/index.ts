@@ -25,9 +25,13 @@ class Service_Twitch implements IServiceInterface {
   state = proxy<{
     user: HelixUser | null;
     liveStatus: ServiceNetworkState;
+    chatTarget: string; // empty string = own channel
+    targetLiveStatus: ServiceNetworkState;
   }>({
     liveStatus: ServiceNetworkState.disconnected,
     user: null,
+    chatTarget: "",
+    targetLiveStatus: ServiceNetworkState.disconnected,
   });
 
   get #state() {
@@ -51,10 +55,7 @@ class Service_Twitch implements IServiceInterface {
     });
 
     serviceSubscibeToSource(this.#state.data, "chatPostSource", (data) => {
-      if (
-        this.#state.data.chatPostLive &&
-        this.state.liveStatus !== ServiceNetworkState.connected
-      )
+      if (!this.#canPost())
         return;
       this.#state.data.chatPostEnable &&
         data?.value &&
@@ -63,10 +64,7 @@ class Service_Twitch implements IServiceInterface {
     });
 
     serviceSubscibeToInput(this.#state.data, "chatPostInput", (data) => {
-      if (
-        this.#state.data.chatPostLive &&
-        this.state.liveStatus !== ServiceNetworkState.connected
-      )
+      if (!this.#canPost())
         return;
       this.#state.data.chatPostEnable &&
         data?.textFieldType !== "twitchChat" &&
@@ -74,6 +72,53 @@ class Service_Twitch implements IServiceInterface {
         data?.type === TextEventType.final &&
         this.chat.post(data.value);
     });
+  }
+
+  // posting to another streamer's channel requires that channel to be live;
+  // posting to the own channel only requires live when chatPostLive is enabled
+  #canPost() {
+    if (this.state.chatTarget)
+      return this.state.targetLiveStatus === ServiceNetworkState.connected;
+    return (
+      !this.#state.data.chatPostLive ||
+      this.state.liveStatus === ServiceNetworkState.connected
+    );
+  }
+
+  setChatTarget(channel: string) {
+    const target = channel.trim().toLowerCase();
+    this.state.chatTarget =
+      !target || target === this.state.user?.name ? "" : target;
+    this.state.targetLiveStatus = ServiceNetworkState.disconnected;
+    if (this.state.chatTarget) this.chat.join(this.state.chatTarget);
+    this.#checkLive();
+  }
+
+  async addChatTarget(name: string): Promise<boolean> {
+    const login = name.trim().toLowerCase().replace(/^[#@]/, "");
+    if (!login || !this.apiClient) return false;
+    if (
+      login === this.state.user?.name ||
+      this.#state.data.chatTargets.includes(login)
+    )
+      return true;
+    try {
+      const user = await this.apiClient.users.getUserByName(login);
+      if (!user) return false;
+      window.ApiServer.patchService("twitch", (s) =>
+        s.data.chatTargets.push(user.name)
+      );
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  removeChatTarget(name: string) {
+    window.ApiServer.patchService("twitch", (s) => {
+      s.data.chatTargets = s.data.chatTargets.filter((c) => c !== name);
+    });
+    if (this.state.chatTarget === name) this.setChatTarget("");
   }
 
   login() {
@@ -126,28 +171,44 @@ class Service_Twitch implements IServiceInterface {
     this.emotes.dispose();
     this.state.user = null;
     this.state.liveStatus = ServiceNetworkState.disconnected;
+    this.state.chatTarget = "";
+    this.state.targetLiveStatus = ServiceNetworkState.disconnected;
   }
 
   async #checkLive() {
     if (!this.state.user?.name) {
       this.state.liveStatus = ServiceNetworkState.disconnected;
+      this.state.targetLiveStatus = ServiceNetworkState.disconnected;
       return;
     }
+    const target = this.state.chatTarget;
     try {
-      const resp = await this.apiClient?.streams.getStreamByUserName(
-        this.state.user.name
+      const names = target
+        ? [this.state.user.name, target]
+        : [this.state.user.name];
+      const streams = await this.apiClient?.streams.getStreamsByUserNames(
+        names
       );
+      const liveNames = streams?.map((s) => s.userName.toLowerCase()) ?? [];
       // window.ApiShared.pubsub.publishLocally({topic: "stream.on_started"});
       const prevStatus = this.state.liveStatus;
-      this.state.liveStatus = !!resp
+      this.state.liveStatus = liveNames.includes(
+        this.state.user.name.toLowerCase()
+      )
         ? ServiceNetworkState.connected
         : ServiceNetworkState.disconnected;
+      this.state.targetLiveStatus = target
+        ? liveNames.includes(target.toLowerCase())
+          ? ServiceNetworkState.connected
+          : ServiceNetworkState.disconnected
+        : this.state.liveStatus;
       // stream ended
       if (prevStatus === ServiceNetworkState.connected && this.state.liveStatus == ServiceNetworkState.disconnected) {
         window.ApiShared.pubsub.publishLocally({topic: "stream.on_ended"});
       }
     } catch (error) {
       this.state.liveStatus = ServiceNetworkState.disconnected;
+      this.state.targetLiveStatus = ServiceNetworkState.disconnected;
     }
   }
 

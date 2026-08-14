@@ -11,6 +11,7 @@ export const Service_Twitch_Schema = z.object({
   chatPostInput: zSafe(z.coerce.boolean(), false),
   chatReceiveEnable: zSafe(z.coerce.boolean(), false),
   chatSendDelay: zSafe(zStringNumber(), "0"),
+  chatTargets: zSafe(z.array(z.coerce.string()), []),
   emotesEnableReplacements: zSafe(z.coerce.boolean(), true),
   emotesCaseSensitive: zSafe(z.coerce.boolean(), true),
   emotesReplacements: zSafe(z.record(z.coerce.string(), z.coerce.string()), {}),

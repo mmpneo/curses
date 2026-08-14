@@ -18,7 +18,9 @@ class TwitchChatApi {
   async connect(username: string, authProvider: AuthProvider) {
     if (this.state.connection !== ServiceNetworkState.disconnected)
       return;
-    this.chatClient = new ChatClient({ authProvider, channels: [username] });
+    const target = window.ApiServer.twitch.state.chatTarget;
+    const channels = target && target !== username ? [username, target] : [username];
+    this.chatClient = new ChatClient({ authProvider, channels });
     this.chatClient.irc.onConnect(() => {
       this.state.username = username;
       this.state.connection = ServiceNetworkState.connected;
@@ -30,6 +32,7 @@ class TwitchChatApi {
     });
 
     this.chatClient.onMessage((channel, user, message, msg) => {
+      if (channel.replace(/^#/, "") !== this.state.username) return;
       if (msg.userInfo.userName !== this.state.username) return;
 
       if (this.#state.data.chatReceiveEnable) {
@@ -52,11 +55,17 @@ class TwitchChatApi {
     this.disconnect(); 
   }
 
+  join(channel: string) {
+    if (this.state.connection !== ServiceNetworkState.connected) return;
+    this.chatClient?.join(channel).catch(() => {});
+  }
+
   post(message: string) {
-    this.state.username &&
+    const target = window.ApiServer.twitch.state.chatTarget || this.state.username;
+    target &&
     this.state.connection === ServiceNetworkState.connected &&
     setTimeout(() => {
-      this.chatClient?.say(this.state.username, message);
+      this.chatClient?.say(target, message);
     }, parseFloat(this.#state.data.chatSendDelay) || 0);
   }
 }

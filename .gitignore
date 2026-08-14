@@ -12,6 +12,7 @@ dist
 dev-dist
 dist-ssr
 *.local
+build-output
 
 # Editor directories and files
 .vscode/*

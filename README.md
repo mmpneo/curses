@@ -43,6 +43,7 @@
 - **Twitch**: 
   - Use 7TV/FFZ/BTTV emotes in OBS captions
   - Post your STT to chat 
+  - Post to another streamer's chat: add channels to your list and pick a target from a dropdown. Your own channel is always the default on startup, and posting to another channel only works while that channel is live
   - Use your chat messages as a source for captions and TTS
   - native captions
 - **Discord**: Send your STT to specified channel
@@ -68,6 +69,63 @@ Or click "Set Up OBS" to have everything set up automatically with **obs-websock
 Paste the link and change window size to match app's canvas size (default is 500x300)
 
 <img width="600" src="https://user-images.githubusercontent.com/3977499/218331723-721b69c5-a457-4dad-9658-f5232afc68f1.gif">
+
+# Building from Source (Windows)
+
+### Requirements
+- [Node.js](https://nodejs.org) 18 or newer
+- [pnpm](https://pnpm.io) 10 or newer (`npm install -g pnpm`)
+- [Rust toolchain](https://rustup.rs) (stable). The WiX and NSIS installer tooling is downloaded automatically by Tauri on the first build
+- Optional: a Twitch application client id — without it the app builds and runs fine, but the Twitch login fails with `{"status":400,"message":"invalid client"}`. See the next section
+
+> **Note**: dependency install scripts (`esbuild`, `@swc/core`, etc.) are pre-approved in [pnpm-workspace.yaml](pnpm-workspace.yaml), so no `pnpm approve-builds` step is needed.
+
+### Twitch client id
+The official releases have a client id baked in at build time from a CI secret, so local builds need their own. Getting one is free:
+
+1. Open the [Twitch developer console](https://dev.twitch.tv/console/apps) (any Twitch account works) and click **Register Your Application**
+2. Fill in the form:
+   - **Name** — anything, e.g. `curses-local`
+   - **OAuth Redirect URLs** — add **both** of these, so packaged builds and `pnpm tauri dev` each work:
+     - `http://localhost:3030/oauth_twitch.html` (must match `CURSES_TWITCH_CLIENT_REDIRECT_LOCAL` in [.env](.env))
+     - `http://localhost:1420/oauth_twitch.html`
+   - **Category** — anything, e.g. Application Integration
+   - **Client Type** — **Public**. This is required: the app uses the OAuth implicit grant flow, which Twitch only allows for public clients. A confidential client will keep failing with "invalid client" even when the id is correct
+3. Click **Manage** on the new application and copy its **Client ID** (the client secret is not needed)
+4. Create a file named `.env.local` in the repository root containing:
+
+   ```
+   CURSES_TWITCH_CLIENT_ID=<your-client-id>
+   ```
+
+   `.env.local` is gitignored, and both the build script and the dev server pick it up automatically. Alternatively, pass the id directly with `.\build.ps1 -TwitchClientId <your-client-id>`
+
+The client id is compiled into the app at build time, not read when the app starts — after adding or changing it, rebuild (and reinstall if you use the installer) for it to take effect.
+
+### Build and package
+Run the build script from the repository root:
+
+```powershell
+.\build.ps1
+```
+
+| Option | Effect |
+|---|---|
+| `-TwitchClientId <id>` | Bake a Twitch client id into the build. Can also be set via the `CURSES_TWITCH_CLIENT_ID` environment variable or a line in `.env.local` |
+| `-Clean` | Delete previous frontend, bundle and packaging output first |
+| `-SkipInstall` | Skip `pnpm install` when dependencies are already up to date |
+
+The script typechecks and builds the frontend, compiles the Tauri app in release mode, and collects everything into `build-output\`:
+- `curses.exe` — standalone binary
+- `curses_<version>_x64_portable.zip` — zipped standalone binary
+- `curses_<version>_x64_en-US.msi` — WiX installer
+- `curses_<version>_x64-setup.exe` — NSIS installer
+
+### Development
+```powershell
+pnpm install
+pnpm tauri dev
+```
 
 ## Roadmap
 - [ ] STT - Vosk

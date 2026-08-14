@@ -192,6 +192,13 @@
     "field_post_in_chat_delay": "Send delay(ms)",
     "field_chat_text": "Use chat messages",
     "field_chat_text_desc": "Use your twitch chat messages as source for speech to text",
+    "field_post_channel": "Post to channel",
+    "field_post_channel_live_desc": "Posting to another streamer's channel only works while that channel is live",
+    "field_add_channel_placeholder": "Add channel name",
+    "status_target_live": "Selected channel",
+    "btn_remove_channel": "Remove selected channel",
+    "error_channel_not_found": "Channel not found",
+    "own_channel": "you",
 
     "section_emotes": "Emotes",
     "btn_show_emotes": "Show emotes",

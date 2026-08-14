@@ -28,7 +28,7 @@ const RecordingAlerts: FC = () => {
   const { chatPostEnable, chatEnable, chatPostLive } = useSnapshot(
     window.ApiServer.state.services.twitch.data
   );
-  const { liveStatus: twitchLiveStatus } = useSnapshot(window.ApiServer.twitch.state);
+  const { liveStatus: twitchLiveStatus, chatTarget: twitchChatTarget, targetLiveStatus: twitchTargetLiveStatus } = useSnapshot(window.ApiServer.twitch.state);
   const { connection: twitchChatStatus } = useSnapshot(window.ApiServer.twitch.chat.state);
 
   const handleStopTwitch = () => {
@@ -41,7 +41,11 @@ const RecordingAlerts: FC = () => {
     chatEnable &&
     chatPostEnable &&
     twitchChatStatus === ServiceNetworkState.connected &&
-    (chatPostLive ? twitchLiveStatus === ServiceNetworkState.connected : true);
+    (twitchChatTarget
+      ? twitchTargetLiveStatus === ServiceNetworkState.connected
+      : chatPostLive
+      ? twitchLiveStatus === ServiceNetworkState.connected
+      : true);
 
 
     

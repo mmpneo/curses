@@ -187,6 +187,13 @@
     "field_post_in_chat_live": "僅在在線時發布",
     "field_chat_text": "使用聊天消息",
     "field_chat_text_desc": "使用你的 Twitch 聊天消息作為語音轉文本的來源",
+    "field_post_channel": "發送到頻道",
+    "field_post_channel_live_desc": "只有當所選頻道正在直播時，才能向其他主播的頻道發送訊息",
+    "field_add_channel_placeholder": "添加頻道名稱",
+    "status_target_live": "所選頻道",
+    "btn_remove_channel": "移除所選頻道",
+    "error_channel_not_found": "未找到頻道",
+    "own_channel": "自己",
 
     "section_emotes": "表情",
     "btn_show_emotes": "顯示表情",
