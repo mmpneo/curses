@@ -12,15 +12,15 @@ jobs:
 
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 20
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
-          version: 7.28.0
+          version: 9.15.5
       - uses: SebRollen/toml-action@v1.0.1
         id: version
         with:
@@ -30,7 +30,7 @@ jobs:
       - name: setup rust
         uses: dtolnay/rust-toolchain@stable
       - name: setup pnpm deps
-        run: pnpm i
+        run: pnpm install --frozen-lockfile
       - name: compile
         run: pnpm tauri build
         env:
