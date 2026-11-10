@@ -215,7 +215,7 @@
       // ['Српски', ['sr-RS']],
       // ['Українська', ['uk-UA']],
       ['한국어', ['ko-KR']],
-      ['中文', ['cmn-Hans-CN']
+      ['中文', ['zh-CN']
         // ['cmn-Hans-CN', '普通话 (中国大陆)'],
         // ['cmn-Hans-HK', '普通话 (香港)'],
         // ['cmn-Hant-TW', '中文 (台灣)'],
@@ -225,7 +225,6 @@
       ['हिन्दी', ['hi-IN']],
       ['ภาษาไทย', ['th-TH']]
     ];
-    const langs = chromeLangs;
   </script>
 
   <style>
@@ -428,6 +427,33 @@
         option.innerText = label;
         to.append(option);
       }
+
+      async function getBrowser() {
+        if (navigator.userAgentData) {
+          const brands = navigator.userAgentData.brands;
+
+          if (brands.some(b => b.brand === 'Microsoft Edge')) {
+            return 'edge';
+          }
+
+          if (brands.some(b => b.brand === 'Google Chrome')) {
+            return 'chrome';
+          }
+        }
+
+        const ua = navigator.userAgent;
+
+        if (/Edg\//.test(ua)) return 'edge';
+        if (/Chrome\//.test(ua)) return 'chrome';
+
+        return 'unknown';
+      }
+
+      const browser = await getBrowser();
+      const langs = browser === 'edge'
+        ? edgeLangs
+        : chromeLangs;
+
       langs.forEach(lang => addOption(lang[0], lang[0], selectLang));
 
       function handleSelectLang(langGroup) {
