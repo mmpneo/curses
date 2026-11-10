@@ -31,8 +31,10 @@ class Service_Sound implements IServiceInterface {
       try {
         const buffer = window.ApiClient.files.getFileBuffer(fileId);
         if (!buffer) return;
+        const audioBuffer = new ArrayBuffer(buffer.byteLength);
+        new Uint8Array(audioBuffer).set(buffer);
         this.#audioFiles[fileId] = await this.audioContext.decodeAudioData(
-          buffer.buffer.slice(0)
+          audioBuffer
         );
       } catch (error) {
         return;

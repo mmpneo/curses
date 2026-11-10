@@ -124,7 +124,9 @@ class Service_Files implements IServiceInterface {
       const metaIndex = filesMeta.findIndex((m) => m.id === id)!;
       const meta = filesMeta[metaIndex]!;
       const rawFile = window.ApiClient.document.fileArray.get(metaIndex);
-      const blob = new Blob([rawFile], { type: meta.type });
+      const fileBuffer = new ArrayBuffer(rawFile.byteLength);
+      new Uint8Array(fileBuffer).set(rawFile);
+      const blob = new Blob([fileBuffer], { type: meta.type });
       this.fileUrls[id] = URL.createObjectURL(blob);
 
       if (meta.type.startsWith("font/")) {
@@ -135,7 +137,7 @@ class Service_Files implements IServiceInterface {
         if (!this.ui.fontFamilies.includes(fontMeta.family))
           this.ui.fontFamilies.push(fontMeta.family);
 
-        new FontFace(fontMeta.family, rawFile, fontMeta).load().then(font => {
+        new FontFace(fontMeta.family, fileBuffer, fontMeta).load().then(font => {
           document.fonts.add(font);
         });
       }
